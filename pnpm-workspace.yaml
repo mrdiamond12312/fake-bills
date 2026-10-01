@@ -1,3 +1,6 @@
+# Flat node_modules so the api route's runtime createRequire('satori'/'@resvg/resvg-js')
+# resolves and gets bundled on Vercel (pnpm's default symlinked layout hides them).
+nodeLinker: hoisted
 allowBuilds:
   core-js: false
   core-js-pure: false

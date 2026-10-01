@@ -6,5 +6,10 @@
     "env": {
       "ENABLE_FILE_SYSTEM_API": "1"
     }
+  },
+  "functions": {
+    "api/bills/render.js": {
+      "includeFiles": "node_modules/{satori,@shuding,css-background-parser,css-box-shadow,css-to-react-native,css-color-keywords,emoji-regex,escape-html,linebreak,parse-css-color,postcss-value-parser,yoga-wasm-web,base64-js,@resvg}/**"
+    }
   }
 }

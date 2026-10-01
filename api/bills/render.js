@@ -34,9 +34,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/utils.js
+// node_modules/@umijs/preset-umi/dist/features/apiRoute/utils.js
 var require_utils = __commonJS({
-  "node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/utils.js"(exports2, module2) {
+  "node_modules/@umijs/preset-umi/dist/features/apiRoute/utils.js"(exports2, module2) {
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
@@ -108,9 +108,9 @@ var require_utils = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/request.js
+// node_modules/@umijs/preset-umi/dist/features/apiRoute/request.js
 var require_request = __commonJS({
-  "node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/request.js"(exports2, module2) {
+  "node_modules/@umijs/preset-umi/dist/features/apiRoute/request.js"(exports2, module2) {
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
@@ -276,9 +276,9 @@ var require_request = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/response.js
+// node_modules/@umijs/preset-umi/dist/features/apiRoute/response.js
 var require_response = __commonJS({
-  "node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/response.js"(exports2, module2) {
+  "node_modules/@umijs/preset-umi/dist/features/apiRoute/response.js"(exports2, module2) {
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
     var __getOwnPropNames2 = Object.getOwnPropertyNames;
@@ -341,9 +341,9 @@ var require_response = __commonJS({
   }
 });
 
-// node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/index.js
+// node_modules/@umijs/preset-umi/dist/features/apiRoute/index.js
 var require_apiRoute = __commonJS({
-  "node_modules/.pnpm/@umijs+preset-umi@4.7.22_@types+node@26.6.3_@types+react@18.3.31_jiti@1.21.7_lightningc_78c59947b9ce7c7d8401327cd78b8b58/node_modules/@umijs/preset-umi/dist/features/apiRoute/index.js"(exports2, module2) {
+  "node_modules/@umijs/preset-umi/dist/features/apiRoute/index.js"(exports2, module2) {
     var __create2 = Object.create;
     var __defProp2 = Object.defineProperty;
     var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
