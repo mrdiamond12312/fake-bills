@@ -1,6 +1,8 @@
 /**
- * Compact minimart slip in Arial: bold title, "date|MSCH|NV" line, Mặt hàng/SL/KM/T.Tiền
- * table, TỔNG TIỀN, QR on the left with the e-invoice note beside it, barcode.
+ * Compact minimart slip in Arial: logo, big store-location line, "date|MSCH|NV" line,
+ * bilingual Mặt hàng/giá · Description header, "qty x price" item lines with the amount
+ * below, TỔNG CỘNG VND block, pre-tax/VAT split, QR beside the e-invoice note, barcode.
+ * Sections are split by dotted printed rules.
  */
 import { Flex } from 'antd';
 import React from 'react';
@@ -9,18 +11,21 @@ import { FONT_ID } from '@/components/Bills/fonts';
 import { formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
 import {
   Cells,
+  CharLine,
   KeyValue,
   Logo,
   PrintImage,
-  RuleLine,
   Text,
   Wordmark,
 } from '@/components/Bills/shared/Print';
 import type { TBillTemplate, TBillTemplateProps } from '@/components/Bills/types';
 import { PAPER_WIDTH } from '@/const/bill';
 
+/** The printer's dotted rule between sections. */
+const Divider: React.FC = () => <CharLine char="." className="my-0.5" />;
+
 const WinMart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) => {
-  const { store, transaction, display } = data;
+  const { store, transaction, display, tax } = data;
   const s = font.size;
 
   return (
@@ -30,53 +35,87 @@ const WinMart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t })
         fallback={<Wordmark text={store.name} size={s * 2.4} letterSpacing={0} />}
       />
       <Flex vertical align="center">
-        <Text align="center" bold size={s * 1.3}>
-          {t('receipt.bill').toUpperCase()}
+        <Text align="center" size={s * 1.6}>
+          {(store.address ?? '').toUpperCase()}
         </Text>
         <Text align="center">{`${formatDateTime(transaction.dateTime, 'DD/MM/YYYY HH:mm')}|MSCH:${
           store.branch ?? ''
         }|NV:${transaction.cashier ?? ''}`}</Text>
         <Text align="center">{`PTT:${transaction.invoiceNo ?? ''}`}</Text>
-        <Text align="center" italic>{`${t('receipt.taxAuthorityCode')}: ${
+        <Text align="center">{`${t('receipt.taxAuthorityCode')}: ${
           transaction.lookupCode || codes.barcodeValue.slice(0, 14)
         }`}</Text>
       </Flex>
+
       <Cells
-        className="mt-3"
+        className="mt-2"
         cells={[
           { text: t('receipt.itemPrice'), flex: 3 },
-          { text: t('receipt.qty'), flex: 1, align: 'center' },
-          { text: t('receipt.promo'), flex: 1, align: 'center' },
+          { text: t('receipt.qty'), flex: 1, align: 'right' },
+        ]}
+      />
+      <Cells
+        cells={[
+          { text: t('receipt.descriptionBilingual'), flex: 3 },
           { text: t('receipt.amountShort'), flex: 2, align: 'right' },
         ]}
       />
+      <Divider />
       {totals.lines.map((line) => (
-        <Flex vertical key={line.index} className="mt-1">
+        <Flex vertical key={line.index}>
           <Text>{line.title}</Text>
           <Cells
             cells={[
-              { text: formatMoney(line.unitPrice), flex: 3 },
-              { text: line.quantity, flex: 1, align: 'center' },
-              { text: line.discount ? formatMoney(line.discount) : '', flex: 1, align: 'center' },
-              { text: formatMoney(line.lineTotal), flex: 2, align: 'right' },
+              { text: `${line.quantity} x ${formatMoney(line.unitPrice)}`, flex: 3 },
+              { text: line.quantity, flex: 1, align: 'right' },
             ]}
           />
+          {line.discount ? (
+            <KeyValue label={t('receipt.promo')} value={`-${formatMoney(line.discount)}`} />
+          ) : null}
+          <Text align="right">{formatMoney(line.lineTotal)}</Text>
+          <Divider />
         </Flex>
       ))}
-      <RuleLine dashed />
+
+      <KeyValue
+        label={t('receipt.totalVnd').toUpperCase()}
+        value={formatMoney(totals.grandTotal)}
+        bold
+      />
+      <KeyValue label={t('receipt.quantity')} value={totals.totalQuantity} />
+      <KeyValue
+        label={transaction.paymentMethod || t('receipt.cash')}
+        value={formatMoney(totals.amountPaid)}
+      />
+      {totals.change ? (
+        <KeyValue label={t('receipt.change')} value={formatMoney(totals.change)} />
+      ) : null}
+      <Divider />
+
+      <Text>{`${t('receipt.netValue')}:`}</Text>
       <Cells
         cells={[
-          { text: t('receipt.totalAmount').toUpperCase(), flex: 3, bold: true },
-          { text: '', flex: 1 },
-          { text: formatMoney(totals.totalDiscount), flex: 1, align: 'center' },
-          { text: formatMoney(totals.grandTotal), flex: 2, align: 'right', bold: true },
+          { text: '1', width: s * 1.5 },
+          {
+            text: t('receipt.vatRateOf', {
+              rate: Number(tax.vatRate).toFixed(2),
+              base: formatMoney(totals.preTaxAmount),
+            }),
+            flex: 3,
+          },
+          { text: formatMoney(totals.preTaxAmount), flex: 2, align: 'right' },
         ]}
       />
-      <KeyValue
-        label={t('receipt.vatInRate', { rate: data.tax.vatRate })}
-        value={formatMoney(totals.vatAmount)}
-      />
-      <RuleLine dashed />
+      <Text align="right">{formatMoney(totals.vatAmount)}</Text>
+      {transaction.customerName ? (
+        <Flex vertical>
+          <Divider />
+          <Text>{`${t('receipt.customer')} ${transaction.customerName}`}</Text>
+        </Flex>
+      ) : null}
+      <Divider />
+
       <Flex gap={8} align="flex-start">
         {display.showQr !== false ? (
           <Flex vertical className="shrink-0">
@@ -101,7 +140,7 @@ const WinMart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t })
 export const winMartTemplate: TBillTemplate = {
   id: 'winmart',
   name: 'WinMart / Bách Hóa Xanh layout',
-  description: 'Compact minimart slip, discount column, QR + e-invoice note side by side',
+  description: 'Minimart slip, bilingual header, qty × price lines, pre-tax/VAT split, QR + note',
   printerStyle: 'Arial / Helvetica',
   component: WinMart,
   fontId: FONT_ID.arimo,
@@ -110,10 +149,14 @@ export const winMartTemplate: TBillTemplate = {
   catalogAccounts: ['winmart', 'bach hoa xanh', 'bhx'],
   fields: [
     'store.branch',
+    'store.address',
     'store.hotline',
     'transaction.invoiceNo',
     'transaction.cashier',
     'transaction.lookupCode',
+    'transaction.paymentMethod',
+    'transaction.amountPaid',
+    'transaction.customerName',
     'item.discount',
     'footerNote',
   ],
@@ -121,6 +164,8 @@ export const winMartTemplate: TBillTemplate = {
     store: {
       name: 'HạnhPhúc',
       branch: '1664',
+      /** Printed as the big location line under the logo */
+      address: 'Bàu Cát Tân Bình',
       hotline: '024 0000 0000',
       /** Default logo image src for this template; empty → text wordmark */
       logoUrl: '',
@@ -130,6 +175,7 @@ export const winMartTemplate: TBillTemplate = {
     transaction: {
       invoiceNo: '166401250803265',
       cashier: '09043572',
+      paymentMethod: 'VietQR',
     },
     footerNote:
       'Quét QR để xuất hóa đơn hoặc truy cập hoadon.example.com trong 60 phút. Xin từ chối chịu trách nhiệm nếu nhập thông tin sai.',

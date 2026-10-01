@@ -117,4 +117,7 @@ export const receiptLocale = {
   'receipt.totalQtyTotal': 'Tổng số/Tổng cộng',
   'receipt.totalDiscountShort': 'Tổng chiết khấu',
   'receipt.dateTimeLine': 'Ngày: {date} - Giờ: {time}',
+  'receipt.descriptionBilingual': 'Description',
+  'receipt.totalVnd': 'Tổng cộng VND',
+  'receipt.vatRateOf': '{rate} % của {base}',
 };

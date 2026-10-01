@@ -116,4 +116,7 @@ export const receiptLocale = {
   'receipt.totalQtyTotal': 'Qty/Total',
   'receipt.totalDiscountShort': 'Total discount',
   'receipt.dateTimeLine': 'Date: {date} - Time: {time}',
+  'receipt.descriptionBilingual': 'Description',
+  'receipt.totalVnd': 'Total VND',
+  'receipt.vatRateOf': '{rate} % of {base}',
 };

@@ -24,7 +24,9 @@ export const justifyOf = (align: TAlign = 'left') =>
   align === 'center' ? 'center' : align === 'right' ? 'flex-end' : 'flex-start';
 
 export const Spacer: React.FC<{ size?: number }> = ({ size = 8 }) => (
-  <Flex className="w-full" style={{ height: size }} />
+  // AntD hides an empty Flex (`.ant-flex:empty { display: none }`), so force it back on;
+  // otherwise the gap only shows in the satori render.
+  <Flex className="w-full" style={{ display: 'flex', height: size, flexShrink: 0 }} />
 );
 
 export type TTextProps = {

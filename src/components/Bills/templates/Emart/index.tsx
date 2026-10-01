@@ -10,17 +10,20 @@ import { FONT_ID } from '@/components/Bills/fonts';
 import { formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
 import {
   Cells,
+  CharLine,
   KeyValue,
   Logo,
   PrintImage,
   PrintScale,
-  RuleLine,
   Spacer,
   Text,
   Wordmark,
 } from '@/components/Bills/shared/Print';
 import type { TBillTemplate, TBillTemplateProps } from '@/components/Bills/types';
 import { PAPER_WIDTH } from '@/const/bill';
+
+/** Every Emart divider is the same printed "- - -" row; a 1px dashed border reads as solid. */
+const Divider: React.FC = () => <CharLine char="- " className="my-0.5" />;
 
 const Emart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) => {
   const { store, transaction, display, tax } = data;
@@ -52,7 +55,7 @@ const Emart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) =
         transaction.dateTime,
         'DD-MM-YYYY HH:mm',
       )}  POS:${transaction.posNo ?? ''}`}</Text>
-      <RuleLine dashed />
+      <Divider />
       <Cells
         cells={[
           { text: t('receipt.productNameLong'), flex: 3 },
@@ -61,7 +64,7 @@ const Emart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) =
           { text: t('receipt.money'), flex: 2, align: 'right' },
         ]}
       />
-      <RuleLine dashed />
+      <Divider />
       {totals.lines.map((line) => (
         <Flex vertical key={line.index}>
           <Text>{`${String(line.index + 1).padStart(
@@ -78,7 +81,7 @@ const Emart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) =
           />
         </Flex>
       ))}
-      <RuleLine dashed />
+      <Divider />
       <KeyValue label={t('receipt.subtotal')} value={formatMoney(totals.grossAmount)} />
       <Flex justify="space-between">
         <PrintScale fontSize={s}>
@@ -88,31 +91,31 @@ const Emart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) =
           <Text>{formatMoney(totals.grandTotal)}</Text>
         </PrintScale>
       </Flex>
-      <RuleLine />
+      <Divider />
       <KeyValue
         label={transaction.paymentMethod || t('receipt.cash')}
         value={formatMoney(totals.amountPaid)}
       />
       <KeyValue label={t('receipt.change')} value={formatMoney(totals.change)} />
-      <RuleLine />
+      <Divider />
       <KeyValue label={t('receipt.taxable')} value={formatMoney(totals.preTaxAmount)} />
       <KeyValue label={t('receipt.vatAmount')} value={formatMoney(totals.vatAmount)} />
-      <RuleLine />
+      <Divider />
       <KeyValue label={t('receipt.totalTax')} value={formatMoney(totals.vatAmount)} />
       <KeyValue label={vatCode} value={`(${formatMoney(totals.vatAmount)})`} />
-      <Spacer size={8} />
+      <Divider />
       <Text align="center">{t('receipt.pointSave')}</Text>
       <KeyValue label={`${t('receipt.cardNo')}:`} value={transaction.memberCode ?? ''} />
       <KeyValue
         label={`${t('receipt.cardHolder')}:`}
         value={(transaction.customerName ?? '').toUpperCase()}
       />
-      <RuleLine dashed />
+      <Divider />
       <Text>{`${t('receipt.totalItems')} : ${totals.totalQuantity}`}</Text>
       <Text>{`NO:${transaction.posNo ?? ''} ${t('receipt.cashier')}:${
         transaction.cashier ?? ''
       }`}</Text>
-      <Spacer size={8} />
+      <Divider />
       <Text>{data.footerNote ?? ''}</Text>
       {display.showBarcode !== false ? (
         <Flex vertical align="center" className="mt-2">
@@ -159,7 +162,7 @@ export const emartTemplate: TBillTemplate = {
     store: {
       name: 'benthanh',
       branch: 'Bến Thành Mart Gò Vấp',
-      address: '100 Phan Văn Trị, P5, Q Gò Vấp, TPHCM',
+      address: '12 Đường Số 9, P5, Q Gò Vấp, TPHCM',
       phone: '(028) 300 00000',
       taxCode: '0100000005',
       slogan: 'Hoạt động từ :7h30 - 22h30',
@@ -168,12 +171,12 @@ export const emartTemplate: TBillTemplate = {
       showLogo: true,
     },
     transaction: {
-      invoiceNo: '01001',
-      posNo: '0026-0188',
-      cashier: '2200057(Nguyen Thu Tuyet)',
+      invoiceNo: '02003',
+      posNo: '0031-0042',
+      cashier: '1100023(Le Minh Khoa)',
       paymentMethod: 'Thẻ tín dụng:VISA',
-      memberCode: '8479********6748',
-      customerName: 'Tạ Phương Thảo',
+      memberCode: '1234********5678',
+      customerName: 'Nguyễn Văn An',
     },
     footerNote:
       'LƯU Ý: Phiếu này chỉ có giá trị xuất\nhóa đơn trong ngày\nXIN CAM ON QUY KHACH\nHẸN GẶP LẠI',
