@@ -47,8 +47,9 @@ build
 
 
 # api route output
+# `api/` is NOT ignored: Umi generates Vercel serverless functions there and
+# Vercel's native builder serves them from the deployed source tree.
 .output
-api/
 
 # cypress
 cypress/screenshots

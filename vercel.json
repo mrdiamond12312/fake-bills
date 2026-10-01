@@ -1,4 +1,7 @@
 {
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "outputDirectory": "dist",
   "build": {
     "env": {
       "ENABLE_FILE_SYSTEM_API": "1"
