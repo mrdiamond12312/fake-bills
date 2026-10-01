@@ -8,11 +8,23 @@
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-neutral-3 rounded;
+    background: transparent;
   }
 
+  /* Translucent thumb so it contrasts over either light or dark backgrounds. */
   ::-webkit-scrollbar-thumb {
-    @apply bg-neutral-5 rounded-lg;
+    background-color: rgb(128 128 128 / 40%);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(128 128 128 / 60%);
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(128 128 128 / 40%) transparent;
   }
 }
 
@@ -30,6 +42,44 @@
     flex-direction: column;
     gap: 1.6rem;
     padding-block: 2.4rem;
+  }
+
+  /* Subtle fade+rise played once when an element mounts. */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.6rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(0.6rem);
+    }
+  }
+
+  .fade-in {
+    animation: fade-in 0.3s ease both;
+  }
+
+  .fade-out {
+    animation: fade-out 0.2s ease both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade-in,
+    .fade-out {
+      animation: none;
+    }
   }
 
   /* Subtle hover elevation for interactive cards. */
@@ -54,5 +104,14 @@
       linear-gradient(-45deg, transparent 75%, theme('colors.neutral-4') 75%);
     background-size: 20px 20px;
     background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  }
+
+  /* Dark checkerboard (ThemeProvider sets data-theme on <html>). */
+  [data-theme='dark'] .checkerboard {
+    background-color: #1f1f1f;
+    background-image: linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+      linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+      linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
   }
 }

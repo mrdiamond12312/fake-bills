@@ -12,6 +12,7 @@ import {
   Tag,
   Typography,
   Upload,
+  theme,
 } from 'antd';
 import React, { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
@@ -86,6 +87,7 @@ export const StoreInfo: React.FC<{ control: any; fields: TBillField[] }> = ({
   fields,
 }) => {
   const { formatMessage } = useIntl();
+  const { token } = theme.useToken();
   const { setValue } = useFormContext();
   const showLogo = useWatch({ control, name: 'store.showLogo' });
   const logoUrl: string | undefined = useWatch({ control, name: 'store.logoUrl' });
@@ -136,7 +138,11 @@ export const StoreInfo: React.FC<{ control: any; fields: TBillField[] }> = ({
             <Flex
               align="center"
               justify="center"
-              className="h-16 w-24 shrink-0 overflow-hidden rounded border border-solid border-neutral-4 bg-neutral-1"
+              className="h-16 w-24 shrink-0 overflow-hidden rounded border border-solid"
+              style={{
+                backgroundColor: token.colorBgContainer,
+                borderColor: token.colorBorder,
+              }}
             >
               {logoUrl ? (
                 <Image
@@ -147,7 +153,7 @@ export const StoreInfo: React.FC<{ control: any; fields: TBillField[] }> = ({
                   onError={() => setLogoError(true)}
                 />
               ) : (
-                <span className="text-body-3-regular text-neutral-6">
+                <span className="text-body-3-regular" style={{ color: token.colorTextTertiary }}>
                   {formatMessage({ id: 'bills.form.store.logo.none', defaultMessage: 'Wordmark' })}
                 </span>
               )}

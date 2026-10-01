@@ -1,14 +1,21 @@
 import { history, useIntl } from '@umijs/max';
-import { Button, Flex, Result } from 'antd';
+import { Button, Flex, Result, theme } from 'antd';
 import React from 'react';
 
 import { PATH_ADMIN_BILLS_CREATE } from '@/const/path';
 
 const NoFoundPage: React.FC = () => {
   const { formatMessage } = useIntl();
+  const { token } = theme.useToken();
   return (
-    <Flex align="center" justify="center" className="min-h-screen bg-neutral-2">
+    <Flex
+      align="center"
+      justify="center"
+      className="min-h-screen"
+      style={{ backgroundColor: token.colorBgLayout }}
+    >
       <Result
+        className="fade-in"
         status="404"
         title="404"
         subTitle={formatMessage({

@@ -1,6 +1,7 @@
 import {
   ClearOutlined,
   CloudDownloadOutlined,
+  CloudUploadOutlined,
   DownloadOutlined,
   LinkOutlined,
   ShareAltOutlined,
@@ -15,12 +16,14 @@ import {
   Flex,
   Form,
   Grid,
+  Modal,
   Popconfirm,
   Row,
   Segmented,
   Slider,
   Space,
   Tooltip,
+  theme,
 } from 'antd';
 import classNames from 'classnames';
 import React, { useState } from 'react';
@@ -45,7 +48,9 @@ const AdminBillCreate: React.FC = () => {
   const t = (id: string, defaultMessage: string) => formatMessage({ id, defaultMessage });
   const [previewMode, setPreviewMode] = useState<TPreviewMode>('flat');
   const [zoom, setZoom] = useState(1);
+  const [catalogOpen, setCatalogOpen] = useState(false);
   const screens = Grid.useBreakpoint();
+  const { token } = theme.useToken();
 
   const {
     methods,
@@ -110,7 +115,18 @@ const AdminBillCreate: React.FC = () => {
                       onResetStore={handleResetStore}
                     />
                   </Card>
-                  <Card title={t('bills.section.products', 'Products')}>
+                  <Card
+                    title={t('bills.section.products', 'Products')}
+                    extra={
+                      <Button
+                        size="small"
+                        icon={<CloudUploadOutlined />}
+                        onClick={() => setCatalogOpen(true)}
+                      >
+                        {t('bills.section.catalog.open', 'Import catalog')}
+                      </Button>
+                    }
+                  >
                     <ProductList control={control} template={view.template} />
                   </Card>
                   <Card title={t('bills.section.tax', 'Tax & totals')}>
@@ -118,7 +134,7 @@ const AdminBillCreate: React.FC = () => {
                   </Card>
                   <Collapse
                     defaultActiveKey={['store']}
-                    className="bg-neutral-1"
+                    style={{ backgroundColor: token.colorBgContainer }}
                     items={[
                       {
                         key: 'store',
@@ -137,11 +153,6 @@ const AdminBillCreate: React.FC = () => {
                           <DisplayOptions control={control} onShuffle={handleShuffleCodes} />
                         ),
                       },
-                      {
-                        key: 'catalog',
-                        label: t('bills.section.catalog', 'Product catalog (.xlsx import)'),
-                        children: <CatalogImport />,
-                      },
                     ]}
                   />
                 </Flex>
@@ -151,8 +162,18 @@ const AdminBillCreate: React.FC = () => {
             <Col span={24} xl={12}>
               {/* Sticky under the 5.6rem header: 1.6rem above + 1.6rem below, body scrolls inside */}
               <Card
-                className="xl:sticky xl:top-[calc(5.6rem+1.6rem)] xl:flex xl:max-h-[calc(100vh-5.6rem-3.2rem)] xl:flex-col [&_.ant-card-head-title]:flex-none [&_.ant-card-head-wrapper]:flex-wrap [&_.ant-card-head-wrapper]:gap-2 [&_.ant-card-head-wrapper]:py-2"
-                styles={{ body: { flex: 1, minHeight: 0, overflow: 'auto' } }}
+                className="xl:sticky xl:top-[calc(5.6rem+1.6rem)] xl:flex xl:h-[calc(100vh-5.6rem-3.2rem)] xl:flex-col [&_.ant-card-head-title]:flex-none [&_.ant-card-head-wrapper]:flex-wrap [&_.ant-card-head-wrapper]:gap-2 [&_.ant-card-head-wrapper]:py-2 [&_.ant-card-head]:relative [&_.ant-card-head]:z-[15]"
+                styles={{
+                  // paddingTop 0 so the sticky bar sits flush at the top (bar adds its own py)
+                  body: {
+                    flex: 1,
+                    minHeight: 0,
+                    overflow: 'auto',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    paddingTop: 0,
+                  },
+                }}
                 title={
                   <Segmented<TPreviewMode>
                     value={previewMode}
@@ -186,8 +207,16 @@ const AdminBillCreate: React.FC = () => {
                 }
               >
                 {previewMode === 'flat' ? (
-                  <Flex align="center" gap={8}>
-                    <span className="text-body-3-medium text-neutral-7">
+                  <Flex
+                    align="center"
+                    gap={8}
+                    className="sticky top-0 z-10 py-3"
+                    style={{ backgroundColor: token.colorBgContainer }}
+                  >
+                    <span
+                      className="text-body-3-medium"
+                      style={{ color: token.colorTextSecondary }}
+                    >
                       {t('bills.preview.zoom', 'Zoom')}
                     </span>
                     <Slider
@@ -204,6 +233,9 @@ const AdminBillCreate: React.FC = () => {
                 <div
                   className={classNames(
                     'checkerboard rounded-lg',
+                    // Flat: fill the remaining card height and scroll the bill within.
+                    previewMode === 'flat' && 'min-h-0 flex-1 overflow-auto',
+                    // Projector: this stays mounted off-screen as the texture source.
                     previewMode === 'projector' && 'fixed -left-[10000px] top-0',
                   )}
                 >
@@ -217,16 +249,29 @@ const AdminBillCreate: React.FC = () => {
                   />
                 </div>
                 {previewMode === 'projector' ? (
-                  <Projector
-                    sourceRef={previewRef}
-                    version={bill}
-                    fileName={`${bill.templateId}-${bill.display.seed}`}
-                  />
+                  <div className="flex min-h-0 flex-1 flex-col">
+                    <Projector
+                      sourceRef={previewRef}
+                      version={bill}
+                      fileName={`${bill.templateId}-${bill.display.seed}`}
+                    />
+                  </div>
                 ) : null}
               </Card>
             </Col>
           </Row>
         </div>
+
+        <Modal
+          open={catalogOpen}
+          onCancel={() => setCatalogOpen(false)}
+          footer={null}
+          width={640}
+          title={t('bills.section.catalog', 'Product catalog (.xlsx import)')}
+          destroyOnClose
+        >
+          <CatalogImport />
+        </Modal>
       </FormProvider>
     </PageContainer>
   );

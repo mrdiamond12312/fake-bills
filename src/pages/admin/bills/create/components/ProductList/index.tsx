@@ -1,6 +1,6 @@
 import { DeleteOutlined, NumberOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Empty, Flex, Row, Tooltip, Typography } from 'antd';
+import { Button, Col, Empty, Flex, Row, Tooltip, Typography, theme } from 'antd';
 import React, { useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 
@@ -31,6 +31,7 @@ type TProductRow = {
 const ProductRow: React.FC<TProductRow> = ({ control, index, template, onRemove, catalog }) => {
   const { fields } = template;
   const { formatMessage } = useIntl();
+  const { token } = theme.useToken();
   const { setValue } = useFormContext();
   const [titleTerm, setTitleTerm] = useState('');
   const [barcodeTerm, setBarcodeTerm] = useState('');
@@ -50,13 +51,19 @@ const ProductRow: React.FC<TProductRow> = ({ control, index, template, onRemove,
   };
 
   const label = (id: string, defaultMessage: string) => (
-    <span className="text-body-3-medium text-neutral-7">
+    <span className="text-body-3-medium" style={{ color: token.colorTextSecondary }}>
       {formatMessage({ id, defaultMessage })}
     </span>
   );
 
   return (
-    <div className="rounded-lg border border-solid border-neutral-3 bg-neutral-2 p-3">
+    <div
+      className="rounded-lg border border-solid p-3"
+      style={{
+        backgroundColor: token.colorFillQuaternary,
+        borderColor: token.colorBorderSecondary,
+      }}
+    >
       <Row gutter={[8, 4]} align="bottom">
         <Col span={24} lg={14}>
           {label('bills.form.item.title', 'Product title')}

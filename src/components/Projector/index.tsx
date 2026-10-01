@@ -1,8 +1,26 @@
-import { CameraOutlined, ExperimentOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  CameraOutlined,
+  ExperimentOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { OrbitControls } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Flex, Row, Segmented, Slider, Spin, Switch, Tooltip, Typography } from 'antd';
+import {
+  Button,
+  Col,
+  Flex,
+  Row,
+  Segmented,
+  Slider,
+  Spin,
+  Switch,
+  Tooltip,
+  Typography,
+  theme,
+} from 'antd';
+import classNames from 'classnames';
 import { toCanvas } from 'html-to-image';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
@@ -54,13 +72,54 @@ type TProjector = {
 
 const Projector: React.FC<TProjector> = ({ sourceRef, version, fileName = 'bill-projected' }) => {
   const { formatMessage } = useIntl();
+  const { token } = theme.useToken();
   const t = (id: string, defaultMessage: string) => formatMessage({ id, defaultMessage });
   const [settings, setSettings] = useState<TProjectorSettings>(DEFAULT_PROJECTOR_SETTINGS);
   const [texture, setTexture] = useState<THREE.CanvasTexture>();
   const [aspect, setAspect] = useState(2.5);
   const [capturing, setCapturing] = useState(false);
+  // settingsMounted keeps the panel in the DOM; settingsClosing plays the exit fade
+  // before unmounting, so there's a fade-out and not just an instant removal.
+  const [settingsMounted, setSettingsMounted] = useState(false);
+  const [settingsClosing, setSettingsClosing] = useState(false);
+  const settingsOpen = settingsMounted && !settingsClosing;
+  const toggleSettings = () => {
+    if (settingsOpen) {
+      setSettingsClosing(true);
+      setTimeout(() => {
+        setSettingsMounted(false);
+        setSettingsClosing(false);
+      }, 200);
+    } else {
+      setSettingsClosing(false);
+      setSettingsMounted(true);
+    }
+  };
   const glRef = useRef<HTMLCanvasElement>();
   const noiseUrl = useMemo(makeNoiseDataUrl, []);
+
+  // Measure the space the canvas can take (root minus the sticky action row) so the
+  // react-three-fiber Canvas always gets a definite height. Floored so it never collapses.
+  const CANVAS_MIN_HEIGHT = 400;
+  const rootRef = useRef<HTMLDivElement>(null);
+  const actionRef = useRef<HTMLDivElement>(null);
+  const [canvasHeight, setCanvasHeight] = useState(CANVAS_MIN_HEIGHT);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const measure = () => {
+      const rootH = root.clientHeight;
+      const actionH = actionRef.current?.offsetHeight ?? 0;
+      const gap = 12; // Flex vertical gap={12}
+      setCanvasHeight(Math.max(CANVAS_MIN_HEIGHT, rootH - actionH - gap));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(root);
+    if (actionRef.current) observer.observe(actionRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   const update = <K extends keyof TProjectorSettings>(key: K, value: TProjectorSettings[K]) =>
     setSettings((previous) => ({ ...previous, [key]: value }));
@@ -143,10 +202,46 @@ const Projector: React.FC<TProjector> = ({ sourceRef, version, fileName = 'bill-
   );
 
   return (
-    <Flex vertical gap={12}>
+    <Flex ref={rootRef} vertical gap={12} className="h-full">
+      <Flex
+        ref={actionRef}
+        gap={8}
+        wrap
+        className="sticky top-0 z-10 py-3"
+        style={{ backgroundColor: token.colorBgContainer }}
+      >
+        <Button
+          type="primary"
+          icon={<CameraOutlined />}
+          loading={capturing}
+          onClick={handleCapture}
+        >
+          {t('projector.capture', 'Capture PNG')}
+        </Button>
+        <Button
+          icon={<ExperimentOutlined />}
+          onClick={() => setSettings((previous) => randomProjectorSettings(previous))}
+        >
+          {t('projector.randomize', 'Randomize')}
+        </Button>
+        <Button icon={<ReloadOutlined />} onClick={() => setSettings(DEFAULT_PROJECTOR_SETTINGS)}>
+          {t('projector.reset', 'Reset')}
+        </Button>
+        <Button
+          type={settingsOpen ? 'primary' : 'default'}
+          ghost={settingsOpen}
+          icon={<SettingOutlined />}
+          onClick={toggleSettings}
+          aria-pressed={settingsOpen}
+          className="ml-auto"
+        >
+          {t('projector.settings', 'Settings')}
+        </Button>
+      </Flex>
+
       <div
         className="relative w-full overflow-hidden rounded-lg"
-        style={{ height: 620, background: settings.background }}
+        style={{ height: canvasHeight, background: settings.background }}
       >
         {texture ? (
           <Canvas
@@ -196,27 +291,14 @@ const Projector: React.FC<TProjector> = ({ sourceRef, version, fileName = 'bill-
             style={{ backgroundImage: `url(${noiseUrl})`, opacity: settings.noise }}
           />
         ) : null}
-      </div>
 
-      <Flex gap={8} wrap>
-        <Button
-          type="primary"
-          icon={<CameraOutlined />}
-          loading={capturing}
-          onClick={handleCapture}
+        {/* Spin / shadow quick toggles overlaid in the canvas corner. */}
+        <Flex
+          gap={6}
+          align="center"
+          className="absolute right-3 top-3 z-10 rounded-lg px-3 py-1 shadow-sm"
+          style={{ backgroundColor: token.colorBgElevated }}
         >
-          {t('projector.capture', 'Capture PNG')}
-        </Button>
-        <Button
-          icon={<ExperimentOutlined />}
-          onClick={() => setSettings((previous) => randomProjectorSettings(previous))}
-        >
-          {t('projector.randomize', 'Randomize')}
-        </Button>
-        <Button icon={<ReloadOutlined />} onClick={() => setSettings(DEFAULT_PROJECTOR_SETTINGS)}>
-          {t('projector.reset', 'Reset')}
-        </Button>
-        <Flex gap={6} align="center" className="ml-auto">
           <Typography.Text className="text-body-3-medium">
             {t('projector.spin', 'Spin')}
           </Typography.Text>
@@ -234,44 +316,55 @@ const Projector: React.FC<TProjector> = ({ sourceRef, version, fileName = 'bill-
             onChange={(value) => update('shadow', value)}
           />
         </Flex>
-      </Flex>
 
-      <Row gutter={[16, 0]}>
-        {slider('curl', t('projector.curl', 'Curl'), 0, 1)}
-        {slider('cup', t('projector.cup', 'Cup'), -0.6, 0.6)}
-        {slider('wave', t('projector.wave', 'Wave'), 0, 1)}
-        {slider('waveFrequency', t('projector.waveFrequency', 'Wave frequency'), 0.5, 8, 0.1)}
-        {slider('tiltX', t('projector.tiltX', 'Tilt X°'), -70, 70, 1)}
-        {slider('tiltY', t('projector.tiltY', 'Tilt Y°'), -70, 70, 1)}
-        {slider('roll', t('projector.roll', 'Roll°'), -180, 180, 1)}
-        {slider('zoom', t('projector.zoom', 'Zoom'), 0.5, 2.5)}
-        {slider('lightIntensity', t('projector.light', 'Light'), 0.2, 3.5)}
-        {slider('lightAngle', t('projector.lightAngle', 'Light angle°'), 0, 360, 1)}
-        {slider('blur', t('projector.blur', 'Camera blur'), 0, 4, 0.1)}
-        {slider('noise', t('projector.noise', 'Sensor noise'), 0, 0.5)}
-        <Col span={24} md={16}>
-          <Typography.Text className="text-body-3-medium">
-            {t('projector.background', 'Background')}
-          </Typography.Text>
-          <Flex gap={8} align="center" className="mt-1">
-            <Segmented
-              value={settings.background}
-              onChange={(value) => update('background', String(value))}
-              options={BACKGROUND_PRESETS}
-            />
-            <Tooltip title={t('projector.curlDirection', 'Curl direction')}>
-              <Segmented
-                value={settings.curlDirection}
-                onChange={(value) => update('curlDirection', value as 1 | -1)}
-                options={[
-                  { value: 1, label: '◠' },
-                  { value: -1, label: '◡' },
-                ]}
-              />
-            </Tooltip>
-          </Flex>
-        </Col>
-      </Row>
+        {/* Settings overlay the bottom of the canvas instead of pushing layout below it. */}
+        {settingsMounted ? (
+          <div
+            className={classNames(
+              'absolute inset-x-0 bottom-0 max-h-[60%] overflow-auto rounded-b-lg p-3 shadow-lg',
+              settingsClosing ? 'fade-out' : 'fade-in',
+            )}
+            style={{ backgroundColor: token.colorBgElevated }}
+          >
+            <Row gutter={[16, 0]}>
+              {slider('curl', t('projector.curl', 'Curl'), 0, 1)}
+              {slider('cup', t('projector.cup', 'Cup'), -0.6, 0.6)}
+              {slider('wave', t('projector.wave', 'Wave'), 0, 1)}
+              {slider('waveFrequency', t('projector.waveFrequency', 'Wave frequency'), 0.5, 8, 0.1)}
+              {slider('tiltX', t('projector.tiltX', 'Tilt X°'), -70, 70, 1)}
+              {slider('tiltY', t('projector.tiltY', 'Tilt Y°'), -70, 70, 1)}
+              {slider('roll', t('projector.roll', 'Roll°'), -180, 180, 1)}
+              {slider('zoom', t('projector.zoom', 'Zoom'), 0.5, 2.5)}
+              {slider('lightIntensity', t('projector.light', 'Light'), 0.2, 3.5)}
+              {slider('lightAngle', t('projector.lightAngle', 'Light angle°'), 0, 360, 1)}
+              {slider('blur', t('projector.blur', 'Camera blur'), 0, 4, 0.1)}
+              {slider('noise', t('projector.noise', 'Sensor noise'), 0, 0.5)}
+              <Col span={24} md={16}>
+                <Typography.Text className="text-body-3-medium">
+                  {t('projector.background', 'Background')}
+                </Typography.Text>
+                <Flex gap={8} align="center" className="mt-1">
+                  <Segmented
+                    value={settings.background}
+                    onChange={(value) => update('background', String(value))}
+                    options={BACKGROUND_PRESETS}
+                  />
+                  <Tooltip title={t('projector.curlDirection', 'Curl direction')}>
+                    <Segmented
+                      value={settings.curlDirection}
+                      onChange={(value) => update('curlDirection', value as 1 | -1)}
+                      options={[
+                        { value: 1, label: '◠' },
+                        { value: -1, label: '◡' },
+                      ]}
+                    />
+                  </Tooltip>
+                </Flex>
+              </Col>
+            </Row>
+          </div>
+        ) : null}
+      </div>
     </Flex>
   );
 };

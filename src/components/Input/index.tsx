@@ -1,5 +1,5 @@
 import { Input } from 'antd';
-import { InputProps } from 'antd/lib';
+import type { InputProps } from 'antd';
 import classNames from 'classnames';
 import React, { Fragment } from 'react';
 import { Controller } from 'react-hook-form';

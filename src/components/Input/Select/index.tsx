@@ -1,4 +1,5 @@
-import { Select as AntdSelect, SelectProps } from 'antd/lib';
+import { Select as AntdSelect } from 'antd';
+import type { SelectProps } from 'antd';
 import { Fragment } from 'react/jsx-runtime';
 import { Controller } from 'react-hook-form';
 

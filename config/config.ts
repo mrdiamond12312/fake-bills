@@ -25,9 +25,9 @@ export default defineConfig({
    * @doc https://umijs.org/docs/max/i18n
    */
   locale: {
-    default: 'en-US',
+    default: 'vi-VN',
     antd: true,
-    baseNavigator: true,
+    baseNavigator: false,
   },
   antd: {},
   request: {},

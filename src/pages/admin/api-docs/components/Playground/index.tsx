@@ -1,6 +1,18 @@
 import { SendOutlined, SyncOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Alert, Button, Col, Descriptions, Empty, Flex, Form, Image, Row, Segmented } from 'antd';
+import {
+  Alert,
+  Button,
+  Col,
+  Descriptions,
+  Empty,
+  Flex,
+  Form,
+  Image,
+  Row,
+  Segmented,
+  theme,
+} from 'antd';
 import React from 'react';
 import { Controller } from 'react-hook-form';
 
@@ -29,6 +41,7 @@ export const Playground: React.FC<TPlayground> = ({
   onShuffleSeed,
 }) => {
   const { formatMessage } = useIntl();
+  const { token } = theme.useToken();
   const t = (id: string, defaultMessage: string) => formatMessage({ id, defaultMessage });
 
   return (
@@ -168,7 +181,12 @@ export const Playground: React.FC<TPlayground> = ({
             ) : null}
           </Flex>
         ) : (
-          <Flex align="center" justify="center" className="h-full min-h-60 rounded-lg bg-neutral-2">
+          <Flex
+            align="center"
+            justify="center"
+            className="h-full min-h-60 rounded-lg"
+            style={{ backgroundColor: token.colorFillQuaternary }}
+          >
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={t(

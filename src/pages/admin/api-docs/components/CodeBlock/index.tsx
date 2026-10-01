@@ -13,7 +13,7 @@ export const CodeBlock: React.FC<TCodeBlock> = ({ code, label, onCopy }) => {
   const { formatMessage } = useIntl();
 
   return (
-    <Flex vertical className="overflow-hidden rounded-lg border border-neutral-3 bg-neutral-9">
+    <Flex vertical className="overflow-hidden rounded-lg border border-neutral-8 bg-neutral-9">
       <Flex align="center" justify="space-between" className="border-b border-neutral-8 px-3 py-1">
         {label ? <Tag bordered={false}>{label}</Tag> : <span />}
         <Tooltip title={formatMessage({ id: 'apiDocs.copy', defaultMessage: 'Copy' })}>
