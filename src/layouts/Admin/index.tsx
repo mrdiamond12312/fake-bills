@@ -34,9 +34,9 @@ const AdminLayout: React.FC = () => {
           zIndex: 30,
         }}
       >
-        <Flex align="center" gap={8} className="h-14 px-5">
-          <span className="text-heading-5 text-teal-4">▤</span>
-          <Typography.Text strong className="text-body-1-semibold">
+        <Flex align="center" gap={10} className="h-14 border-b border-neutral-3 px-5">
+          <span className="text-heading-5 leading-none text-teal-4">▤</span>
+          <Typography.Text strong className="text-body-1-semibold text-neutral-9">
             Receipt Lab
           </Typography.Text>
         </Flex>
@@ -68,11 +68,17 @@ const AdminLayout: React.FC = () => {
         <div className="fixed inset-0 z-[25] bg-neutral-10/40" onClick={() => setCollapsed(true)} />
       ) : null}
       <Layout>
-        <Header className="sticky top-0 z-20 flex h-14 items-center justify-end bg-neutral-1/80 px-6 shadow-sm backdrop-blur">
-          <SelectLang />
+        {/* Bar spans edge-to-edge; inner content aligns to the page container. */}
+        <Header className="sticky top-0 z-20 h-14 border-b border-neutral-3 bg-neutral-1/80 !px-0 backdrop-blur">
+          <Flex align="center" justify="end" className="container-page h-full">
+            <SelectLang />
+          </Flex>
         </Header>
+        {/* One container wraps every page: title header and content align to it. */}
         <Content className="bg-neutral-2">
-          <Outlet />
+          <div className="container-page pt-6">
+            <Outlet />
+          </div>
         </Content>
       </Layout>
     </Layout>

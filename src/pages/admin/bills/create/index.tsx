@@ -97,132 +97,136 @@ const AdminBillCreate: React.FC = () => {
     >
       <BillFontFaces />
       <FormProvider {...methods}>
-        <Row gutter={[16, 16]}>
-          <Col span={24} xl={12}>
-            {/* Inline labels squeeze the inputs on phones; stack them below `sm` */}
-            <Form layout={screens.sm ? 'horizontal' : 'vertical'} component={false}>
-              <Flex vertical gap={16}>
-                <Card>
-                  <TemplatePicker
-                    control={control}
-                    onChange={handleTemplateChange}
-                    onResetStore={handleResetStore}
-                  />
-                </Card>
-                <Card title={t('bills.section.products', 'Products')}>
-                  <ProductList control={control} template={view.template} />
-                </Card>
-                <Card title={t('bills.section.tax', 'Tax & totals')}>
-                  <TaxInfo control={control} totals={totals} />
-                </Card>
-                <Collapse
-                  defaultActiveKey={['store']}
-                  className="bg-neutral-1"
-                  items={[
-                    {
-                      key: 'store',
-                      label: t('bills.section.store', 'Store info'),
-                      children: <StoreInfo control={control} fields={fields} />,
-                    },
-                    {
-                      key: 'transaction',
-                      label: t('bills.section.transaction', 'Transaction'),
-                      children: <TransactionInfo control={control} fields={fields} />,
-                    },
-                    {
-                      key: 'display',
-                      label: t('bills.section.display', 'Print & watermark'),
-                      children: <DisplayOptions control={control} onShuffle={handleShuffleCodes} />,
-                    },
-                    {
-                      key: 'catalog',
-                      label: t('bills.section.catalog', 'Product catalog (.xlsx import)'),
-                      children: <CatalogImport />,
-                    },
-                  ]}
-                />
-              </Flex>
-            </Form>
-          </Col>
-
-          <Col span={24} xl={12}>
-            {/* Sticky in the space under the h-14 header: 1rem above + 1rem below, body scrolls inside */}
-            <Card
-              className="xl:sticky xl:top-[calc(3.5rem+1rem)] xl:flex xl:max-h-[calc(100vh-3.5rem-2rem)] xl:flex-col [&_.ant-card-head-title]:flex-none [&_.ant-card-head-wrapper]:flex-wrap [&_.ant-card-head-wrapper]:gap-2 [&_.ant-card-head-wrapper]:py-2"
-              styles={{ body: { flex: 1, minHeight: 0, overflow: 'auto' } }}
-              title={
-                <Segmented<TPreviewMode>
-                  value={previewMode}
-                  onChange={setPreviewMode}
-                  options={[
-                    { value: 'flat', label: t('bills.preview.flat', 'Preview') },
-                    { value: 'projector', label: t('bills.preview.projector', 'Projector') },
-                  ]}
-                />
-              }
-              extra={
-                <Space wrap>
-                  <Button
-                    icon={<DownloadOutlined />}
-                    loading={isExporting}
-                    onClick={handleExportPng}
-                  >
-                    PNG
-                  </Button>
-                  <Button
-                    icon={<CloudDownloadOutlined />}
-                    loading={isRendering}
-                    onClick={handleRenderViaApi}
-                  >
-                    {t('bills.actions.renderApi', 'Via API')}
-                  </Button>
-                  <Tooltip title={t('bills.actions.copyApiUrl', 'Copy API URL')}>
-                    <Button icon={<LinkOutlined />} onClick={handleCopyApiUrl} />
-                  </Tooltip>
-                </Space>
-              }
-            >
-              {previewMode === 'flat' ? (
-                <Flex align="center" gap={8}>
-                  <span className="text-body-3-medium text-neutral-7">
-                    {t('bills.preview.zoom', 'Zoom')}
-                  </span>
-                  <Slider
-                    className="flex-1"
-                    min={0.4}
-                    max={1.6}
-                    step={0.05}
-                    value={zoom}
-                    onChange={setZoom}
+        <div className="page-stack">
+          <Row gutter={[16, 16]}>
+            <Col span={24} xl={12}>
+              {/* Inline labels squeeze the inputs on phones; stack them below `sm` */}
+              <Form layout={screens.sm ? 'horizontal' : 'vertical'} component={false}>
+                <Flex vertical gap={16}>
+                  <Card>
+                    <TemplatePicker
+                      control={control}
+                      onChange={handleTemplateChange}
+                      onResetStore={handleResetStore}
+                    />
+                  </Card>
+                  <Card title={t('bills.section.products', 'Products')}>
+                    <ProductList control={control} template={view.template} />
+                  </Card>
+                  <Card title={t('bills.section.tax', 'Tax & totals')}>
+                    <TaxInfo control={control} totals={totals} />
+                  </Card>
+                  <Collapse
+                    defaultActiveKey={['store']}
+                    className="bg-neutral-1"
+                    items={[
+                      {
+                        key: 'store',
+                        label: t('bills.section.store', 'Store info'),
+                        children: <StoreInfo control={control} fields={fields} />,
+                      },
+                      {
+                        key: 'transaction',
+                        label: t('bills.section.transaction', 'Transaction'),
+                        children: <TransactionInfo control={control} fields={fields} />,
+                      },
+                      {
+                        key: 'display',
+                        label: t('bills.section.display', 'Print & watermark'),
+                        children: (
+                          <DisplayOptions control={control} onShuffle={handleShuffleCodes} />
+                        ),
+                      },
+                      {
+                        key: 'catalog',
+                        label: t('bills.section.catalog', 'Product catalog (.xlsx import)'),
+                        children: <CatalogImport />,
+                      },
+                    ]}
                   />
                 </Flex>
-              ) : null}
-              {/* The flat bill stays mounted (off-screen in projector mode) — it is the projector's texture source */}
-              <div
-                className={classNames(
-                  'checkerboard rounded-lg',
-                  previewMode === 'projector' && 'fixed -left-[10000px] top-0',
-                )}
+              </Form>
+            </Col>
+
+            <Col span={24} xl={12}>
+              {/* Sticky under the 5.6rem header: 1.6rem above + 1.6rem below, body scrolls inside */}
+              <Card
+                className="xl:sticky xl:top-[calc(5.6rem+1.6rem)] xl:flex xl:max-h-[calc(100vh-5.6rem-3.2rem)] xl:flex-col [&_.ant-card-head-title]:flex-none [&_.ant-card-head-wrapper]:flex-wrap [&_.ant-card-head-wrapper]:gap-2 [&_.ant-card-head-wrapper]:py-2"
+                styles={{ body: { flex: 1, minHeight: 0, overflow: 'auto' } }}
+                title={
+                  <Segmented<TPreviewMode>
+                    value={previewMode}
+                    onChange={setPreviewMode}
+                    options={[
+                      { value: 'flat', label: t('bills.preview.flat', 'Preview') },
+                      { value: 'projector', label: t('bills.preview.projector', 'Projector') },
+                    ]}
+                  />
+                }
+                extra={
+                  <Space wrap>
+                    <Button
+                      icon={<DownloadOutlined />}
+                      loading={isExporting}
+                      onClick={handleExportPng}
+                    >
+                      PNG
+                    </Button>
+                    <Button
+                      icon={<CloudDownloadOutlined />}
+                      loading={isRendering}
+                      onClick={handleRenderViaApi}
+                    >
+                      {t('bills.actions.renderApi', 'Via API')}
+                    </Button>
+                    <Tooltip title={t('bills.actions.copyApiUrl', 'Copy API URL')}>
+                      <Button icon={<LinkOutlined />} onClick={handleCopyApiUrl} />
+                    </Tooltip>
+                  </Space>
+                }
               >
-                <BillPreview
-                  ref={previewRef}
-                  bill={bill}
-                  totals={totals}
-                  codes={codes}
-                  paperWidth={view.paperWidth}
-                  zoom={previewMode === 'flat' ? zoom : 1}
-                />
-              </div>
-              {previewMode === 'projector' ? (
-                <Projector
-                  sourceRef={previewRef}
-                  version={bill}
-                  fileName={`${bill.templateId}-${bill.display.seed}`}
-                />
-              ) : null}
-            </Card>
-          </Col>
-        </Row>
+                {previewMode === 'flat' ? (
+                  <Flex align="center" gap={8}>
+                    <span className="text-body-3-medium text-neutral-7">
+                      {t('bills.preview.zoom', 'Zoom')}
+                    </span>
+                    <Slider
+                      className="flex-1"
+                      min={0.4}
+                      max={1.6}
+                      step={0.05}
+                      value={zoom}
+                      onChange={setZoom}
+                    />
+                  </Flex>
+                ) : null}
+                {/* The flat bill stays mounted (off-screen in projector mode) — it is the projector's texture source */}
+                <div
+                  className={classNames(
+                    'checkerboard rounded-lg',
+                    previewMode === 'projector' && 'fixed -left-[10000px] top-0',
+                  )}
+                >
+                  <BillPreview
+                    ref={previewRef}
+                    bill={bill}
+                    totals={totals}
+                    codes={codes}
+                    paperWidth={view.paperWidth}
+                    zoom={previewMode === 'flat' ? zoom : 1}
+                  />
+                </div>
+                {previewMode === 'projector' ? (
+                  <Projector
+                    sourceRef={previewRef}
+                    version={bill}
+                    fileName={`${bill.templateId}-${bill.display.seed}`}
+                  />
+                ) : null}
+              </Card>
+            </Col>
+          </Row>
+        </div>
       </FormProvider>
     </PageContainer>
   );

@@ -17,6 +17,31 @@
 }
 
 @layer components {
+  /* Centred container: fixed target width capped at 92% for an 8% viewport gutter. */
+  .container-page {
+    width: 136rem;
+    max-width: 92%;
+    margin-inline: auto;
+  }
+
+  /* Vertical rhythm between stacked page sections. */
+  .page-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    padding-block: 2.4rem;
+  }
+
+  /* Subtle hover elevation for interactive cards. */
+  .card-interactive {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      border-color: theme('colors.teal-2');
+      box-shadow: 0 0.2rem 0.8rem rgb(0 13 11 / 8%);
+    }
+  }
+
   .custom-antd-form-small .ant-form-item {
     @apply mb-3;
   }

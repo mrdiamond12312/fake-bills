@@ -1,3 +1,49 @@
+// Restate scales in rem on a 10px root so sizes stay pixel-identical (p-3 = 1.2rem = 12px).
+const pxToRem = (px) => `${px / 10}rem`;
+
+// Tailwind's default spacing scale in px, restated for the 10px root.
+const SPACING_PX = {
+  px: 1,
+  0: 0,
+  0.5: 2,
+  1: 4,
+  1.5: 6,
+  2: 8,
+  2.5: 10,
+  3: 12,
+  3.5: 14,
+  4: 16,
+  5: 20,
+  6: 24,
+  7: 28,
+  8: 32,
+  9: 36,
+  10: 40,
+  11: 44,
+  12: 48,
+  14: 56,
+  16: 64,
+  20: 80,
+  24: 96,
+  28: 112,
+  32: 128,
+  36: 144,
+  40: 160,
+  44: 176,
+  48: 192,
+  52: 208,
+  56: 224,
+  60: 240,
+  64: 256,
+  72: 288,
+  80: 320,
+  96: 384,
+};
+
+const spacing = Object.fromEntries(
+  Object.entries(SPACING_PX).map(([key, px]) => [key, px === 0 ? '0px' : pxToRem(px)]),
+);
+
 module.exports = {
   content: [
     './src/pages/**/*.tsx',
@@ -8,6 +54,19 @@ module.exports = {
   safelist: ['animate-pulse'],
   theme: {
     extend: {
+      spacing,
+      borderRadius: {
+        none: '0px',
+        sm: pxToRem(2),
+        DEFAULT: pxToRem(4),
+        default: pxToRem(4),
+        md: pxToRem(6),
+        lg: pxToRem(8),
+        xl: pxToRem(12),
+        '2xl': pxToRem(16),
+        '3xl': pxToRem(24),
+        full: '9999px',
+      },
       fontFamily: {
         sans: [
           'Be Vietnam Pro',
@@ -119,37 +178,33 @@ module.exports = {
         'error-10': '#42090C',
       },
       margin: {
-        3.75: '15px',
+        3.75: pxToRem(15),
       },
       width: {
-        75: '300px',
+        75: pxToRem(300),
       },
       fontSize: {
-        sm: ['14px', '20px'],
-        base: ['16px', '24px'],
-        error: ['12px', '20px'],
+        sm: [pxToRem(14), pxToRem(20)],
+        base: [pxToRem(16), pxToRem(24)],
+        error: [pxToRem(12), pxToRem(20)],
         // Display
-        'heading-1': ['40px', { lineHeight: '48px', fontWeight: '600' }],
-        'heading-2': ['34px', { lineHeight: '40px', fontWeight: '600' }],
-        'heading-3': ['28px', { lineHeight: '36px', fontWeight: '600' }],
-        'heading-4': ['24px', { lineHeight: '32px', fontWeight: '600' }],
-        'heading-5': ['20px', { lineHeight: '28px', fontWeight: '600' }],
+        'heading-1': [pxToRem(40), { lineHeight: pxToRem(48), fontWeight: '600' }],
+        'heading-2': [pxToRem(34), { lineHeight: pxToRem(40), fontWeight: '600' }],
+        'heading-3': [pxToRem(28), { lineHeight: pxToRem(36), fontWeight: '600' }],
+        'heading-4': [pxToRem(24), { lineHeight: pxToRem(32), fontWeight: '600' }],
+        'heading-5': [pxToRem(20), { lineHeight: pxToRem(28), fontWeight: '600' }],
 
-        'body-1-semibold': ['16px', { lineHeight: '24px', fontWeight: '600' }],
-        'body-1-medium': ['16px', { lineHeight: '24px', fontWeight: '500' }],
-        'body-1-regular': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+        'body-1-semibold': [pxToRem(16), { lineHeight: pxToRem(24), fontWeight: '600' }],
+        'body-1-medium': [pxToRem(16), { lineHeight: pxToRem(24), fontWeight: '500' }],
+        'body-1-regular': [pxToRem(16), { lineHeight: pxToRem(24), fontWeight: '400' }],
 
-        'body-2-semibold': ['14px', { lineHeight: '22px', fontWeight: '600' }],
-        'body-2-medium': ['14px', { lineHeight: '22px', fontWeight: '500' }],
-        'body-2-regular': ['14px', { lineHeight: '22px', fontWeight: '400' }],
+        'body-2-semibold': [pxToRem(14), { lineHeight: pxToRem(22), fontWeight: '600' }],
+        'body-2-medium': [pxToRem(14), { lineHeight: pxToRem(22), fontWeight: '500' }],
+        'body-2-regular': [pxToRem(14), { lineHeight: pxToRem(22), fontWeight: '400' }],
 
-        'body-3-semibold': ['12px', { lineHeight: '20px', fontWeight: '600' }],
-        'body-3-medium': ['12px', { lineHeight: '20px', fontWeight: '500' }],
-        'body-3-regular': ['12px', { lineHeight: '20px', fontWeight: '400' }],
-
-        borderRadius: {
-          default: '4px',
-        },
+        'body-3-semibold': [pxToRem(12), { lineHeight: pxToRem(20), fontWeight: '600' }],
+        'body-3-medium': [pxToRem(12), { lineHeight: pxToRem(20), fontWeight: '500' }],
+        'body-3-regular': [pxToRem(12), { lineHeight: pxToRem(20), fontWeight: '400' }],
       },
     },
   },

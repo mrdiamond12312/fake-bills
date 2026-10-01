@@ -63,7 +63,7 @@ const AdminApiDocs: React.FC = () => {
       subTitle={t('apiDocs.subtitle', 'Render the same sample receipts over HTTP')}
       className="w-full"
     >
-      <Flex vertical gap={16}>
+      <div className="page-stack">
         <Card title={t('apiDocs.section.overview', 'Overview')}>
           <Flex vertical gap={12}>
             <Typography.Paragraph className="!mb-0">
@@ -194,7 +194,7 @@ const AdminApiDocs: React.FC = () => {
             <CodeBlock label="GET" code={examples.catalogUrl} onCopy={handleCopy} />
           </Flex>
         </Card>
-      </Flex>
+      </div>
     </PageContainer>
   );
 };

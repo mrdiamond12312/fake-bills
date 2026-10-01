@@ -1,3 +1,8 @@
+// 10px rem base (1rem = 10px); Tailwind's scale and AntD's px2rem both target this root.
+html {
+  font-size: 62.5%;
+}
+
 html,
 body,
 #root {
@@ -9,4 +14,11 @@ body,
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+// Keep keyboard focus visible on plain interactive elements (accessibility).
+:where(a, button):focus-visible {
+  outline: 2px solid var(--teal-focus, #286e6c);
+  outline-offset: 2px;
+  border-radius: 0.4rem;
 }
