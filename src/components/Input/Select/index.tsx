@@ -1,6 +1,6 @@
-import { Select as AntdSelect } from 'antd';
 import type { SelectProps } from 'antd';
-import { Fragment } from 'react/jsx-runtime';
+import { Select as AntdSelect } from 'antd';
+import React, { Fragment } from 'react';
 import { Controller } from 'react-hook-form';
 
 import ValidateError from '@/components/Input/ValidateError';

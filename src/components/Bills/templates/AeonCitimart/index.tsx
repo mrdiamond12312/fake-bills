@@ -12,8 +12,8 @@ import {
   stripDiacritics as vn,
 } from '@/components/Bills/helpers/calc';
 import {
-  CharLine,
   Cells,
+  CharLine,
   KeyValue,
   Logo,
   PrintImage,

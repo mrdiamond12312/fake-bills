@@ -9,8 +9,8 @@ import React from 'react';
 import { FONT_ID } from '@/components/Bills/fonts';
 import { formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
 import {
-  CharLine,
   Cells,
+  CharLine,
   KeyValue,
   Logo,
   PrintImage,

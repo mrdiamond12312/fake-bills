@@ -9,7 +9,7 @@
   },
   "functions": {
     "api/bills/render.js": {
-      "includeFiles": "node_modules/{satori,@shuding,@resvg,yoga-wasm-web,css-*,emoji-regex,escape-html,linebreak,unicode-trie,tiny-inflate,base64-js,parse-css-color,hex-rgb,postcss-value-parser,camelize,color-name,string.prototype.codepointat,fflate,bwip-js}/**"
+      "includeFiles": "{public/fonts/**,node_modules/{satori,@shuding,@resvg,yoga-wasm-web,css-*,emoji-regex,escape-html,linebreak,unicode-trie,tiny-inflate,base64-js,parse-css-color,hex-rgb,postcss-value-parser,camelize,color-name,string.prototype.codepointat,fflate,bwip-js}/**}"
     }
   }
 }

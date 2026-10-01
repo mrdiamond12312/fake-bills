@@ -268,7 +268,7 @@ const AdminBillCreate: React.FC = () => {
           footer={null}
           width={640}
           title={t('bills.section.catalog', 'Product catalog (.xlsx import)')}
-          destroyOnClose
+          destroyOnHidden
         >
           <CatalogImport />
         </Modal>

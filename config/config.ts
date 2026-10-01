@@ -42,6 +42,9 @@ export default defineConfig({
   },
   mfsu: {
     strategy: 'normal',
+    // With pnpm `nodeLinker: hoisted`, MFSU mis-resolves umi's own dev-client helper
+    // (".//<abs>/@umijs/utils/compiled/strip-ansi … does not exist in container" → blank page).
+    exclude: ['@umijs/utils'],
   },
   esbuildMinifyIIFE: true,
   tailwindcss: {},

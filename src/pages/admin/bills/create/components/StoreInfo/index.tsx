@@ -10,9 +10,9 @@ import {
   Row,
   Segmented,
   Tag,
+  theme,
   Typography,
   Upload,
-  theme,
 } from 'antd';
 import React, { useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';

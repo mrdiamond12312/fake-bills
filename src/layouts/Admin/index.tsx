@@ -4,7 +4,6 @@ import { Button, Flex, Grid, Layout, Menu, Typography, theme } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 
-
 import SelectTheme from '@/components/SelectTheme';
 import { useThemeSettings } from '@/components/ThemeProvider';
 import { PATH_ADMIN_API_DOCS, PATH_ADMIN_BILLS_CREATE } from '@/const/path';
@@ -119,7 +118,7 @@ const AdminLayout: React.FC = () => {
         {/* One container wraps every page: title header and content align to it. */}
         <Content style={{ backgroundColor: token.colorBgLayout }}>
           <div className="container-page pt-6">
-            {/* Fade the page out then in on route change (mode="wait"). */}
+            {/* Cross-fade pages on route change; popLayout lifts the exiting page out of flow. */}
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={pathname}

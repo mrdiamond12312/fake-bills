@@ -16,9 +16,9 @@ import {
   Slider,
   Spin,
   Switch,
+  theme,
   Tooltip,
   Typography,
-  theme,
 } from 'antd';
 import classNames from 'classnames';
 import { toCanvas } from 'html-to-image';
