@@ -1,0 +1,41 @@
+/**
+ * Built-in sample catalog (served by /api/catalog/products). Generic products with
+ * placeholder barcodes; import your own .xlsx from the admin page for real test sets.
+ */
+export const BUILT_IN_CATALOG: Omit<API.TCatalogProduct, 'id' | 'source'>[] = [
+  { title: 'Nước suối tinh khiết 500ml', barcode: '8930000000017', price: 7000, unit: 'Chai' },
+  { title: 'Nước suối tinh khiết 1.5L', barcode: '8930000000024', price: 12000, unit: 'Chai' },
+  { title: 'Mì ăn liền vị tôm chua cay 75g', barcode: '8930000000031', price: 4500, unit: 'Gói' },
+  { title: 'Mì trộn vị bò sa tế 85g', barcode: '8930000000048', price: 8500, unit: 'Gói' },
+  { title: 'Cháo ăn liền vị gà 50g', barcode: '8930000000055', price: 4000, unit: 'Gói' },
+  {
+    title: 'Sữa tươi tiệt trùng có đường 180ml',
+    barcode: '8930000000062',
+    price: 8000,
+    unit: 'Hộp',
+  },
+  { title: 'Sữa chua uống vị dâu 110ml', barcode: '8930000000079', price: 6500, unit: 'Chai' },
+  { title: 'Trà xanh không độ 455ml', barcode: '8930000000086', price: 10000, unit: 'Chai' },
+  { title: 'Nước ngọt có ga lon 320ml', barcode: '8930000000093', price: 13000, unit: 'Lon' },
+  { title: 'Cà phê sữa đá lon 235ml', barcode: '8930000000109', price: 15000, unit: 'Lon' },
+  { title: 'Bánh quy bơ hộp thiếc 454g', barcode: '8930000000116', price: 119000, unit: 'Hộp' },
+  { title: 'Bánh xốp phô mai 150g', barcode: '8930000000123', price: 25000, unit: 'Gói' },
+  { title: 'Bánh bông lan kem sữa 45g', barcode: '8930000000130', price: 19000, unit: 'Gói' },
+  { title: 'Kẹo trái cây hỗn hợp 98g', barcode: '8930000000147', price: 35000, unit: 'Gói' },
+  { title: 'Snack khoai tây vị tự nhiên 52g', barcode: '8930000000154', price: 12000, unit: 'Gói' },
+  { title: 'Gạo thơm túi 5kg', barcode: '8930000000161', price: 139000, unit: 'Túi' },
+  { title: 'Dầu ăn đậu nành 1L', barcode: '8930000000178', price: 52000, unit: 'Chai' },
+  { title: 'Nước mắm cá cơm 500ml', barcode: '8930000000185', price: 38000, unit: 'Chai' },
+  { title: 'Nước tương đậu nành 250ml', barcode: '8930000000192', price: 15500, unit: 'Chai' },
+  { title: 'Đường tinh luyện 1kg', barcode: '8930000000208', price: 27000, unit: 'Gói' },
+  { title: 'Trứng gà hộp 10 quả', barcode: '8930000000215', price: 32000, unit: 'Hộp' },
+  { title: 'Thịt heo xay 300g', barcode: '8930000000222', price: 45900, unit: 'Khay' },
+  { title: 'Rau muống 500g', barcode: '8930000000239', price: 11900, unit: 'Bó' },
+  { title: 'Chuối già nam mỹ 1kg', barcode: '8930000000246', price: 29900, unit: 'Kg' },
+  { title: 'Táo đỏ nhập khẩu 1kg', barcode: '8930000000253', price: 79000, unit: 'Kg' },
+  { title: 'Kem đánh răng bạc hà 180g', barcode: '8930000000260', price: 36000, unit: 'Tuýp' },
+  { title: 'Dầu gội sạch gàu 650ml', barcode: '8930000000277', price: 159000, unit: 'Chai' },
+  { title: 'Nước rửa chén hương chanh 750g', barcode: '8930000000284', price: 29500, unit: 'Chai' },
+  { title: 'Khăn giấy rút 180 tờ', barcode: '8930000000291', price: 18000, unit: 'Gói' },
+  { title: 'Túi giấy nhỏ', barcode: '8930000000307', price: 2000, unit: 'Cái' },
+];

@@ -1,0 +1,12 @@
+allowBuilds:
+  core-js: false
+  core-js-pure: false
+  es5-ext: false
+  esbuild: true
+  '@parcel/watcher': true
+  cypress: false
+  '@swc/core': true
+  unrs-resolver: true
+overrides:
+  '@types/react': ^18.3.0
+  '@types/react-dom': ^18.3.0
