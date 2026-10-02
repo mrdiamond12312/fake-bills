@@ -41,3 +41,27 @@ export const randomEan13 = (seed = randomSeed()) => {
     .reduce((acc, char, index) => acc + Number(char) * (index % 2 === 0 ? 1 : 3), 0);
   return body + ((10 - (sum % 10)) % 10);
 };
+
+/**
+ * Fills a user-typed mask: `#` digit, `A` A–Z, `a` a–z, `*` letter or digit, `\x` literal x;
+ * anything else prints as typed. Empty mask → a generic 12-character ID.
+ */
+export const fillIdMask = (mask = '', seed = randomSeed()) => {
+  const random = createRandom(seed);
+  const pick = (charset: string) => charset[random.int(0, charset.length - 1)];
+  const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const DIGITS = '0123456789';
+  if (!mask.trim()) return random.alphanumeric(12);
+
+  let out = '';
+  for (let i = 0; i < mask.length; i++) {
+    const char = mask[i];
+    if (char === '\\' && i + 1 < mask.length) out += mask[++i];
+    else if (char === '#') out += pick(DIGITS);
+    else if (char === 'A') out += pick(UPPER);
+    else if (char === 'a') out += pick(UPPER.toLowerCase());
+    else if (char === '*') out += pick(UPPER + DIGITS);
+    else out += char;
+  }
+  return out;
+};

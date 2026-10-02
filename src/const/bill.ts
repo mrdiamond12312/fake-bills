@@ -22,4 +22,7 @@ export const WATERMARK_LIMITS = {
 
 export const BILL_RENDER_API = '/api/bills/render';
 
+/** templateId → invoice-number mask the user typed (see fillIdMask). */
+export const INVOICE_MASK_STORAGE_KEY = 'receipt-lab.invoice-masks';
+
 export const BILL_DRAFT_STORAGE_KEY = 'receipt-lab.bill-draft';

@@ -96,6 +96,11 @@ export const billsLocale = {
   'bills.form.transaction.cashier': 'Thu ngân',
   'bills.form.transaction.customerName': 'Tên khách hàng',
   'bills.form.transaction.dateTime': 'Ngày giờ',
+  'bills.form.invoiceMask.generate': 'Tạo theo mẫu',
+  'bills.form.invoiceMask.generateRandom': 'Tạo mã ngẫu nhiên',
+  'bills.form.invoiceMask.title': 'Mẫu mã cho template này',
+  'bills.form.invoiceMask.hint':
+    '# chữ số · A chữ hoa · a chữ thường · * chữ hoặc số · \\x giữ nguyên ký tự x. Để trống → mã ngẫu nhiên 12 ký tự.',
   'bills.form.transaction.invoiceNo': 'Số hóa đơn',
   'bills.form.transaction.lookupCode': 'Mã tra cứu (trống = ngẫu nhiên)',
   'bills.form.transaction.memberCode': 'Số thẻ thành viên',

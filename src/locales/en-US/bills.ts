@@ -95,6 +95,11 @@ export const billsLocale = {
   'bills.form.transaction.cashier': 'Cashier',
   'bills.form.transaction.customerName': 'Customer name',
   'bills.form.transaction.dateTime': 'Date & time',
+  'bills.form.invoiceMask.generate': 'Generate from mask',
+  'bills.form.invoiceMask.generateRandom': 'Generate a random ID',
+  'bills.form.invoiceMask.title': 'ID mask for this template',
+  'bills.form.invoiceMask.hint':
+    '# digit · A uppercase · a lowercase · * letter or digit · \\x literal x. Empty → random 12 characters.',
   'bills.form.transaction.invoiceNo': 'Invoice / receipt no.',
   'bills.form.transaction.lookupCode': 'Lookup code (empty = random)',
   'bills.form.transaction.memberCode': 'Member card no.',
