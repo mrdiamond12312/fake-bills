@@ -41,6 +41,7 @@ export const Aeon: TStory = { args: { templateId: 'aeon' } };
 export const AeonCitimart: TStory = { args: { templateId: 'aeon-citimart' } };
 export const Coopmart: TStory = { args: { templateId: 'coopmart' } };
 export const Emart: TStory = { args: { templateId: 'emart' } };
+export const LotteMart: TStory = { args: { templateId: 'lotte-mart' } };
 export const WinMart: TStory = { args: { templateId: 'winmart' } };
 export const FamilyMart: TStory = { args: { templateId: 'familymart' } };
 export const FarmersMarket: TStory = { args: { templateId: 'farmers-market' } };

@@ -139,7 +139,7 @@ export const familyMartTemplate: TBillTemplate = {
     transaction: {
       invoiceNo: '2026010340UhzgwedRhi',
       posNo: 'POS01',
-      cashier: 'Nguyễn Thị Diễm',
+      cashier: 'Nguyễn Thị B',
       paymentMethod: 'MOMO',
     },
     footerNote:

@@ -73,7 +73,18 @@ export const useBillForm = () => {
   const totals = useMemo(() => calculateTotals(bill), [bill]);
   const codes = useMemo(
     () => generateBillCodes(bill),
-    [bill.display.seed, bill.display.qrText, bill.display.barcodeText, bill.transaction.lookupCode],
+    // templates build their barcode number from the store/POS/ticket/date fields
+    [
+      bill.templateId,
+      bill.display.seed,
+      bill.display.qrText,
+      bill.display.barcodeText,
+      bill.transaction.lookupCode,
+      bill.transaction.dateTime,
+      bill.transaction.invoiceNo,
+      bill.transaction.posNo,
+      bill.store.branch,
+    ],
   );
   const view = useMemo(() => resolveBillView(bill), [bill]);
 

@@ -1,6 +1,6 @@
 # Receipt Lab
 
-Admin tool for composing **sample** Vietnamese retail receipts to test an OCR pipeline. Built on UmiJS Max + AntD + Tailwind, structured like `e-neighbor-frontend`.
+Admin tool for composing **sample** Vietnamese retail receipts to test an OCR pipeline. Built on UmiJS Max + AntD + Tailwind.
 
 Technical details (architecture, API, data formats, adding templates): see [REFERENCE.md](REFERENCE.md).
 
@@ -15,7 +15,7 @@ pnpm start            # http://localhost:8000/admin/bills/create
 
 ## What's in the composer
 
-- **Store template**: 9 layouts named after the store receipt they copy (`circle-k`, `go-tops`, `aeon`, `aeon-citimart`, `coopmart`, `emart`, `winmart`, `familymart`, `farmers-market`). Default printed store info is fictional; everything is editable, and each uses the font matched to that printer (Epson Font A/B-style mono, Courier-style, Arial, Times, condensed sans…), including the logo (upload or URL). The form only shows the fields the active template prints.
+- **Store template**: 10 layouts named after the store receipt they copy (`circle-k`, `go-tops`, `aeon`, `aeon-citimart`, `coopmart`, `emart`, `lotte-mart`, `winmart`, `familymart`, `farmers-market`). Default printed store info is fictional; everything is editable, and each uses the font matched to that printer (Epson Font A/B-style mono, Courier-style, Arial, Times, condensed sans…), including the logo (upload or URL). The form only shows the fields the active template prints.
 - **Products**: `+` adds a line. Title and barcode are search-selects over the catalog and also accept free text. Picking a title fills in its barcode, price and unit. Price and quantity are always shown; unit and discount appear when the template uses them.
 - **Receipt language**: Tiếng Việt / English for the printed labels (`src/locales/{vi-VN,en-US}/receipt.ts`). Store info, product names and the footer note print as typed. The admin UI follows the language selector in the header.
 - **Tax**: VAT defaults to 10%, with a choice of prices including or excluding VAT.

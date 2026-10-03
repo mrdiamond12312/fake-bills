@@ -58,7 +58,12 @@ const pad = (value: number) => String(value).padStart(2, '0');
 
 export const formatDateTime = (
   iso: string | undefined,
-  pattern: 'DD/MM/YYYY HH:mm' | 'DD/MM/YYYY HH:mm:ss' | 'YYYY-MM-DD HH:mm' | 'DD-MM-YYYY HH:mm',
+  pattern:
+    | 'DD/MM/YYYY HH:mm'
+    | 'DD/MM/YYYY HH:mm:ss'
+    | 'YYYY-MM-DD HH:mm'
+    | 'DD-MM-YYYY HH:mm'
+    | 'YYYYMMDDHHmmss',
 ) => {
   const date = iso ? new Date(iso) : new Date();
   const safe = Number.isNaN(date.getTime()) ? new Date() : date;
@@ -72,6 +77,10 @@ export const formatDateTime = (
   };
   return pattern.replace(/YYYY|MM|DD|HH|mm|ss/g, (token) => tokens[token]);
 };
+
+/** Last `length` digits of a field, zero-padded: ("0206-0119", 8) → "02060119". */
+export const digitsOf = (value = '', length: number) =>
+  value.replace(/\D/g, '').slice(-length).padStart(length, '0');
 
 /** Removes Vietnamese diacritics — many POS printers print unaccented text. */
 export const stripDiacritics = (text = '') =>

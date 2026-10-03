@@ -7,6 +7,7 @@ import React from 'react';
 
 import { FONT_ID } from '@/components/Bills/fonts';
 import {
+  digitsOf,
   formatDateTime,
   formatMoney,
   stripDiacritics as vn,
@@ -50,6 +51,7 @@ const Coopmart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }
           {T('receipt.bill').toUpperCase()}
         </Text>
         <Text align="center">{T('receipt.supermarketOrder')}</Text>
+        <Text align="center">{`${T('receipt.taxAuthorityCode')}: ${codes.taxAuthorityCode}`}</Text>
       </Flex>
       <Flex justify="space-between">
         <Text>{`${T('receipt.counter')}: ${transaction.posNo ?? ''}`}</Text>
@@ -131,6 +133,15 @@ export const coopmartTemplate: TBillTemplate = {
   fontSize: 14,
   paperWidth: PAPER_WIDTH.mm80 - 96,
   catalogAccounts: ['co.op', 'coop'],
+  // store + counter + YYMMDD + invoice no, e.g. 0012000126010110001
+  barcodeValue: ({ transaction }, random) => {
+    return [
+      `00${random.int(100, 999)}`,
+      digitsOf(transaction.posNo, 3),
+      formatDateTime(transaction.dateTime, 'YYYYMMDDHHmmss').slice(2, 8),
+      digitsOf(transaction.invoiceNo, 5),
+    ].join('');
+  },
   fields: [
     'store.branch',
     'store.address',
@@ -146,6 +157,7 @@ export const coopmartTemplate: TBillTemplate = {
     'transaction.amountPaid',
     'transaction.customerName',
     'transaction.memberCode',
+    'transaction.lookupCode',
     'item.barcode',
     'footerNote',
   ],
@@ -165,12 +177,12 @@ export const coopmartTemplate: TBillTemplate = {
       logoAlign: 'center',
     },
     transaction: {
-      invoiceNo: '77870',
-      posNo: '10',
-      cashier: '57033569-Dung',
+      invoiceNo: '10001',
+      posNo: '01',
+      cashier: '00000001-NVA',
       paymentMethod: 'MOMO',
-      memberCode: '4646426353656',
-      customerName: 'Mai Thị Hoàng',
+      memberCode: '1000000000001',
+      customerName: 'Nguyễn Văn A',
     },
     footerNote: 'Cam on Quy khach - Hen gap lai',
     tax: { vatRate: 8 },

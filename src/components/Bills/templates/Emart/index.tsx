@@ -7,7 +7,7 @@ import { Flex } from 'antd';
 import React from 'react';
 
 import { FONT_ID } from '@/components/Bills/fonts';
-import { formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
+import { digitsOf, formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
 import {
   Cells,
   CharLine,
@@ -142,6 +142,14 @@ export const emartTemplate: TBillTemplate = {
   fontSize: 16,
   paperWidth: PAPER_WIDTH.mm58 + 16,
   catalogAccounts: ['emart'],
+  // 0 + YYYYMMDD + invoice no + POS ("0001-0001"), e.g. 0202601010000100010001
+  barcodeValue: ({ transaction }) =>
+    [
+      '0',
+      formatDateTime(transaction.dateTime, 'YYYYMMDDHHmmss').slice(0, 8),
+      digitsOf(transaction.invoiceNo, 5),
+      digitsOf(transaction.posNo, 8),
+    ].join(''),
   fields: [
     'store.branch',
     'store.address',
@@ -171,12 +179,12 @@ export const emartTemplate: TBillTemplate = {
       showLogo: true,
     },
     transaction: {
-      invoiceNo: '02003',
-      posNo: '0031-0042',
-      cashier: '1100023(Le Minh Khoa)',
+      invoiceNo: '00001',
+      posNo: '0001-0001',
+      cashier: '0000001(Nguyen Van A)',
       paymentMethod: 'Thẻ tín dụng:VISA',
-      memberCode: '1234********5678',
-      customerName: 'Nguyễn Văn An',
+      memberCode: '1000********0001',
+      customerName: 'Nguyễn Văn A',
     },
     footerNote:
       'LƯU Ý: Phiếu này chỉ có giá trị xuất\nhóa đơn trong ngày\nXIN CAM ON QUY KHACH\nHẸN GẶP LẠI',

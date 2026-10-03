@@ -6,7 +6,7 @@ import { Flex } from 'antd';
 import React from 'react';
 
 import { FONT_ID } from '@/components/Bills/fonts';
-import { formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
+import { digitsOf, formatDateTime, formatMoney } from '@/components/Bills/helpers/calc';
 import {
   Cells,
   CharLine,
@@ -44,7 +44,8 @@ const GoTops: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) 
       {totals.lines.map((line) => (
         <Flex vertical key={line.index}>
           <Flex justify="space-between">
-            <Text flex={1}>{line.title.toUpperCase()}</Text>
+            {/* "+" marks the item description line */}
+            <Text flex={1}>{`+${line.title.toUpperCase()}`}</Text>
             <Text align="right" nowrap>
               {String(tax.vatRate)}
             </Text>
@@ -120,9 +121,16 @@ const GoTops: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) 
           <Text align="center">{t('receipt.scanQrInvoice')}</Text>
         </Flex>
       ) : null}
+      {display.showQr !== false ? (
+        <Flex vertical align="center" className="mt-2">
+          <PrintImage src={codes.qrDataUrl} width={s * 5} />
+          <Text align="center">{t('receipt.scanQrFanpage')}</Text>
+        </Flex>
+      ) : null}
       <Text align="center" className="mt-2">
         {data.footerNote ?? ''}
       </Text>
+      {/* receipt barcode, below the second QR: the last thing on the slip */}
       {display.showBarcode !== false ? (
         <Flex vertical align="center" className="mt-1">
           <PrintImage src={codes.barcodeDataUrl} width={Math.round(s * 18)} height={s * 2} />
@@ -143,6 +151,17 @@ export const goTopsTemplate: TBillTemplate = {
   fontSize: 16,
   paperWidth: PAPER_WIDTH.mm58,
   catalogAccounts: ['go!', 'mini go', 'tops'],
+  // 660000 + store + 0000 + POS + ticket + YYYYMMDDHHmmss, e.g. 660000120000001000000120260101120000
+  barcodeValue: ({ transaction }, random) => {
+    return [
+      '660000',
+      String(random.int(10, 99)),
+      '0000',
+      digitsOf(transaction.posNo, 3),
+      digitsOf(transaction.invoiceNo, 7),
+      formatDateTime(transaction.dateTime, 'YYYYMMDDHHmmss'),
+    ].join('');
+  },
   fields: [
     'store.legalName',
     'store.address',
@@ -174,12 +193,12 @@ export const goTopsTemplate: TBillTemplate = {
       logoWidth: 180,
     },
     transaction: {
-      invoiceNo: '029010875',
-      posNo: '029',
-      cashier: '120126',
+      invoiceNo: '001000001',
+      posNo: '001',
+      cashier: '100001',
       paymentMethod: 'CASH',
-      memberCode: '3101533****',
-      customerName: 'Trần Minh Anh',
+      memberCode: '1000000****',
+      customerName: 'Nguyễn Văn A',
     },
     footerNote:
       'Cám ơn Quý Khách !\nHẹn gặp lại!\nPhiếu tính tiền chỉ có giá trị xuất\nhóa đơn trong vòng 120 phút',

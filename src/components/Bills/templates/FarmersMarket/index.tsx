@@ -163,7 +163,7 @@ export const farmersMarketTemplate: TBillTemplate = {
       showLogo: true,
     },
     transaction: {
-      cashier: 'E6952 - Lý Khánh Phương',
+      cashier: 'E0001 - Nguyễn Văn A',
       paymentMethod: 'Cà thẻ',
       memberCode: 'C9999999',
     },

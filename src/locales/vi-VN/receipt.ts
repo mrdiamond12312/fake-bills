@@ -83,6 +83,15 @@ export const receiptLocale = {
   'receipt.scanQrInvoiceSide': 'Quét QR để xuất hóa đơn hoặc truy cập {site} trong 60 phút.',
   'receipt.scanQrVat':
     'Phiếu này có giá trị xuất hóa đơn GTGT trong vòng 02 giờ kể từ thời điểm thanh toán. Quý khách vui lòng quét mã QR để xuất hóa đơn GTGT',
+  'receipt.productCodeShort': 'Mã sp',
+  'receipt.unitPriceShort': 'Đgiá',
+  'receipt.amountTendered': 'Tiền nhận',
+  'receipt.amountCollected': 'Số tiền đã nhận',
+  'receipt.changeReturned': 'Tiền trả lại',
+  'receipt.itemLines': 'Tsố mặt/h',
+  'receipt.soldQty': 'Tổng sl bhàng',
+  'receipt.memberSavings': 'Tiết kiệm hơn khi sử dụng thẻ thành viên',
+  'receipt.scanQrFanpage': 'Quét QR code và ghé Fanpage để biết thêm thông tin khuyến mãi',
   'receipt.scanQrFeedback': 'Vui lòng quét mã QR để chia sẻ ý kiến của bạn',
   'receipt.scanQrInvoiceSite':
     'Để xuất hóa đơn VAT, vui lòng quét QR code để truy cập {site} và điền thông tin trong ngày mua hàng',

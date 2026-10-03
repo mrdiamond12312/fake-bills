@@ -98,6 +98,7 @@ Each template is named after the receipt layout it reproduces and ships with **f
 | `aeon-citimart` | Aeon Citimart / MM Mega Market | VT323 (Epson Font A) | 400 px | barcode |
 | `coopmart` | Co.opmart | IBM Plex Mono (Courier-style) | 480 px | barcode |
 | `emart` | Emart | Roboto Condensed | 400 px | barcode |
+| `lotte-mart` | Lotte Mart | Inconsolata Condensed (Epson Font B) | 416 px | barcode |
 | `winmart` | WinMart / Bách Hóa Xanh | Arimo (Arial) | 400 px | barcode |
 | `familymart` | FamilyMart / GS25 | Tinos (Times New Roman) | 400 px | barcode |
 | `farmers-market` | Farmers Market | Open Sans (Segoe UI-like) | 416 px | barcode |

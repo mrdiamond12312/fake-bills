@@ -171,9 +171,9 @@ export const aeonCitimartTemplate: TBillTemplate = {
       logoAlign: 'center',
     },
     transaction: {
-      invoiceNo: '1111110269833',
-      posNo: '111110',
-      cashier: '674624_NHU',
+      invoiceNo: '1000000000001',
+      posNo: '100001',
+      cashier: '000001_NVA',
       paymentMethod: 'Tien mat',
       amountPaid: 100000,
     },

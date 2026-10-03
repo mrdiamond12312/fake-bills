@@ -21,6 +21,9 @@ export const templatesLocale = {
   'bills.template.farmers-market.name': 'Farmers Market layout',
   'bills.template.farmers-market.description':
     'Fresh market, member block, per-line discounts, payment section, policy text',
+  'bills.template.lotte-mart.name': 'Lotte Mart layout',
+  'bills.template.lotte-mart.description':
+    'Hypermarket, unaccented mono, numbered lines with barcode row, barcode before policy',
   'bills.template.go-tops.name': 'GO! / Tops Market layout',
   'bills.template.go-tops.description':
     'Hypermarket POS: qty × price lines, double-height total, VAT table, QR footer',

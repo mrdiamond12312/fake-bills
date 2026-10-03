@@ -60,3 +60,10 @@ storybook-static
 CLAUDE.md
 CLAUDE.local.md
 .claude/
+
+# real receipt photos may contain personal info; keep them out of the repo
+assets/*.png
+assets/*.jpg
+assets/*.jpeg
+assets/*.heic
+assets/*.webp

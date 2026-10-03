@@ -21,6 +21,9 @@ export const templatesLocale = {
   'bills.template.farmers-market.name': 'Mẫu Farmers Market',
   'bills.template.farmers-market.description':
     'Chợ tươi sống, khối thành viên, giảm giá từng dòng, phần thanh toán, chính sách đổi trả',
+  'bills.template.lotte-mart.name': 'Mẫu Lotte Mart',
+  'bills.template.lotte-mart.description':
+    'Đại siêu thị, mono không dấu, dòng hàng đánh số kèm dòng mã vạch, mã vạch trước phần chính sách',
   'bills.template.go-tops.name': 'Mẫu GO! / Tops Market',
   'bills.template.go-tops.description':
     'POS đại siêu thị: dòng SL × giá, tổng tiền in cao gấp đôi, bảng VAT, QR cuối phiếu',

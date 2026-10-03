@@ -83,6 +83,15 @@ export const receiptLocale = {
   'receipt.scanQrInvoiceSide': 'Scan the QR or visit {site} within 60 minutes for an invoice.',
   'receipt.scanQrVat':
     'This receipt can be exchanged for a VAT invoice within 2 hours of payment. Please scan the QR code to request it',
+  'receipt.productCodeShort': 'Item code',
+  'receipt.unitPriceShort': 'Price',
+  'receipt.amountTendered': 'Tendered',
+  'receipt.amountCollected': 'Amount received',
+  'receipt.changeReturned': 'Change',
+  'receipt.itemLines': 'Lines',
+  'receipt.soldQty': 'Total qty',
+  'receipt.memberSavings': 'Save more with a membership card',
+  'receipt.scanQrFanpage': 'Scan the QR code and visit our Fanpage for the latest promotions',
   'receipt.scanQrFeedback': 'Please share your feedback by scanning the QR code',
   'receipt.scanQrInvoiceSite':
     'To get a VAT invoice, scan the QR code to visit {site} and fill in your details on the day of purchase',

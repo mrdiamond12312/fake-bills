@@ -12,6 +12,7 @@ import { emartTemplate } from '@/components/Bills/templates/Emart';
 import { familyMartTemplate } from '@/components/Bills/templates/FamilyMart';
 import { farmersMarketTemplate } from '@/components/Bills/templates/FarmersMarket';
 import { goTopsTemplate } from '@/components/Bills/templates/GoTops';
+import { lotteMartTemplate } from '@/components/Bills/templates/LotteMart';
 import { winMartTemplate } from '@/components/Bills/templates/WinMart';
 import type { TBillTemplate } from '@/components/Bills/types';
 
@@ -22,6 +23,7 @@ export const BILL_TEMPLATES: TBillTemplate[] = [
   aeonCitimartTemplate,
   coopmartTemplate,
   emartTemplate,
+  lotteMartTemplate,
   winMartTemplate,
   familyMartTemplate,
   farmersMarketTemplate,

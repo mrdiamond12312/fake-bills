@@ -43,9 +43,8 @@ const Aeon: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t }) =>
         }`}</Text>
         <Text align="center">{`${T('receipt.openingHours')}: ${upper(store.slogan)}`}</Text>
         <Text align="center">{`${T('receipt.phone')}: ${store.hotline ?? ''}`}</Text>
-        <Text align="center">
-          {transaction.lookupCode || `M1-26-${codes.barcodeValue.slice(0, 13)}`}
-        </Text>
+        {/* Mã CQT, unlabelled, as the last header line right above the product table */}
+        <Text align="center">{codes.taxAuthorityCode}</Text>
       </Flex>
       <Text>{T('receipt.product')}</Text>
       <Text>{T('receipt.productCode')}</Text>
@@ -172,11 +171,11 @@ export const aeonTemplate: TBillTemplate = {
       logoAlign: 'center',
     },
     transaction: {
-      invoiceNo: '0150241',
-      posNo: '015',
-      cashier: 'Nguyễn Thị Khánh An',
+      invoiceNo: '0010001',
+      posNo: '001',
+      cashier: 'Nguyễn Văn A',
       paymentMethod: 'Tiền mặt',
-      memberCode: '1003279371',
+      memberCode: '1000000001',
       amountPaid: 60000,
     },
     footerNote:

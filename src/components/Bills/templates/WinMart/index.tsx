@@ -1,7 +1,7 @@
 /**
- * Compact minimart slip in Arial: logo, big store-location line, "date|MSCH|NV" line,
- * bilingual Mặt hàng/giá · Description header, "qty x price" item lines with the amount
- * below, TỔNG CỘNG VND block, pre-tax/VAT split, QR beside the e-invoice note, barcode.
+ * Compact minimart slip in Arial: logo, PHIẾU TÍNH TIỀN, "date|MSCH|PTT" line, NV, Mã CQT,
+ * bilingual Mặt hàng/giá · Description header, name / SKU / "qty x price" item lines with the
+ * amount below, TỔNG CỘNG VND block, pre-tax/VAT split, QR beside the e-invoice note, barcode.
  * Sections are split by dotted printed rules.
  */
 import { Flex } from 'antd';
@@ -35,16 +35,16 @@ const WinMart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t })
         fallback={<Wordmark text={store.name} size={s * 2.4} letterSpacing={0} />}
       />
       <Flex vertical align="center">
-        <Text align="center" size={s * 1.6}>
-          {(store.address ?? '').toUpperCase()}
+        <Text align="center" size={s * 1.3} bold>
+          {t('receipt.bill').toUpperCase()}
         </Text>
-        <Text align="center">{`${formatDateTime(transaction.dateTime, 'DD/MM/YYYY HH:mm')}|MSCH:${
-          store.branch ?? ''
-        }|NV:${transaction.cashier ?? ''}`}</Text>
-        <Text align="center">{`PTT:${transaction.invoiceNo ?? ''}`}</Text>
-        <Text align="center">{`${t('receipt.taxAuthorityCode')}: ${
-          transaction.lookupCode || codes.barcodeValue.slice(0, 14)
-        }`}</Text>
+        {/* MSCH (store code) sits between the date/time and PTT on one line */}
+        <Text align="center" size={s * 0.9}>{`${formatDateTime(
+          transaction.dateTime,
+          'DD/MM/YYYY HH:mm',
+        )}|MSCH:${store.branch ?? ''}|PTT:${transaction.invoiceNo ?? ''}`}</Text>
+        <Text align="center">{`NV:${transaction.cashier ?? ''}`}</Text>
+        <Text align="center">{`${t('receipt.taxAuthorityCode')}: ${codes.taxAuthorityCode}`}</Text>
       </Flex>
 
       <Cells
@@ -64,6 +64,7 @@ const WinMart: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, t })
       {totals.lines.map((line) => (
         <Flex vertical key={line.index}>
           <Text>{line.title}</Text>
+          {line.barcode ? <Text>{line.barcode}</Text> : null}
           <Cells
             cells={[
               { text: `${line.quantity} x ${formatMoney(line.unitPrice)}`, flex: 3 },
@@ -149,7 +150,6 @@ export const winMartTemplate: TBillTemplate = {
   catalogAccounts: ['winmart', 'bach hoa xanh', 'bhx'],
   fields: [
     'store.branch',
-    'store.address',
     'store.hotline',
     'transaction.invoiceNo',
     'transaction.cashier',
@@ -157,15 +157,15 @@ export const winMartTemplate: TBillTemplate = {
     'transaction.paymentMethod',
     'transaction.amountPaid',
     'transaction.customerName',
+    'item.barcode',
     'item.discount',
     'footerNote',
   ],
   defaults: {
     store: {
       name: 'HạnhPhúc',
-      branch: '1664',
-      /** Printed as the big location line under the logo */
-      address: 'Bàu Cát Tân Bình',
+      /** MSCH: the store's numeric code */
+      branch: '1001',
       hotline: '024 0000 0000',
       /** Default logo image src for this template; empty → text wordmark */
       logoUrl: '',
@@ -173,8 +173,8 @@ export const winMartTemplate: TBillTemplate = {
       logoAlign: 'center',
     },
     transaction: {
-      invoiceNo: '166401250803265',
-      cashier: '09043572',
+      invoiceNo: '100126010100001',
+      cashier: '00000001',
       paymentMethod: 'VietQR',
     },
     footerNote:

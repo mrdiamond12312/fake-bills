@@ -186,7 +186,7 @@ export const circleKTemplate: TBillTemplate = {
     transaction: {
       invoiceNo: 'TE',
       posNo: '02',
-      cashier: 'Nguyễn Thị Lan',
+      cashier: 'Nguyễn Thị B',
       paymentMethod: 'Cash',
     },
     footerNote:

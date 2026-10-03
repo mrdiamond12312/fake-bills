@@ -1,6 +1,7 @@
 import type React from 'react';
 
 import type { FONT_ID } from '@/components/Bills/fonts';
+import type { createRandom } from '@/components/Bills/helpers/random';
 import type { TReceiptT } from '@/components/Bills/helpers/receipt-text';
 
 export type TReceiptLanguage = 'vi' | 'en';
@@ -125,6 +126,8 @@ export type TBillCodes = {
   qrDataUrl: string;
   barcodeValue: string;
   barcodeDataUrl: string;
+  /** Mã CQT (tax-authority code) in the "M1-YY-XXXXX-###########" format; `transaction.lookupCode` when set */
+  taxAuthorityCode: string;
 };
 
 /** Everything a template needs to draw itself. Templates must be pure (no hooks) so satori can render them. */
@@ -178,6 +181,11 @@ export type TBillTemplate = {
   catalogAccounts?: string[];
   /** Which catalog code the store's bill prints for an item. Default: barcode. */
   itemCode?: 'barcode' | 'artCode';
+  /**
+   * The receipt barcode number this store prints, built from the bill (store/POS/date/ticket).
+   * Used when `display.barcodeText` is empty; default: 20 random digits.
+   */
+  barcodeValue?: (data: TBillData, random: ReturnType<typeof createRandom>) => string;
   defaults: Pick<TBillData, 'store' | 'transaction' | 'footerNote'> & {
     tax?: Partial<TTaxInfo>;
   };
