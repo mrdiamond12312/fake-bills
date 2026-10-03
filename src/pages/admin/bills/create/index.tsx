@@ -144,7 +144,14 @@ const AdminBillCreate: React.FC = () => {
                       {
                         key: 'transaction',
                         label: t('bills.section.transaction', 'Transaction'),
-                        children: <TransactionInfo control={control} fields={fields} />,
+                        children: (
+                          <TransactionInfo
+                            control={control}
+                            fields={fields}
+                            bill={bill}
+                            codes={codes}
+                          />
+                        ),
                       },
                       {
                         key: 'display',

@@ -110314,7 +110314,7 @@ var require_flex = __commonJS({
       }
       return t;
     };
-    var Flex13 = /* @__PURE__ */ _react.default.forwardRef((props, ref) => {
+    var Flex14 = /* @__PURE__ */ _react.default.forwardRef((props, ref) => {
       const {
         prefixCls: customizePrefixCls,
         rootClassName,
@@ -110353,9 +110353,9 @@ var require_flex = __commonJS({
       }, (0, _omit.default)(othersProps, ["justify", "wrap", "align"])), children));
     });
     if (process.env.NODE_ENV !== "production") {
-      Flex13.displayName = "Flex";
+      Flex14.displayName = "Flex";
     }
-    var _default = exports2.default = Flex13;
+    var _default = exports2.default = Flex14;
   }
 });
 
@@ -154669,11 +154669,11 @@ var require_react_jsx_runtime_development = __commonJS({
             return jsxWithValidation(type, props, key, false);
           }
         }
-        var jsx14 = jsxWithValidationDynamic;
-        var jsxs12 = jsxWithValidationStatic;
+        var jsx15 = jsxWithValidationDynamic;
+        var jsxs13 = jsxWithValidationStatic;
         exports2.Fragment = REACT_FRAGMENT_TYPE;
-        exports2.jsx = jsx14;
-        exports2.jsxs = jsxs12;
+        exports2.jsx = jsx15;
+        exports2.jsxs = jsxs13;
       })();
     }
   }
@@ -160699,6 +160699,7 @@ var formatDateTime = (iso, pattern) => {
   };
   return pattern.replace(/YYYY|MM|DD|HH|mm|ss/g, (token) => tokens[token]);
 };
+var digitsOf = (value = "", length) => value.replace(/\D/g, "").slice(-length).padStart(length, "0");
 var stripDiacritics = (text = "") => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
 
 // src/components/Bills/shared/Print.tsx
@@ -160892,7 +160893,7 @@ var Aeon = ({ data, totals, codes, font, t }) => {
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { align: "center", children: `${T("receipt.phone")}: ${store.phone ?? ""} - ${store.website ?? ""}` }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { align: "center", children: `${T("receipt.openingHours")}: ${upper(store.slogan)}` }),
       /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { align: "center", children: `${T("receipt.phone")}: ${store.hotline ?? ""}` }),
-      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { align: "center", children: transaction.lookupCode || `M1-26-${codes.barcodeValue.slice(0, 13)}` })
+      /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { align: "center", children: codes.taxAuthorityCode })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { children: T("receipt.product") }),
     /* @__PURE__ */ (0, import_jsx_runtime2.jsx)(Text, { children: T("receipt.productCode") }),
@@ -160984,6 +160985,7 @@ var aeonTemplate = {
   catalogAccounts: ["aeon"],
   // the bill prints the store's own item code (ART CODE), not the EAN
   itemCode: "artCode",
+  billId: { source: "cqt", retailer: "aeon" },
   fields: [
     "store.legalName",
     "store.phone",
@@ -160991,12 +160993,12 @@ var aeonTemplate = {
     "store.website",
     "store.slogan",
     "transaction.invoiceNo",
+    "transaction.billId",
     "transaction.posNo",
     "transaction.cashier",
     "transaction.paymentMethod",
     "transaction.amountPaid",
     "transaction.memberCode",
-    "transaction.lookupCode",
     "item.barcode",
     "footerNote"
   ],
@@ -161014,11 +161016,11 @@ var aeonTemplate = {
       logoAlign: "center"
     },
     transaction: {
-      invoiceNo: "0150241",
-      posNo: "015",
-      cashier: "Nguy\u1EC5n Th\u1ECB Kh\xE1nh An",
+      invoiceNo: "0010001",
+      posNo: "001",
+      cashier: "Nguy\u1EC5n V\u0103n A",
       paymentMethod: "Ti\u1EC1n m\u1EB7t",
-      memberCode: "1003279371",
+      memberCode: "1000000001",
       amountPaid: 6e4
     },
     footerNote: "Vui l\xF2ng gi\u1EEF l\u1EA1i phi\u1EBFu \u0111\u1EC3 c\xF3 th\u1EC3 \u0111\u1ED5i, tr\u1EA3 trong th\u1EDDi h\u1EA1n quy \u0111\u1ECBnh \u0111\u01B0\u1EE3c ni\xEAm y\u1EBFt t\u1EA1i qu\u1EA7y d\u1ECBch v\u1EE5 kh\xE1ch h\xE0ng",
@@ -161182,9 +161184,9 @@ var aeonCitimartTemplate = {
       logoAlign: "center"
     },
     transaction: {
-      invoiceNo: "1111110269833",
-      posNo: "111110",
-      cashier: "674624_NHU",
+      invoiceNo: "1000000000001",
+      posNo: "100001",
+      cashier: "000001_NVA",
       paymentMethod: "Tien mat",
       amountPaid: 1e5
     },
@@ -161350,7 +161352,7 @@ var circleKTemplate = {
     transaction: {
       invoiceNo: "TE",
       posNo: "02",
-      cashier: "Nguy\u1EC5n Th\u1ECB Lan",
+      cashier: "Nguy\u1EC5n Th\u1ECB B",
       paymentMethod: "Cash"
     },
     footerNote: "Khong tra hang va hoan tien thua khi thanh toan bang voucher.\nNo refund and no change due when paying by voucher."
@@ -161382,7 +161384,8 @@ var Coopmart = ({ data, totals, codes, font, t }) => {
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { align: "center", children: `Hotline: ${store.hotline ?? ""}` }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { align: "center", children: `Website: ${store.website ?? ""}` }),
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { align: "center", size: s * 1.2, bold: true, children: T("receipt.bill").toUpperCase() }),
-      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { align: "center", children: T("receipt.supermarketOrder") })
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { align: "center", children: T("receipt.supermarketOrder") }),
+      /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { align: "center", children: `${T("receipt.taxAuthorityCode")}: ${codes.taxAuthorityCode}` })
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)(import_antd5.Flex, { justify: "space-between", children: [
       /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(Text, { children: `${T("receipt.counter")}: ${transaction.posNo ?? ""}` }),
@@ -161462,6 +161465,16 @@ var coopmartTemplate = {
   fontSize: 14,
   paperWidth: PAPER_WIDTH.mm80 - 96,
   catalogAccounts: ["co.op", "coop"],
+  billId: { source: "cqt", retailer: "coopmart" },
+  // store + counter + YYMMDD + invoice no, e.g. 0012000126010110001
+  barcodeValue: ({ transaction }, random) => {
+    return [
+      `00${random.int(100, 999)}`,
+      digitsOf(transaction.posNo, 3),
+      formatDateTime(transaction.dateTime, "YYYYMMDDHHmmss").slice(2, 8),
+      digitsOf(transaction.invoiceNo, 5)
+    ].join("");
+  },
   fields: [
     "store.branch",
     "store.address",
@@ -161471,6 +161484,7 @@ var coopmartTemplate = {
     "store.website",
     "store.slogan",
     "transaction.invoiceNo",
+    "transaction.billId",
     "transaction.posNo",
     "transaction.cashier",
     "transaction.paymentMethod",
@@ -161496,12 +161510,12 @@ var coopmartTemplate = {
       logoAlign: "center"
     },
     transaction: {
-      invoiceNo: "77870",
-      posNo: "10",
-      cashier: "57033569-Dung",
+      invoiceNo: "10001",
+      posNo: "01",
+      cashier: "00000001-NVA",
       paymentMethod: "MOMO",
-      memberCode: "4646426353656",
-      customerName: "Mai Th\u1ECB Ho\xE0ng"
+      memberCode: "1000000000001",
+      customerName: "Nguy\u1EC5n V\u0103n A"
     },
     footerNote: "Cam on Quy khach - Hen gap lai",
     tax: { vatRate: 8 }
@@ -161624,6 +161638,14 @@ var emartTemplate = {
   fontSize: 16,
   paperWidth: PAPER_WIDTH.mm58 + 16,
   catalogAccounts: ["emart"],
+  billId: { source: "barcode", retailer: "emart" },
+  // 0 + YYYYMMDD + invoice no + POS ("0001-0001"), e.g. 0202601010000100010001
+  barcodeValue: ({ transaction }) => [
+    "0",
+    formatDateTime(transaction.dateTime, "YYYYMMDDHHmmss").slice(0, 8),
+    digitsOf(transaction.invoiceNo, 5),
+    digitsOf(transaction.posNo, 8)
+  ].join(""),
   fields: [
     "store.branch",
     "store.address",
@@ -161631,6 +161653,7 @@ var emartTemplate = {
     "store.taxCode",
     "store.slogan",
     "transaction.invoiceNo",
+    "transaction.billId",
     "transaction.posNo",
     "transaction.cashier",
     "transaction.paymentMethod",
@@ -161653,12 +161676,12 @@ var emartTemplate = {
       showLogo: true
     },
     transaction: {
-      invoiceNo: "02003",
-      posNo: "0031-0042",
-      cashier: "1100023(Le Minh Khoa)",
+      invoiceNo: "00001",
+      posNo: "0001-0001",
+      cashier: "0000001(Nguyen Van A)",
       paymentMethod: "Th\u1EBB t\xEDn d\u1EE5ng:VISA",
-      memberCode: "1234********5678",
-      customerName: "Nguy\u1EC5n V\u0103n An"
+      memberCode: "1000********0001",
+      customerName: "Nguy\u1EC5n V\u0103n A"
     },
     footerNote: "L\u01AFU \xDD: Phi\u1EBFu n\xE0y ch\u1EC9 c\xF3 gi\xE1 tr\u1ECB xu\u1EA5t\nh\xF3a \u0111\u01A1n trong ng\xE0y\nXIN CAM ON QUY KHACH\nH\u1EB8N G\u1EB6P L\u1EA0I",
     tax: { vatRate: 8 }
@@ -161787,7 +161810,7 @@ var familyMartTemplate = {
     transaction: {
       invoiceNo: "2026010340UhzgwedRhi",
       posNo: "POS01",
-      cashier: "Nguy\u1EC5n Th\u1ECB Di\u1EC5m",
+      cashier: "Nguy\u1EC5n Th\u1ECB B",
       paymentMethod: "MOMO"
     },
     footerNote: "Xu\u1EA5t h\xF3a \u0111\u01A1n: Qu\xE9t QR ho\u1EB7c truy c\u1EADp https://portal.example.com/xuat-hoa-don\nY\xEAu c\u1EA7u xu\u1EA5t h\xF3a \u0111\u01A1n VAT ch\u1EC9 nh\u1EADn trong 120 ph\xFAt sau khi mua h\xE0ng\nInvoice issuing: Scan QR or visit https://portal.example.com\nRequest VAT invoice within 120 minutes of purchase"
@@ -161936,7 +161959,7 @@ var farmersMarketTemplate = {
       showLogo: true
     },
     transaction: {
-      cashier: "E6952 - L\xFD Kh\xE1nh Ph\u01B0\u01A1ng",
+      cashier: "E0001 - Nguy\u1EC5n V\u0103n A",
       paymentMethod: "C\xE0 th\u1EBB",
       memberCode: "C9999999"
     },
@@ -161969,7 +161992,7 @@ var GoTops = ({ data, totals, codes, font, t }) => {
     /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(CharLine, {}),
     totals.lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_antd9.Flex, { vertical: true, children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_antd9.Flex, { justify: "space-between", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { flex: 1, children: line.title.toUpperCase() }),
+        /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { flex: 1, children: `+${line.title.toUpperCase()}` }),
         /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { align: "right", nowrap: true, children: String(tax.vatRate) })
       ] }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(
@@ -162045,6 +162068,10 @@ var GoTops = ({ data, totals, codes, font, t }) => {
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PrintImage, { src: codes.qrDataUrl, width: s * 6 }),
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { align: "center", children: t("receipt.scanQrInvoice") })
     ] }) : null,
+    display.showQr !== false ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_antd9.Flex, { vertical: true, align: "center", className: "mt-2", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PrintImage, { src: codes.qrDataUrl, width: s * 5 }),
+      /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { align: "center", children: t("receipt.scanQrFanpage") })
+    ] }) : null,
     /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(Text, { align: "center", className: "mt-2", children: data.footerNote ?? "" }),
     display.showBarcode !== false ? /* @__PURE__ */ (0, import_jsx_runtime9.jsxs)(import_antd9.Flex, { vertical: true, align: "center", className: "mt-1", children: [
       /* @__PURE__ */ (0, import_jsx_runtime9.jsx)(PrintImage, { src: codes.barcodeDataUrl, width: Math.round(s * 18), height: s * 2 }),
@@ -162062,6 +162089,18 @@ var goTopsTemplate = {
   fontSize: 16,
   paperWidth: PAPER_WIDTH.mm58,
   catalogAccounts: ["go!", "mini go", "tops"],
+  billId: { source: "barcode", retailer: "go" },
+  // 660000 + store + 0000 + POS + ticket + YYYYMMDDHHmmss, e.g. 660000120000001000000120260101120000
+  barcodeValue: ({ transaction }, random) => {
+    return [
+      "660000",
+      String(random.int(10, 99)),
+      "0000",
+      digitsOf(transaction.posNo, 3),
+      digitsOf(transaction.invoiceNo, 7),
+      formatDateTime(transaction.dateTime, "YYYYMMDDHHmmss")
+    ].join("");
+  },
   fields: [
     "store.legalName",
     "store.address",
@@ -162069,6 +162108,7 @@ var goTopsTemplate = {
     "store.hotline",
     "store.taxCode",
     "transaction.invoiceNo",
+    "transaction.billId",
     "transaction.posNo",
     "transaction.cashier",
     "transaction.paymentMethod",
@@ -162093,39 +162133,193 @@ var goTopsTemplate = {
       logoWidth: 180
     },
     transaction: {
-      invoiceNo: "029010875",
-      posNo: "029",
-      cashier: "120126",
+      invoiceNo: "001000001",
+      posNo: "001",
+      cashier: "100001",
       paymentMethod: "CASH",
-      memberCode: "3101533****",
-      customerName: "Tr\u1EA7n Minh Anh"
+      memberCode: "1000000****",
+      customerName: "Nguy\u1EC5n V\u0103n A"
     },
     footerNote: "C\xE1m \u01A1n Qu\xFD Kh\xE1ch !\nH\u1EB9n g\u1EB7p l\u1EA1i!\nPhi\u1EBFu t\xEDnh ti\u1EC1n ch\u1EC9 c\xF3 gi\xE1 tr\u1ECB xu\u1EA5t\nh\xF3a \u0111\u01A1n trong v\xF2ng 120 ph\xFAt"
   }
 };
 
-// src/components/Bills/templates/WinMart/index.tsx
+// src/components/Bills/templates/LotteMart/index.tsx
 var import_antd10 = __toESM(require_lib49());
 var import_jsx_runtime10 = __toESM(require_jsx_runtime());
-var Divider2 = () => /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: ".", className: "my-0.5" });
-var WinMart = ({ data, totals, codes, font, t }) => {
+var LotteMart = ({ data, totals, codes, font, t }) => {
   const { store, transaction, display, tax } = data;
   const s = font.size;
+  const T = (key) => stripDiacritics(t(key));
+  const vatLabel = `${String(tax.vatRate).padStart(2, "0")} % VAT`;
   return /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, children: [
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
       Logo,
       {
         store,
-        fallback: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Wordmark, { text: store.name, size: s * 2.4, letterSpacing: 0 })
+        fallback: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Wordmark, { text: store.name, size: s * 2.2, letterSpacing: 1 })
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, align: "center", children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "center", size: s * 1.6, children: (store.address ?? "").toUpperCase() }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "center", children: `${formatDateTime(transaction.dateTime, "DD/MM/YYYY HH:mm")}|MSCH:${store.branch ?? ""}|NV:${transaction.cashier ?? ""}` }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "center", children: `PTT:${transaction.invoiceNo ?? ""}` }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "center", children: `${t("receipt.taxAuthorityCode")}: ${transaction.lookupCode || codes.barcodeValue.slice(0, 14)}` })
-    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: stripDiacritics(store.branch).toUpperCase() }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: stripDiacritics(store.address).toUpperCase() }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `Hotline: ${store.hotline ?? ""}` }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `MST: ${store.taxCode ?? ""}` }),
     /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      Cells,
+      {
+        cells: [
+          { text: "ENT", width: s * 3 },
+          { text: formatDateTime(transaction.dateTime, "YYYY-MM-DD HH:mm"), flex: 1 },
+          { text: `POS:${transaction.posNo ?? ""}`, flex: 1, align: "right" }
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "=" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      Cells,
+      {
+        cells: [
+          { text: T("receipt.productCodeShort"), flex: 2 },
+          { text: T("receipt.unitPriceShort").toLowerCase(), flex: 1, align: "right" },
+          { text: T("receipt.qty").toLowerCase(), width: s * 2.5, align: "right" },
+          { text: T("receipt.money").toLowerCase(), flex: 1, align: "right" }
+        ]
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "=" }),
+    totals.lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `${String(line.index + 1).padStart(3, "0")} ${stripDiacritics(line.title).toUpperCase()}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+        Cells,
+        {
+          cells: [
+            { text: ` ${line.barcode ?? ""}`, flex: 2 },
+            { text: String(Math.round(line.unitPrice)), flex: 1, align: "right" },
+            { text: line.quantity, width: s * 2.5, align: "right" },
+            { text: formatMoney(line.lineTotal), flex: 1, align: "right" }
+          ]
+        }
+      )
+    ] }, line.index)),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "=" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: vatLabel, value: formatMoney(totals.vatAmount) }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: T("receipt.total"), value: formatMoney(totals.grandTotal) }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "=" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: T("receipt.amountTendered"), value: formatMoney(totals.amountPaid) }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "-" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+      KeyValue,
+      {
+        label: stripDiacritics(transaction.paymentMethod || t("receipt.cash")).toUpperCase(),
+        value: formatMoney(totals.amountPaid)
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: T("receipt.invoiceNoLong"), value: transaction.invoiceNo ?? "" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "-" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { justify: "space-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintScale, { fontSize: s, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: T("receipt.amountCollected") }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintScale, { fontSize: s, align: "right", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: formatMoney(totals.amountPaid) }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { justify: "space-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintScale, { fontSize: s, children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: T("receipt.changeReturned") }) }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintScale, { fontSize: s, align: "right", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: formatMoney(totals.change) }) })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "=" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { justify: "space-between", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `${T("receipt.itemLines")} : ${totals.lines.length}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "right", nowrap: true, children: `${T("receipt.soldQty")} : ${totals.totalQuantity}` })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(CharLine, { char: "-" }),
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `Cashier:${stripDiacritics(transaction.cashier).toUpperCase()}` }),
+    display.showBarcode !== false ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, align: "center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintImage, { src: codes.barcodeDataUrl, width: Math.round(s * 18), height: s * 2 }),
+      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "center", children: codes.barcodeValue })
+    ] }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { className: "mt-2", children: stripDiacritics(data.footerNote).toUpperCase() }),
+    display.showQr !== false ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_antd10.Flex, { justify: "center", className: "mt-2", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintImage, { src: codes.qrDataUrl, width: s * 7 }) }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { className: "mt-2", size: s * 0.85, children: T("receipt.memberSavings").toUpperCase() })
+  ] });
+};
+var lotteMartTemplate = {
+  id: "lotte-mart",
+  name: "Lotte Mart layout",
+  description: "Hypermarket, unaccented mono, numbered lines with barcode row, barcode before policy",
+  printerStyle: "Condensed thermal mono (Epson Font B)",
+  component: LotteMart,
+  fontId: "inconsolata-condensed" /* inconsolataCondensed */,
+  fontSize: 17,
+  paperWidth: PAPER_WIDTH.mm58 + 32,
+  catalogAccounts: ["lotte"],
+  billId: { source: "barcode", retailer: "lottemart" },
+  // 002 + YYMMDD + store/POS (from "0206-0119") + 8-digit sequence, e.g. 0022601010001000100000001
+  barcodeValue: ({ transaction }) => [
+    "002",
+    formatDateTime(transaction.dateTime, "YYYYMMDDHHmmss").slice(2, 8),
+    digitsOf(transaction.posNo, 8),
+    digitsOf(transaction.invoiceNo, 8)
+  ].join(""),
+  fields: [
+    "store.branch",
+    "store.address",
+    "store.hotline",
+    "store.taxCode",
+    "transaction.invoiceNo",
+    "transaction.billId",
+    "transaction.posNo",
+    "transaction.cashier",
+    "transaction.paymentMethod",
+    "transaction.amountPaid",
+    "item.barcode",
+    "footerNote"
+  ],
+  defaults: {
+    store: {
+      name: "SAO MAI Mart",
+      branch: "SAO MAI Mart Ph\xFA Th\u1ECD",
+      address: "L\u1EA7u 1, 000 \u0110\u01B0\u1EDDng S\u1ED1 1, P.1, Q.1",
+      hotline: "0900000000",
+      taxCode: "0100000009",
+      /** Default logo image src for this template; empty → text wordmark */
+      logoUrl: "",
+      showLogo: true,
+      logoAlign: "center"
+    },
+    transaction: {
+      invoiceNo: "00000001",
+      posNo: "0001-0001",
+      cashier: "100000001 Nguy\u1EC5n V\u0103n A",
+      paymentMethod: "QR VNPAY"
+    },
+    footerNote: "H\xF3a \u0111\u01A1n GTGT ch\u1EC9 \u0111\u01B0\u1EE3c xu\u1EA5t trong ng\xE0y ph\xE1t h\xE0nh h\xF3a \u0111\u01A1n b\xE1n h\xE0ng, qu\xFD kh\xE1ch vui l\xF2ng qu\xE9t m\xE3 QR tr\u01B0\u1EDBc 11PM \u0111\u1EC3 nh\u1EADn h\xF3a \u0111\u01A1n GTGT.",
+    tax: { vatRate: 8 }
+  }
+};
+
+// src/components/Bills/templates/WinMart/index.tsx
+var import_antd11 = __toESM(require_lib49());
+var import_jsx_runtime11 = __toESM(require_jsx_runtime());
+var Divider2 = () => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(CharLine, { char: ".", className: "my-0.5" });
+var WinMart = ({ data, totals, codes, font, t }) => {
+  const { store, transaction, display, tax } = data;
+  const s = font.size;
+  return /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { vertical: true, children: [
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+      Logo,
+      {
+        store,
+        fallback: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Wordmark, { text: store.name, size: s * 2.4, letterSpacing: 0 })
+      }
+    ),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { vertical: true, align: "center", children: [
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { align: "center", size: s * 1.3, bold: true, children: t("receipt.bill").toUpperCase() }),
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { align: "center", size: s * 0.9, children: `${formatDateTime(
+        transaction.dateTime,
+        "DD/MM/YYYY HH:mm"
+      )}|MSCH:${store.branch ?? ""}|PTT:${transaction.invoiceNo ?? ""}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { align: "center", children: `NV:${transaction.cashier ?? ""}` }),
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { align: "center", children: `${t("receipt.taxAuthorityCode")}: ${codes.taxAuthorityCode}` })
+    ] }),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       Cells,
       {
         className: "mt-2",
@@ -162135,7 +162329,7 @@ var WinMart = ({ data, totals, codes, font, t }) => {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       Cells,
       {
         cells: [
@@ -162144,10 +162338,11 @@ var WinMart = ({ data, totals, codes, font, t }) => {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Divider2, {}),
-    totals.lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: line.title }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Divider2, {}),
+    totals.lines.map((line) => /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { vertical: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: line.title }),
+      line.barcode ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: line.barcode }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
         Cells,
         {
           cells: [
@@ -162156,11 +162351,11 @@ var WinMart = ({ data, totals, codes, font, t }) => {
           ]
         }
       ),
-      line.discount ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: t("receipt.promo"), value: `-${formatMoney(line.discount)}` }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "right", children: formatMoney(line.lineTotal) }),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Divider2, {})
+      line.discount ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(KeyValue, { label: t("receipt.promo"), value: `-${formatMoney(line.discount)}` }) : null,
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { align: "right", children: formatMoney(line.lineTotal) }),
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Divider2, {})
     ] }, line.index)),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       KeyValue,
       {
         label: t("receipt.totalVnd").toUpperCase(),
@@ -162168,18 +162363,18 @@ var WinMart = ({ data, totals, codes, font, t }) => {
         bold: true
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: t("receipt.quantity"), value: totals.totalQuantity }),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(KeyValue, { label: t("receipt.quantity"), value: totals.totalQuantity }),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       KeyValue,
       {
         label: transaction.paymentMethod || t("receipt.cash"),
         value: formatMoney(totals.amountPaid)
       }
     ),
-    totals.change ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(KeyValue, { label: t("receipt.change"), value: formatMoney(totals.change) }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Divider2, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `${t("receipt.netValue")}:` }),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(
+    totals.change ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(KeyValue, { label: t("receipt.change"), value: formatMoney(totals.change) }) : null,
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Divider2, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: `${t("receipt.netValue")}:` }),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
       Cells,
       {
         cells: [
@@ -162195,21 +162390,21 @@ var WinMart = ({ data, totals, codes, font, t }) => {
         ]
       }
     ),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { align: "right", children: formatMoney(totals.vatAmount) }),
-    transaction.customerName ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, children: [
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Divider2, {}),
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `${t("receipt.customer")} ${transaction.customerName}` })
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { align: "right", children: formatMoney(totals.vatAmount) }),
+    transaction.customerName ? /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { vertical: true, children: [
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Divider2, {}),
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: `${t("receipt.customer")} ${transaction.customerName}` })
     ] }) : null,
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Divider2, {}),
-    /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { gap: 8, align: "flex-start", children: [
-      display.showQr !== false ? /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, className: "shrink-0", children: [
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintImage, { src: codes.qrDataUrl, width: s * 6.5 }),
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `${t("receipt.invoiceCode")}: ${(transaction.invoiceNo ?? "").slice(-4)}` })
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Divider2, {}),
+    /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { gap: 8, align: "flex-start", children: [
+      display.showQr !== false ? /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { vertical: true, className: "shrink-0", children: [
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(PrintImage, { src: codes.qrDataUrl, width: s * 6.5 }),
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: `${t("receipt.invoiceCode")}: ${(transaction.invoiceNo ?? "").slice(-4)}` })
       ] }) : null,
-      /* @__PURE__ */ (0, import_jsx_runtime10.jsxs)(import_antd10.Flex, { vertical: true, flex: 1, children: [
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: data.footerNote ?? "" }),
-        display.showBarcode !== false ? /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(import_antd10.Flex, { className: "mt-2", children: /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(PrintImage, { src: codes.barcodeDataUrl, width: Math.round(s * 13), height: s * 2.4 }) }) : null,
-        /* @__PURE__ */ (0, import_jsx_runtime10.jsx)(Text, { children: `${t("receipt.phone")}: ${store.hotline ?? ""}` })
+      /* @__PURE__ */ (0, import_jsx_runtime11.jsxs)(import_antd11.Flex, { vertical: true, flex: 1, children: [
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: data.footerNote ?? "" }),
+        display.showBarcode !== false ? /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(import_antd11.Flex, { className: "mt-2", children: /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(PrintImage, { src: codes.barcodeDataUrl, width: Math.round(s * 13), height: s * 2.4 }) }) : null,
+        /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(Text, { children: `${t("receipt.phone")}: ${store.hotline ?? ""}` })
       ] })
     ] })
   ] });
@@ -162224,25 +162419,25 @@ var winMartTemplate = {
   fontSize: 15,
   paperWidth: PAPER_WIDTH.mm58 + 16,
   catalogAccounts: ["winmart", "bach hoa xanh", "bhx"],
+  billId: { source: "cqt", retailer: "winmart" },
   fields: [
     "store.branch",
-    "store.address",
     "store.hotline",
     "transaction.invoiceNo",
+    "transaction.billId",
     "transaction.cashier",
-    "transaction.lookupCode",
     "transaction.paymentMethod",
     "transaction.amountPaid",
     "transaction.customerName",
+    "item.barcode",
     "item.discount",
     "footerNote"
   ],
   defaults: {
     store: {
       name: "H\u1EA1nhPh\xFAc",
-      branch: "1664",
-      /** Printed as the big location line under the logo */
-      address: "B\xE0u C\xE1t T\xE2n B\xECnh",
+      /** MSCH: the store's numeric code */
+      branch: "1001",
       hotline: "024 0000 0000",
       /** Default logo image src for this template; empty → text wordmark */
       logoUrl: "",
@@ -162250,8 +162445,8 @@ var winMartTemplate = {
       logoAlign: "center"
     },
     transaction: {
-      invoiceNo: "166401250803265",
-      cashier: "09043572",
+      invoiceNo: "100126010100001",
+      cashier: "00000001",
       paymentMethod: "VietQR"
     },
     footerNote: "Qu\xE9t QR \u0111\u1EC3 xu\u1EA5t h\xF3a \u0111\u01A1n ho\u1EB7c truy c\u1EADp hoadon.example.com trong 60 ph\xFAt. Xin t\u1EEB ch\u1ED1i ch\u1ECBu tr\xE1ch nhi\u1EC7m n\u1EBFu nh\u1EADp th\xF4ng tin sai."
@@ -162266,6 +162461,7 @@ var BILL_TEMPLATES = [
   aeonCitimartTemplate,
   coopmartTemplate,
   emartTemplate,
+  lotteMartTemplate,
   winMartTemplate,
   familyMartTemplate,
   farmersMarketTemplate
@@ -211469,14 +211665,28 @@ var randomSeed = () => Math.random().toString(36).slice(2, 10);
 // src/components/Bills/helpers/codes.ts
 var toBase64 = (text) => typeof Buffer !== "undefined" ? Buffer.from(text, "utf-8").toString("base64") : btoa(unescape(encodeURIComponent(text)));
 var svgToDataUrl = (svg) => `data:image/svg+xml;base64,${toBase64(svg)}`;
+var randomTaxAuthorityCode = (random, dateTime) => {
+  const year = formatDateTime(dateTime, "YYYYMMDDHHmmss").slice(2, 4);
+  return `M1-${year}-TEST0-000000${random.digits(5)}`;
+};
 var generateBillCodes = (data) => {
   const seed = data.display?.seed || "receipt-lab";
   const random = createRandom(seed);
+  const extraRandom = createRandom(`${seed}:codes`);
+  const template = BILL_TEMPLATE_MAP[data.templateId ?? ""];
   const lookupCode = data.transaction?.lookupCode || random.alphanumeric(10);
   const randomQr = `https://einvoice.example.com/lookup?code=${lookupCode}&ref=${random.alphanumeric(
     12
   )}`;
-  const randomBarcode = random.digits(20);
+  const digitsBarcode = random.digits(20);
+  const randomBarcode = template?.barcodeValue ? template.barcodeValue(data, extraRandom) : digitsBarcode;
+  const presetTaxAuthorityCode = randomTaxAuthorityCode(
+    createRandom(`${seed}:cqt`),
+    data.transaction?.dateTime
+  );
+  const billIdSource = template?.billId?.source;
+  const billIdOverride = data.transaction?.billId?.trim();
+  const taxAuthorityCode = billIdSource === "cqt" && billIdOverride || presetTaxAuthorityCode;
   const qrSvgFor = (text) => ToSVG({ bcid: "qrcode", text, scale: 3, eclevel: "M" });
   const barcodeSvgFor = (text) => ToSVG({ bcid: "code128", text, scale: 2, height: 10, includetext: false });
   const encode = (custom, fallback, draw) => {
@@ -211490,7 +211700,11 @@ var generateBillCodes = (data) => {
     return { value: fallback, svg: draw(fallback) };
   };
   const qr = encode(data.display?.qrText, randomQr, qrSvgFor);
-  const barcode = encode(data.display?.barcodeText, randomBarcode, barcodeSvgFor);
+  const barcode = encode(
+    billIdSource === "barcode" && billIdOverride || data.display?.barcodeText,
+    randomBarcode,
+    barcodeSvgFor
+  );
   const qrPayload = qr.value;
   const barcodeValue = barcode.value;
   const qrSvg = qr.svg;
@@ -211499,7 +211713,10 @@ var generateBillCodes = (data) => {
     qrPayload,
     qrDataUrl: svgToDataUrl(qrSvg),
     barcodeValue,
-    barcodeDataUrl: svgToDataUrl(barcodeSvg)
+    barcodeDataUrl: svgToDataUrl(barcodeSvg),
+    taxAuthorityCode,
+    billId: billIdSource === "cqt" ? taxAuthorityCode : billIdSource ? barcodeValue : "",
+    generatedBillId: billIdSource === "cqt" ? presetTaxAuthorityCode : billIdSource ? randomBarcode : ""
   };
 };
 
@@ -211583,6 +211800,15 @@ var receiptLocale = {
   "receipt.scanQrInvoice": "Scan the QR code above\nto request an e-invoice",
   "receipt.scanQrInvoiceSide": "Scan the QR or visit {site} within 60 minutes for an invoice.",
   "receipt.scanQrVat": "This receipt can be exchanged for a VAT invoice within 2 hours of payment. Please scan the QR code to request it",
+  "receipt.productCodeShort": "Item code",
+  "receipt.unitPriceShort": "Price",
+  "receipt.amountTendered": "Tendered",
+  "receipt.amountCollected": "Amount received",
+  "receipt.changeReturned": "Change",
+  "receipt.itemLines": "Lines",
+  "receipt.soldQty": "Total qty",
+  "receipt.memberSavings": "Save more with a membership card",
+  "receipt.scanQrFanpage": "Scan the QR code and visit our Fanpage for the latest promotions",
   "receipt.scanQrFeedback": "Please share your feedback by scanning the QR code",
   "receipt.scanQrInvoiceSite": "To get a VAT invoice, scan the QR code to visit {site} and fill in your details on the day of purchase",
   "receipt.updateInvoiceInfo": "To update invoice information, please visit: {site}",
@@ -211700,6 +211926,15 @@ var receiptLocale2 = {
   "receipt.scanQrInvoice": "\u0110\u1EC3 xu\u1EA5t h\xF3a \u0111\u01A1n \u0111i\u1EC7n t\u1EED\nvui l\xF2ng qu\xE9t QR code ph\xEDa tr\xEAn",
   "receipt.scanQrInvoiceSide": "Qu\xE9t QR \u0111\u1EC3 xu\u1EA5t h\xF3a \u0111\u01A1n ho\u1EB7c truy c\u1EADp {site} trong 60 ph\xFAt.",
   "receipt.scanQrVat": "Phi\u1EBFu n\xE0y c\xF3 gi\xE1 tr\u1ECB xu\u1EA5t h\xF3a \u0111\u01A1n GTGT trong v\xF2ng 02 gi\u1EDD k\u1EC3 t\u1EEB th\u1EDDi \u0111i\u1EC3m thanh to\xE1n. Qu\xFD kh\xE1ch vui l\xF2ng qu\xE9t m\xE3 QR \u0111\u1EC3 xu\u1EA5t h\xF3a \u0111\u01A1n GTGT",
+  "receipt.productCodeShort": "M\xE3 sp",
+  "receipt.unitPriceShort": "\u0110gi\xE1",
+  "receipt.amountTendered": "Ti\u1EC1n nh\u1EADn",
+  "receipt.amountCollected": "S\u1ED1 ti\u1EC1n \u0111\xE3 nh\u1EADn",
+  "receipt.changeReturned": "Ti\u1EC1n tr\u1EA3 l\u1EA1i",
+  "receipt.itemLines": "Ts\u1ED1 m\u1EB7t/h",
+  "receipt.soldQty": "T\u1ED5ng sl bh\xE0ng",
+  "receipt.memberSavings": "Ti\u1EBFt ki\u1EC7m h\u01A1n khi s\u1EED d\u1EE5ng th\u1EBB th\xE0nh vi\xEAn",
+  "receipt.scanQrFanpage": "Qu\xE9t QR code v\xE0 gh\xE9 Fanpage \u0111\u1EC3 bi\u1EBFt th\xEAm th\xF4ng tin khuy\u1EBFn m\xE3i",
   "receipt.scanQrFeedback": "Vui l\xF2ng qu\xE9t m\xE3 QR \u0111\u1EC3 chia s\u1EBB \xFD ki\u1EBFn c\u1EE7a b\u1EA1n",
   "receipt.scanQrInvoiceSite": "\u0110\u1EC3 xu\u1EA5t h\xF3a \u0111\u01A1n VAT, vui l\xF2ng qu\xE9t QR code \u0111\u1EC3 truy c\u1EADp {site} v\xE0 \u0111i\u1EC1n th\xF4ng tin trong ng\xE0y mua h\xE0ng",
   "receipt.updateInvoiceInfo": "\u0110\u1EC3 c\u1EADp nh\u1EADt th\xF4ng tin xu\u1EA5t h\xF3a \u0111\u01A1n, qu\xFD kh\xE1ch vui l\xF2ng truy c\u1EADp: {site}",
@@ -211750,10 +211985,10 @@ var createReceiptT = (lang = "vi") => {
 };
 
 // src/components/Bills/shared/Paper.tsx
-var import_antd11 = __toESM(require_lib49());
+var import_antd12 = __toESM(require_lib49());
 
 // src/components/Bills/shared/Watermark.tsx
-var import_jsx_runtime11 = __toESM(require_jsx_runtime());
+var import_jsx_runtime12 = __toESM(require_jsx_runtime());
 var clamp = (value, { min, max, default: fallback }) => Math.min(max, Math.max(min, Number.isFinite(value) ? value : fallback));
 var resolveWatermark = (options = {}) => {
   const custom = (options.text ?? "").trim() || WATERMARK_LIMITS.defaultText;
@@ -211785,7 +212020,7 @@ var buildWatermarkDataUrl = (options, width) => `data:image/svg+xml;charset=utf-
 var Watermark = ({
   options,
   width
-}) => /* @__PURE__ */ (0, import_jsx_runtime11.jsx)(
+}) => /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
   "div",
   {
     className: "absolute inset-0 pointer-events-none bg-repeat-y bg-top",
@@ -211797,7 +212032,7 @@ var Watermark = ({
 );
 
 // src/components/Bills/shared/Paper.tsx
-var import_jsx_runtime12 = __toESM(require_jsx_runtime());
+var import_jsx_runtime13 = __toESM(require_jsx_runtime());
 var Paper = ({
   width,
   fontFamily,
@@ -211806,9 +212041,9 @@ var Paper = ({
   watermark,
   withWatermarkOverlay = true,
   children
-}) => /* @__PURE__ */ (0, import_jsx_runtime12.jsxs)(import_antd11.Flex, { vertical: true, className: "relative overflow-hidden bg-[#fdfdfb]", style: { width }, children: [
-  /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
-    import_antd11.Flex,
+}) => /* @__PURE__ */ (0, import_jsx_runtime13.jsxs)(import_antd12.Flex, { vertical: true, className: "relative overflow-hidden bg-[#fdfdfb]", style: { width }, children: [
+  /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+    import_antd12.Flex,
     {
       vertical: true,
       className: "w-full pt-6 px-[18px] pb-7",
@@ -211822,11 +212057,11 @@ var Paper = ({
       children
     }
   ),
-  withWatermarkOverlay ? /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Watermark, { options: watermark, width }) : null
+  withWatermarkOverlay ? /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(Watermark, { options: watermark, width }) : null
 ] });
 
 // src/components/Bills/BillRenderer.tsx
-var import_jsx_runtime13 = __toESM(require_jsx_runtime());
+var import_jsx_runtime14 = __toESM(require_jsx_runtime());
 var resolveBillView = (data) => {
   const template = getBillTemplate(data.templateId);
   const font = getFontPreset(data.display?.fontId || template.fontId);
@@ -211842,7 +212077,7 @@ var BillRenderer = ({
 }) => {
   const { template, font, fontSize, paperWidth } = resolveBillView(data);
   const Template = template.component;
-  return /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+  return /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
     Paper,
     {
       width: paperWidth,
@@ -211851,7 +212086,7 @@ var BillRenderer = ({
       inkDensity: data.display?.inkDensity,
       watermark: data.display?.watermark,
       withWatermarkOverlay,
-      children: /* @__PURE__ */ (0, import_jsx_runtime13.jsx)(
+      children: /* @__PURE__ */ (0, import_jsx_runtime14.jsx)(
         Template,
         {
           data,
@@ -211933,7 +212168,7 @@ var normalizeBillData = (input = {}) => {
 };
 
 // src/utils/render-bill/to-satori.ts
-var import_antd12 = __toESM(require_lib49());
+var import_antd13 = __toESM(require_lib49());
 var import_lodash = __toESM(require_lodash());
 var import_react = __toESM(require_react());
 var FORWARD_REF = /* @__PURE__ */ Symbol.for("react.forward_ref");
@@ -211963,7 +212198,7 @@ var toSatoriTree = (node) => {
   const { type } = node;
   const props = node.props;
   if (type === import_react.default.Fragment) return toSatoriTree(props.children);
-  if (type === import_antd12.Flex) {
+  if (type === import_antd13.Flex) {
     const { vertical, wrap, justify, align, flex, gap } = props;
     const rest = (0, import_lodash.omit)(props, ["vertical", "wrap", "justify", "align", "flex", "gap", "component"]);
     return import_react.default.createElement(
@@ -211980,7 +212215,7 @@ var toSatoriTree = (node) => {
       toSatoriTree(props.children)
     );
   }
-  if (type === import_antd12.Image) {
+  if (type === import_antd13.Image) {
     const { src, width, height } = props;
     const rest = (0, import_lodash.omit)(props, ["preview", "fallback", "placeholder", "rootClassName"]);
     return import_react.default.createElement(
@@ -212065,7 +212300,8 @@ var fromQuery = (query) => {
     transaction: {
       ...base.transaction,
       ...first(query.cashier) ? { cashier: first(query.cashier) } : {},
-      ...first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}
+      ...first(query.invoice) ? { invoiceNo: first(query.invoice) } : {},
+      ...first(query.billId) ? { billId: first(query.billId) } : {}
     },
     tax: { ...base.tax, ...first(query.vat) ? { vatRate: Number(first(query.vat)) } : {} },
     display: {
@@ -212117,7 +212353,7 @@ async function render_default(req, res) {
 
 // src/.umi/api/bills/render.ts
 var import_apiRoute = __toESM(require_apiRoute());
-var apiRoutes = [{ "path": "catalog/products", "id": "catalog/products", "file": "catalog/products.ts", "absPath": "/catalog/products", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport { stripDiacritics } from '@/components/Bills/helpers/calc';\nimport { BUILT_IN_CATALOG } from '@/const/catalog';\n\nconst fold = (text: string) => stripDiacritics(text).toLowerCase();\n\n/** GET /api/catalog/products?keyword= \u2014 built-in sample products */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  const keyword = fold(String(req.query.keyword ?? ''));\n  const products: API.TCatalogProduct[] = BUILT_IN_CATALOG.map((product, index) => ({\n    ...product,\n    id: `built-in:${index}`,\n    source: 'built-in',\n  })).filter(\n    (product) =>\n      !keyword || fold(product.title).includes(keyword) || product.barcode.includes(keyword),\n  );\n  res.status(200).json(products);\n}\n" }, { "path": "bills/render", "id": "bills/render", "file": "bills/render.ts", "absPath": "/bills/render", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';\nimport { BILL_TEMPLATES } from '@/components/Bills/registry';\nimport { renderBill } from '@/utils/render-bill';\n\nconst MAX_ITEMS = 200;\n\nconst decodePayload = (payload: string) =>\n  JSON.parse(\n    Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'),\n  );\n\nconst first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);\n\n/**\n * Query-string shortcuts on top of the full JSON bill:\n *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, qr, barcode,\n *   scale, format,\n *   items (JSON array)\n */\nconst fromQuery = (\n  query: UmiApiRequest['query'],\n): TDeepPartialBill & { scale?: string; format?: string } => {\n  const payload = first(query.payload);\n  const base: TDeepPartialBill = payload ? decodePayload(payload) : {};\n  const items = first(query.items);\n  return {\n    ...base,\n    templateId: first(query.template) ?? base.templateId,\n    store: {\n      ...base.store,\n      ...(first(query.name) ? { name: first(query.name) } : {}),\n      ...(first(query.logo) ? { logoUrl: first(query.logo) } : {}),\n    },\n    transaction: {\n      ...base.transaction,\n      ...(first(query.cashier) ? { cashier: first(query.cashier) } : {}),\n      ...(first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}),\n    },\n    tax: { ...base.tax, ...(first(query.vat) ? { vatRate: Number(first(query.vat)) } : {}) },\n    display: {\n      ...base.display,\n      ...(first(query.seed) ? { seed: first(query.seed) } : {}),\n      ...(first(query.qr) ? { qrText: first(query.qr) } : {}),\n      ...(first(query.barcode) ? { barcodeText: first(query.barcode) } : {}),\n      ...(first(query.language) === 'en' || first(query.language) === 'vi'\n        ? { language: first(query.language) as 'vi' | 'en' }\n        : {}),\n    },\n    items: items ? JSON.parse(items) : base.items,\n    scale: first(query.scale),\n    format: first(query.format),\n  };\n};\n\n/**\n * GET|POST /api/bills/render \u2192 image/png (or image/svg+xml with format=svg)\n * GET /api/bills/render?list=templates \u2192 available template ids\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  try {\n    if (first(req.query.list) === 'templates') {\n      res.status(200).json(\n        BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({\n          id,\n          name,\n          description,\n          printerStyle,\n          fields,\n        })),\n      );\n      return;\n    }\n\n    let input: TDeepPartialBill & { scale?: string | number; format?: string };\n    if (req.method === 'POST') {\n      // umi has already read the body before calling the handler\n      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body ?? {};\n    } else {\n      input = fromQuery(req.query);\n    }\n\n    if ((input.items?.length ?? 0) > MAX_ITEMS) {\n      res.status(400).json({ message: `At most ${MAX_ITEMS} items per bill.` });\n      return;\n    }\n\n    const { scale, format, ...bill } = input;\n    const result = await renderBill(bill, {\n      scale: Number(scale) || undefined,\n      format: format === 'svg' ? 'svg' : 'png',\n    });\n\n    res\n      .status(200)\n      .header('Content-Type', result.contentType)\n      .header('Cache-Control', 'no-store')\n      .header('X-Bill-Template', result.data.templateId)\n      .header('X-Bill-Seed', String(result.data.display.seed))\n      .end(result.body);\n  } catch (error: any) {\n    res.status(400).json({ message: error?.message ?? 'Render failed' });\n  }\n}\n" }];
+var apiRoutes = [{ "path": "catalog/products", "id": "catalog/products", "file": "catalog/products.ts", "absPath": "/catalog/products", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\r\n\r\nimport { stripDiacritics } from '@/components/Bills/helpers/calc';\r\nimport { BUILT_IN_CATALOG } from '@/const/catalog';\r\n\r\nconst fold = (text: string) => stripDiacritics(text).toLowerCase();\r\n\r\n/** GET /api/catalog/products?keyword= \u2014 built-in sample products */\r\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\r\n  const keyword = fold(String(req.query.keyword ?? ''));\r\n  const products: API.TCatalogProduct[] = BUILT_IN_CATALOG.map((product, index) => ({\r\n    ...product,\r\n    id: `built-in:${index}`,\r\n    source: 'built-in',\r\n  })).filter(\r\n    (product) =>\r\n      !keyword || fold(product.title).includes(keyword) || product.barcode.includes(keyword),\r\n  );\r\n  res.status(200).json(products);\r\n}\r\n" }, { "path": "bills/render", "id": "bills/render", "file": "bills/render.ts", "absPath": "/bills/render", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';\nimport { BILL_TEMPLATES } from '@/components/Bills/registry';\nimport { renderBill } from '@/utils/render-bill';\n\nconst MAX_ITEMS = 200;\n\nconst decodePayload = (payload: string) =>\n  JSON.parse(\n    Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'),\n  );\n\nconst first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);\n\n/**\n * Query-string shortcuts on top of the full JSON bill:\n *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, qr, barcode,\n *   scale, format,\n *   items (JSON array)\n */\nconst fromQuery = (\n  query: UmiApiRequest['query'],\n): TDeepPartialBill & { scale?: string; format?: string } => {\n  const payload = first(query.payload);\n  const base: TDeepPartialBill = payload ? decodePayload(payload) : {};\n  const items = first(query.items);\n  return {\n    ...base,\n    templateId: first(query.template) ?? base.templateId,\n    store: {\n      ...base.store,\n      ...(first(query.name) ? { name: first(query.name) } : {}),\n      ...(first(query.logo) ? { logoUrl: first(query.logo) } : {}),\n    },\n    transaction: {\n      ...base.transaction,\n      ...(first(query.cashier) ? { cashier: first(query.cashier) } : {}),\n      ...(first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}),\n      ...(first(query.billId) ? { billId: first(query.billId) } : {}),\n    },\n    tax: { ...base.tax, ...(first(query.vat) ? { vatRate: Number(first(query.vat)) } : {}) },\n    display: {\n      ...base.display,\n      ...(first(query.seed) ? { seed: first(query.seed) } : {}),\n      ...(first(query.qr) ? { qrText: first(query.qr) } : {}),\n      ...(first(query.barcode) ? { barcodeText: first(query.barcode) } : {}),\n      ...(first(query.language) === 'en' || first(query.language) === 'vi'\n        ? { language: first(query.language) as 'vi' | 'en' }\n        : {}),\n    },\n    items: items ? JSON.parse(items) : base.items,\n    scale: first(query.scale),\n    format: first(query.format),\n  };\n};\n\n/**\n * GET|POST /api/bills/render \u2192 image/png (or image/svg+xml with format=svg)\n * GET /api/bills/render?list=templates \u2192 available template ids\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  try {\n    if (first(req.query.list) === 'templates') {\n      res.status(200).json(\n        BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({\n          id,\n          name,\n          description,\n          printerStyle,\n          fields,\n        })),\n      );\n      return;\n    }\n\n    let input: TDeepPartialBill & { scale?: string | number; format?: string };\n    if (req.method === 'POST') {\n      // umi has already read the body before calling the handler\n      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body ?? {};\n    } else {\n      input = fromQuery(req.query);\n    }\n\n    if ((input.items?.length ?? 0) > MAX_ITEMS) {\n      res.status(400).json({ message: `At most ${MAX_ITEMS} items per bill.` });\n      return;\n    }\n\n    const { scale, format, ...bill } = input;\n    const result = await renderBill(bill, {\n      scale: Number(scale) || undefined,\n      format: format === 'svg' ? 'svg' : 'png',\n    });\n\n    res\n      .status(200)\n      .header('Content-Type', result.contentType)\n      .header('Cache-Control', 'no-store')\n      .header('X-Bill-Template', result.data.templateId)\n      .header('X-Bill-Seed', String(result.data.display.seed))\n      .end(result.body);\n  } catch (error: any) {\n    res.status(400).json({ message: error?.message ?? 'Render failed' });\n  }\n}\n" }];
 var render_default2 = async (req, res) => {
   const umiReq = new import_apiRoute.UmiApiRequest(req, apiRoutes);
   await umiReq.readBody();

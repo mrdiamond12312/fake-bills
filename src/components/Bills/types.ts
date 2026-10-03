@@ -1,6 +1,7 @@
 import type React from 'react';
 
 import type { FONT_ID } from '@/components/Bills/fonts';
+import type { TBillIdSource, TOcrRetailer } from '@/components/Bills/helpers/bill-id';
 import type { createRandom } from '@/components/Bills/helpers/random';
 import type { TReceiptT } from '@/components/Bills/helpers/receipt-text';
 
@@ -39,7 +40,10 @@ export type TTransactionInfo = {
   amountPaid?: number;
   customerName?: string;
   memberCode?: string;
+  /** E-invoice lookup code put in the random QR link (and printed by Circle K) */
   lookupCode?: string;
+  /** Overrides whatever the template prints as the OCR `bill_id` (Mã CQT or barcode). Empty → generated. */
+  billId?: string;
 };
 
 export type TBillItem = {
@@ -126,8 +130,12 @@ export type TBillCodes = {
   qrDataUrl: string;
   barcodeValue: string;
   barcodeDataUrl: string;
-  /** Mã CQT (tax-authority code) in the "M1-YY-XXXXX-###########" format; `transaction.lookupCode` when set */
+  /** Mã CQT (tax-authority code) in the "M1-YY-XXXXX-###########" format */
   taxAuthorityCode: string;
+  /** The value the OCR reads as `bill_id` for this template; '' when the template has none */
+  billId: string;
+  /** What `billId` would be without the `transaction.billId` override */
+  generatedBillId: string;
 };
 
 /** Everything a template needs to draw itself. Templates must be pure (no hooks) so satori can render them. */
@@ -158,6 +166,7 @@ export type TBillField =
   | 'transaction.customerName'
   | 'transaction.memberCode'
   | 'transaction.lookupCode'
+  | 'transaction.billId'
   | 'item.barcode'
   | 'item.unit'
   | 'item.discount'
@@ -186,6 +195,11 @@ export type TBillTemplate = {
    * Used when `display.barcodeText` is empty; default: 20 random digits.
    */
   barcodeValue?: (data: TBillData, random: ReturnType<typeof createRandom>) => string;
+  /**
+   * Where this store's receipt carries the OCR `bill_id` and which backend rule checks it.
+   * Templates without it have no Bill ID field.
+   */
+  billId?: { source: TBillIdSource; retailer: TOcrRetailer };
   defaults: Pick<TBillData, 'store' | 'transaction' | 'footerNote'> & {
     tax?: Partial<TTaxInfo>;
   };

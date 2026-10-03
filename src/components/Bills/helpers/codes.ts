@@ -27,7 +27,8 @@ const randomTaxAuthorityCode = (
 /**
  * QR + barcode for a bill. Custom content from `display.qrText` / `display.barcodeText` when set;
  * otherwise random but seeded, with the QR pointing at example.com. The barcode falls back to the
- * template's own receipt-number format (`barcodeValue`) when it has one.
+ * template's own receipt-number format (`barcodeValue`) when it has one. `transaction.billId`
+ * overrides whichever of the two (Mã CQT or barcode) the template prints as the OCR `bill_id`.
  */
 export const generateBillCodes = (data: Pick<TBillData, 'display' | 'transaction' | 'templateId'>) => {
   const seed = data.display?.seed || 'receipt-lab';
@@ -44,9 +45,14 @@ export const generateBillCodes = (data: Pick<TBillData, 'display' | 'transaction
   const randomBarcode = template?.barcodeValue
     ? template.barcodeValue(data as TBillData, extraRandom)
     : digitsBarcode;
+  const presetTaxAuthorityCode = randomTaxAuthorityCode(
+    createRandom(`${seed}:cqt`),
+    data.transaction?.dateTime,
+  );
+  const billIdSource = template?.billId?.source;
+  const billIdOverride = data.transaction?.billId?.trim();
   const taxAuthorityCode =
-    data.transaction?.lookupCode?.trim() ||
-    randomTaxAuthorityCode(createRandom(`${seed}:cqt`), data.transaction?.dateTime);
+    (billIdSource === 'cqt' && billIdOverride) || presetTaxAuthorityCode;
 
   const qrSvgFor = (text: string) => toSVG({ bcid: 'qrcode', text, scale: 3, eclevel: 'M' } as any);
   const barcodeSvgFor = (text: string) =>
@@ -67,7 +73,11 @@ export const generateBillCodes = (data: Pick<TBillData, 'display' | 'transaction
   };
 
   const qr = encode(data.display?.qrText, randomQr, qrSvgFor);
-  const barcode = encode(data.display?.barcodeText, randomBarcode, barcodeSvgFor);
+  const barcode = encode(
+    (billIdSource === 'barcode' && billIdOverride) || data.display?.barcodeText,
+    randomBarcode,
+    barcodeSvgFor,
+  );
   const qrPayload = qr.value;
   const barcodeValue = barcode.value;
   const qrSvg = qr.svg;
@@ -79,5 +89,8 @@ export const generateBillCodes = (data: Pick<TBillData, 'display' | 'transaction
     barcodeValue,
     barcodeDataUrl: svgToDataUrl(barcodeSvg),
     taxAuthorityCode,
+    billId: billIdSource === 'cqt' ? taxAuthorityCode : billIdSource ? barcodeValue : '',
+    generatedBillId:
+      billIdSource === 'cqt' ? presetTaxAuthorityCode : billIdSource ? randomBarcode : '',
   } satisfies TBillCodes;
 };

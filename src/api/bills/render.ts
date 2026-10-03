@@ -37,6 +37,7 @@ const fromQuery = (
       ...base.transaction,
       ...(first(query.cashier) ? { cashier: first(query.cashier) } : {}),
       ...(first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}),
+      ...(first(query.billId) ? { billId: first(query.billId) } : {}),
     },
     tax: { ...base.tax, ...(first(query.vat) ? { vatRate: Number(first(query.vat)) } : {}) },
     display: {

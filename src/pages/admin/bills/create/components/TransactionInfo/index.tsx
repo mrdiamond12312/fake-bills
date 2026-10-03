@@ -1,11 +1,14 @@
 import { SettingOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Flex, Form, Input, Popover, Row, Tooltip, Typography } from 'antd';
+import { Button, Col, Flex, Form, Input, Popover, Row, Tag, Tooltip, Typography } from 'antd';
 import React from 'react';
 import { useWatch } from 'react-hook-form';
 
-import type { TBillField } from '@/components/Bills/types';
+import { checkBillId, makeInvalidBillId } from '@/components/Bills/helpers/bill-id';
+import { getBillTemplate } from '@/components/Bills/registry';
+import type { TBillCodes, TBillData, TBillField } from '@/components/Bills/types';
 import InputText from '@/components/Input';
+import AutoComplete from '@/components/Input/AutoComplete';
 import DatePicker from '@/components/Input/DatePicker';
 import InputNumber from '@/components/Input/InputNumber';
 import { BILL_FORM_KEY, isFieldVisible } from '@/pages/admin/bills/create/helpers/billFormKeys';
@@ -39,14 +42,16 @@ const TEXT_FIELDS: { field: TBillField; id: string; label: string }[] = [
   {
     field: 'transaction.lookupCode',
     id: 'bills.form.transaction.lookupCode',
-    label: 'Lookup code (empty = random)',
+    label: 'Lookup code in the QR link (empty = random)',
   },
 ];
 
-export const TransactionInfo: React.FC<{ control: any; fields: TBillField[] }> = ({
-  control,
-  fields,
-}) => {
+export const TransactionInfo: React.FC<{
+  control: any;
+  fields: TBillField[];
+  bill: TBillData;
+  codes: TBillCodes;
+}> = ({ control, fields, bill, codes }) => {
   const { formatMessage } = useIntl();
   const t = (id: string, defaultMessage: string) => formatMessage({ id, defaultMessage });
   const templateId = useWatch({ control, name: BILL_FORM_KEY.templateId });
@@ -94,8 +99,85 @@ export const TransactionInfo: React.FC<{ control: any; fields: TBillField[] }> =
     </Flex>
   );
 
+  // Bill ID = what the OCR reads as bill_id for this store; checked with the backend's rule
+  const billIdRule = getBillTemplate(templateId).billId;
+  const billIdInput = (() => {
+    if (!billIdRule || !isFieldVisible(fields, 'transaction.billId')) return null;
+    const { retailer, source } = billIdRule;
+    const dateTime = bill.transaction.dateTime;
+    const validId = codes.generatedBillId;
+    const invalidId = makeInvalidBillId(retailer, validId);
+    const invalidCheck = checkBillId(retailer, invalidId, dateTime);
+    const check = checkBillId(retailer, codes.billId, dateTime);
+    const suggestion = (id: string, ok: boolean, note: string) => ({
+      value: id,
+      // reason under the ID so a long reason never truncates the code itself
+      label: (
+        <Flex vertical align="flex-start" gap={2}>
+          <Typography.Text>{id}</Typography.Text>
+          <Tag color={ok ? 'success' : 'error'} className="m-0 whitespace-normal">
+            {note}
+          </Tag>
+        </Flex>
+      ),
+    });
+
+    return (
+      <Col span={24}>
+        <Item
+          label={formatMessage(
+            { id: 'bills.form.transaction.billId', defaultMessage: 'Bill ID ({source})' },
+            {
+              source:
+                source === 'cqt'
+                  ? 'Mã CQT'
+                  : formatMessage({ id: 'bills.form.billId.barcode', defaultMessage: 'barcode' }),
+            },
+          )}
+          extra={
+            <Typography.Text type={check.ok ? 'success' : 'danger'}>
+              {check.ok
+                ? formatMessage(
+                    {
+                      id: 'bills.form.billId.passes',
+                      defaultMessage: '✓ {id} passes the OCR bill ID check',
+                    },
+                    { id: codes.billId },
+                  )
+                : formatMessage(
+                    {
+                      id: 'bills.form.billId.fails',
+                      defaultMessage: '✗ {id} will be rejected: {reason}',
+                    },
+                    { id: codes.billId, reason: check.reason },
+                  )}
+            </Typography.Text>
+          }
+        >
+          <AutoComplete
+            control={control}
+            name="transaction.billId"
+            placeholder={`${validId} (${formatMessage({
+              id: 'bills.form.billId.preset',
+              defaultMessage: 'preset',
+            })})`}
+            options={[
+              suggestion(
+                validId,
+                true,
+                formatMessage({ id: 'bills.form.billId.suggestValid', defaultMessage: '✓ passes' }),
+              ),
+              suggestion(invalidId, false, `✗ ${invalidCheck.reason ?? ''}`),
+            ]}
+          />
+        </Item>
+      </Col>
+    );
+  })();
+
   return (
     <Row gutter={12}>
+      {billIdInput}
       <Col span={24} md={12}>
         <Item
           label={formatMessage({

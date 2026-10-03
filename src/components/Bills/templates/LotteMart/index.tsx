@@ -139,6 +139,7 @@ export const lotteMartTemplate: TBillTemplate = {
   fontSize: 17,
   paperWidth: PAPER_WIDTH.mm58 + 32,
   catalogAccounts: ['lotte'],
+  billId: { source: 'barcode', retailer: 'lottemart' },
   // 002 + YYMMDD + store/POS (from "0206-0119") + 8-digit sequence, e.g. 0022601010001000100000001
   barcodeValue: ({ transaction }) =>
     [
@@ -153,6 +154,7 @@ export const lotteMartTemplate: TBillTemplate = {
     'store.hotline',
     'store.taxCode',
     'transaction.invoiceNo',
+    'transaction.billId',
     'transaction.posNo',
     'transaction.cashier',
     'transaction.paymentMethod',

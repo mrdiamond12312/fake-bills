@@ -80,6 +80,7 @@ export const useBillForm = () => {
       bill.display.qrText,
       bill.display.barcodeText,
       bill.transaction.lookupCode,
+      bill.transaction.billId,
       bill.transaction.dateTime,
       bill.transaction.invoiceNo,
       bill.transaction.posNo,

@@ -142,6 +142,7 @@ export const emartTemplate: TBillTemplate = {
   fontSize: 16,
   paperWidth: PAPER_WIDTH.mm58 + 16,
   catalogAccounts: ['emart'],
+  billId: { source: 'barcode', retailer: 'emart' },
   // 0 + YYYYMMDD + invoice no + POS ("0001-0001"), e.g. 0202601010000100010001
   barcodeValue: ({ transaction }) =>
     [
@@ -157,6 +158,7 @@ export const emartTemplate: TBillTemplate = {
     'store.taxCode',
     'store.slogan',
     'transaction.invoiceNo',
+    'transaction.billId',
     'transaction.posNo',
     'transaction.cashier',
     'transaction.paymentMethod',

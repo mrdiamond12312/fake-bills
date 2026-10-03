@@ -141,6 +141,7 @@ export const aeonTemplate: TBillTemplate = {
   catalogAccounts: ['aeon'],
   // the bill prints the store's own item code (ART CODE), not the EAN
   itemCode: 'artCode',
+  billId: { source: 'cqt', retailer: 'aeon' },
   fields: [
     'store.legalName',
     'store.phone',
@@ -148,12 +149,12 @@ export const aeonTemplate: TBillTemplate = {
     'store.website',
     'store.slogan',
     'transaction.invoiceNo',
+    'transaction.billId',
     'transaction.posNo',
     'transaction.cashier',
     'transaction.paymentMethod',
     'transaction.amountPaid',
     'transaction.memberCode',
-    'transaction.lookupCode',
     'item.barcode',
     'footerNote',
   ],

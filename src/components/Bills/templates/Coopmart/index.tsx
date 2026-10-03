@@ -133,6 +133,7 @@ export const coopmartTemplate: TBillTemplate = {
   fontSize: 14,
   paperWidth: PAPER_WIDTH.mm80 - 96,
   catalogAccounts: ['co.op', 'coop'],
+  billId: { source: 'cqt', retailer: 'coopmart' },
   // store + counter + YYMMDD + invoice no, e.g. 0012000126010110001
   barcodeValue: ({ transaction }, random) => {
     return [
@@ -151,13 +152,13 @@ export const coopmartTemplate: TBillTemplate = {
     'store.website',
     'store.slogan',
     'transaction.invoiceNo',
+    'transaction.billId',
     'transaction.posNo',
     'transaction.cashier',
     'transaction.paymentMethod',
     'transaction.amountPaid',
     'transaction.customerName',
     'transaction.memberCode',
-    'transaction.lookupCode',
     'item.barcode',
     'footerNote',
   ],

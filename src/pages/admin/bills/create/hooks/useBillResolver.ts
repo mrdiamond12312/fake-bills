@@ -64,6 +64,24 @@ export const useBillResolver = () => {
         ),
       logoWidth: yup.number().min(24).max(400).nullable(),
     }),
+    transaction: yup.object().shape({
+      // may become the Code 128 barcode, so the same limits apply
+      billId: yup
+        .string()
+        .max(
+          80,
+          formatMessage({
+            id: 'bills.form.validation.barcode.max',
+            defaultMessage: 'Barcode content must be at most 80 characters',
+          }),
+        )
+        .matches(/^[\x20-\x7E]*$/, {
+          message: formatMessage({
+            id: 'bills.form.validation.barcode.ascii',
+            defaultMessage: 'Code 128 only supports plain ASCII (no accents)',
+          }),
+        }),
+    }),
     items: yup
       .array()
       .of(ItemSchema)

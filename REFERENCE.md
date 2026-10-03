@@ -16,16 +16,17 @@ For setup and day-to-day usage, see [README.md](README.md).
 
 1. [Architecture](#architecture)
 2. [Data model](#data-model)
-3. [Templates](#templates)
-4. [Render API](#render-api)
-5. [Product catalog (xlsx)](#product-catalog-xlsx)
-6. [Shareable page links](#shareable-page-links)
-7. [i18n](#i18n)
-8. [Fonts](#fonts)
-9. [Watermark](#watermark)
-10. [Adding a template](#adding-a-template)
-11. [Project structure](#project-structure)
-12. [Scripts](#scripts)
+3. [Bill ID](#bill-id)
+4. [Templates](#templates)
+5. [Render API](#render-api)
+6. [Product catalog (xlsx)](#product-catalog-xlsx)
+7. [Shareable page links](#shareable-page-links)
+8. [i18n](#i18n)
+9. [Fonts](#fonts)
+10. [Watermark](#watermark)
+11. [Adding a template](#adding-a-template)
+12. [Project structure](#project-structure)
+13. [Scripts](#scripts)
 
 ---
 
@@ -64,7 +65,9 @@ Stack: UmiJS Max 4, React 18, Ant Design 5, Tailwind 3, react-hook-form + yup, r
   transaction: {
     invoiceNo?; posNo?; cashier?; dateTime? /* ISO */; paymentMethod?;
     amountPaid?;                    // empty → exact total
-    customerName?; memberCode?; lookupCode?;
+    customerName?; memberCode?;
+    lookupCode?;                    // goes into the random QR link (Circle K also prints it)
+    billId?;                        // the OCR bill_id; overrides the Mã CQT or barcode, see below
   };
   items: { title; barcode?; unit?; unitPrice; quantity; discount? }[];
   tax: { vatRate /* % , default 10 */; priceIncludesVat /* default true */ };
@@ -85,6 +88,19 @@ Stack: UmiJS Max 4, React 18, Ant Design 5, Tailwind 3, react-hook-form + yup, r
 **Totals** (`helpers/calc.ts`): line total = `unitPrice × quantity − discount`. When `priceIncludesVat` is on, VAT is extracted from the net amount; when it's off, VAT is added on top.
 
 ---
+
+## Bill ID
+
+`bill_id` is what the OCR prompt extracts and the backend's `getBillIdConfidence` (ocr.ts) checks. Each template declares where it prints it (`billId: { source, retailer }`); `src/components/Bills/helpers/bill-id.ts` mirrors the backend rules, and the composer's **Bill ID** field shows ✓/✗ for the printed value plus one passing and one failing suggestion.
+
+| Template | Printed as | Backend key | Rule |
+| --- | --- | --- | --- |
+| `aeon`, `coopmart`, `winmart` | Mã CQT | `aeon`, `coopmart`, `winmart` | `M1-<25\|26>-<4–6 A–Z/0–9>-<8–12 digits>` |
+| `emart` | barcode | `emart` | `0` + YYYYMMDD (±1 day of the bill) + 12–14 digits |
+| `lotte-mart` | barcode | `lottemart` | 3 digits + YYMMDD (±1 day) + 14–16 digits |
+| `go-tops` | barcode | `go`, `topsmarket` | `660000` + 28–32 digits |
+
+Empty `billId` → a preset that passes (Mã CQT uses the fixed `TEST0` series so it can't match a real invoice). Precedence for the barcode: `billId` (when the template's bill ID is the barcode) → `display.barcodeText` → generated.
 
 ## Templates
 
@@ -145,6 +161,7 @@ curl -o bill.png -X POST -H 'Content-Type: application/json' http://localhost:80
 | `logo`            | `store.logoUrl`                                           |
 | `cashier`         | `transaction.cashier`                                     |
 | `invoice`         | `transaction.invoiceNo`                                   |
+| `billId`          | `transaction.billId`                                      |
 | `qr`              | `display.qrText`                                          |
 | `barcode`         | `display.barcodeText`                                     |
 | `items`           | `items` (JSON array)                                      |

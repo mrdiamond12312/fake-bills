@@ -41,6 +41,7 @@ export const RENDER_QUERY_PARAMS = [
   { param: 'logo', sets: 'store.logoUrl' },
   { param: 'cashier', sets: 'transaction.cashier' },
   { param: 'invoice', sets: 'transaction.invoiceNo' },
+  { param: 'billId', sets: 'transaction.billId (the OCR bill_id: Mã CQT or barcode)' },
   { param: 'qr', sets: 'display.qrText' },
   { param: 'barcode', sets: 'display.barcodeText' },
   { param: 'items', sets: 'items (JSON array)' },

@@ -151,6 +151,7 @@ export const goTopsTemplate: TBillTemplate = {
   fontSize: 16,
   paperWidth: PAPER_WIDTH.mm58,
   catalogAccounts: ['go!', 'mini go', 'tops'],
+  billId: { source: 'barcode', retailer: 'go' },
   // 660000 + store + 0000 + POS + ticket + YYYYMMDDHHmmss, e.g. 660000120000001000000120260101120000
   barcodeValue: ({ transaction }, random) => {
     return [
@@ -169,6 +170,7 @@ export const goTopsTemplate: TBillTemplate = {
     'store.hotline',
     'store.taxCode',
     'transaction.invoiceNo',
+    'transaction.billId',
     'transaction.posNo',
     'transaction.cashier',
     'transaction.paymentMethod',
