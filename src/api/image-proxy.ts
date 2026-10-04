@@ -1,6 +1,6 @@
 import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';
 
-const MAX_BYTES = 2 * 1024 * 1024;
+const MAX_BYTES = 10 * 1024 * 1024;
 const PRIVATE_HOST =
   /^(localhost|0\.0\.0\.0|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$|\[?f[cd])/i;
 
@@ -12,7 +12,9 @@ const PRIVATE_HOST =
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   let target: URL;
   try {
-    target = new URL(String(req.query.url ?? ''));
+    // req.query leaves values percent-encoded, so read the decoded param from the raw URL
+    const search = String(req.url ?? '').split('?')[1] ?? '';
+    target = new URL(new URLSearchParams(search).get('url') ?? '');
   } catch {
     res.status(400).json({ message: 'Invalid url' });
     return;
@@ -31,7 +33,7 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
     }
     const body = Buffer.from(await upstream.arrayBuffer());
     if (body.length > MAX_BYTES) {
-      res.status(413).json({ message: 'Image is larger than 2 MB' });
+      res.status(413).json({ message: `Image is larger than ${MAX_BYTES / 1024 / 1024} MB` });
       return;
     }
     res
