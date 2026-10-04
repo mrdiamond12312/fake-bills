@@ -384,81 +384,58 @@ var require_apiRoute = __commonJS({
   }
 });
 
-// src/.umi/api/catalog/products.ts
-var products_exports = {};
-__export(products_exports, {
-  default: () => products_default2
+// src/.umi/api/image-proxy.ts
+var image_proxy_exports = {};
+__export(image_proxy_exports, {
+  default: () => image_proxy_default2
 });
-module.exports = __toCommonJS(products_exports);
+module.exports = __toCommonJS(image_proxy_exports);
 
 // src/.umi/api/_middlewares.ts
 var middlewares_default = async (req, res, next) => {
   next();
 };
 
-// src/components/Bills/helpers/calc.ts
-var stripDiacritics = (text = "") => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D");
-
-// src/const/catalog.ts
-var BUILT_IN_CATALOG = [
-  { title: "N\u01B0\u1EDBc su\u1ED1i tinh khi\u1EBFt 500ml", barcode: "8930000000017", price: 7e3, unit: "Chai" },
-  { title: "N\u01B0\u1EDBc su\u1ED1i tinh khi\u1EBFt 1.5L", barcode: "8930000000024", price: 12e3, unit: "Chai" },
-  { title: "M\xEC \u0103n li\u1EC1n v\u1ECB t\xF4m chua cay 75g", barcode: "8930000000031", price: 4500, unit: "G\xF3i" },
-  { title: "M\xEC tr\u1ED9n v\u1ECB b\xF2 sa t\u1EBF 85g", barcode: "8930000000048", price: 8500, unit: "G\xF3i" },
-  { title: "Ch\xE1o \u0103n li\u1EC1n v\u1ECB g\xE0 50g", barcode: "8930000000055", price: 4e3, unit: "G\xF3i" },
-  {
-    title: "S\u1EEFa t\u01B0\u01A1i ti\u1EC7t tr\xF9ng c\xF3 \u0111\u01B0\u1EDDng 180ml",
-    barcode: "8930000000062",
-    price: 8e3,
-    unit: "H\u1ED9p"
-  },
-  { title: "S\u1EEFa chua u\u1ED1ng v\u1ECB d\xE2u 110ml", barcode: "8930000000079", price: 6500, unit: "Chai" },
-  { title: "Tr\xE0 xanh kh\xF4ng \u0111\u1ED9 455ml", barcode: "8930000000086", price: 1e4, unit: "Chai" },
-  { title: "N\u01B0\u1EDBc ng\u1ECDt c\xF3 ga lon 320ml", barcode: "8930000000093", price: 13e3, unit: "Lon" },
-  { title: "C\xE0 ph\xEA s\u1EEFa \u0111\xE1 lon 235ml", barcode: "8930000000109", price: 15e3, unit: "Lon" },
-  { title: "B\xE1nh quy b\u01A1 h\u1ED9p thi\u1EBFc 454g", barcode: "8930000000116", price: 119e3, unit: "H\u1ED9p" },
-  { title: "B\xE1nh x\u1ED1p ph\xF4 mai 150g", barcode: "8930000000123", price: 25e3, unit: "G\xF3i" },
-  { title: "B\xE1nh b\xF4ng lan kem s\u1EEFa 45g", barcode: "8930000000130", price: 19e3, unit: "G\xF3i" },
-  { title: "K\u1EB9o tr\xE1i c\xE2y h\u1ED7n h\u1EE3p 98g", barcode: "8930000000147", price: 35e3, unit: "G\xF3i" },
-  { title: "Snack khoai t\xE2y v\u1ECB t\u1EF1 nhi\xEAn 52g", barcode: "8930000000154", price: 12e3, unit: "G\xF3i" },
-  { title: "G\u1EA1o th\u01A1m t\xFAi 5kg", barcode: "8930000000161", price: 139e3, unit: "T\xFAi" },
-  { title: "D\u1EA7u \u0103n \u0111\u1EADu n\xE0nh 1L", barcode: "8930000000178", price: 52e3, unit: "Chai" },
-  { title: "N\u01B0\u1EDBc m\u1EAFm c\xE1 c\u01A1m 500ml", barcode: "8930000000185", price: 38e3, unit: "Chai" },
-  { title: "N\u01B0\u1EDBc t\u01B0\u01A1ng \u0111\u1EADu n\xE0nh 250ml", barcode: "8930000000192", price: 15500, unit: "Chai" },
-  { title: "\u0110\u01B0\u1EDDng tinh luy\u1EC7n 1kg", barcode: "8930000000208", price: 27e3, unit: "G\xF3i" },
-  { title: "Tr\u1EE9ng g\xE0 h\u1ED9p 10 qu\u1EA3", barcode: "8930000000215", price: 32e3, unit: "H\u1ED9p" },
-  { title: "Th\u1ECBt heo xay 300g", barcode: "8930000000222", price: 45900, unit: "Khay" },
-  { title: "Rau mu\u1ED1ng 500g", barcode: "8930000000239", price: 11900, unit: "B\xF3" },
-  { title: "Chu\u1ED1i gi\xE0 nam m\u1EF9 1kg", barcode: "8930000000246", price: 29900, unit: "Kg" },
-  { title: "T\xE1o \u0111\u1ECF nh\u1EADp kh\u1EA9u 1kg", barcode: "8930000000253", price: 79e3, unit: "Kg" },
-  { title: "Kem \u0111\xE1nh r\u0103ng b\u1EA1c h\xE0 180g", barcode: "8930000000260", price: 36e3, unit: "Tu\xFDp" },
-  { title: "D\u1EA7u g\u1ED9i s\u1EA1ch g\xE0u 650ml", barcode: "8930000000277", price: 159e3, unit: "Chai" },
-  { title: "N\u01B0\u1EDBc r\u1EEDa ch\xE9n h\u01B0\u01A1ng chanh 750g", barcode: "8930000000284", price: 29500, unit: "Chai" },
-  { title: "Kh\u0103n gi\u1EA5y r\xFAt 180 t\u1EDD", barcode: "8930000000291", price: 18e3, unit: "G\xF3i" },
-  { title: "T\xFAi gi\u1EA5y nh\u1ECF", barcode: "8930000000307", price: 2e3, unit: "C\xE1i" }
-];
-
-// src/api/catalog/products.ts
-var fold = (text) => stripDiacritics(text).toLowerCase();
-async function products_default(req, res) {
-  const keyword = fold(String(req.query.keyword ?? ""));
-  const products = BUILT_IN_CATALOG.map((product, index) => ({
-    ...product,
-    id: `built-in:${index}`,
-    source: "built-in"
-  })).filter(
-    (product) => !keyword || fold(product.title).includes(keyword) || product.barcode.includes(keyword)
-  );
-  res.status(200).json(products);
+// src/api/image-proxy.ts
+var MAX_BYTES = 2 * 1024 * 1024;
+var PRIVATE_HOST = /^(localhost|0\.0\.0\.0|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$|\[?f[cd])/i;
+async function image_proxy_default(req, res) {
+  let target;
+  try {
+    target = new URL(String(req.query.url ?? ""));
+  } catch {
+    res.status(400).json({ message: "Invalid url" });
+    return;
+  }
+  if (!/^https?:$/.test(target.protocol) || PRIVATE_HOST.test(target.hostname)) {
+    res.status(400).json({ message: "Only public http(s) URLs are allowed" });
+    return;
+  }
+  try {
+    const upstream = await fetch(target, { redirect: "follow" });
+    const contentType = upstream.headers.get("content-type") ?? "";
+    if (!upstream.ok || !contentType.startsWith("image/")) {
+      res.status(502).json({ message: `Upstream returned ${upstream.status} ${contentType}` });
+      return;
+    }
+    const body = Buffer.from(await upstream.arrayBuffer());
+    if (body.length > MAX_BYTES) {
+      res.status(413).json({ message: "Image is larger than 2 MB" });
+      return;
+    }
+    res.status(200).header("Content-Type", contentType).header("Cache-Control", "public, max-age=86400").header("Access-Control-Allow-Origin", "*").end(body);
+  } catch (error) {
+    res.status(502).json({ message: error?.message ?? "Fetch failed" });
+  }
 }
 
-// src/.umi/api/catalog/products.ts
+// src/.umi/api/image-proxy.ts
 var import_apiRoute = __toESM(require_apiRoute());
 var apiRoutes = [{ "path": "catalog/products", "id": "catalog/products", "file": "catalog/products.ts", "absPath": "/catalog/products", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\r\n\r\nimport { stripDiacritics } from '@/components/Bills/helpers/calc';\r\nimport { BUILT_IN_CATALOG } from '@/const/catalog';\r\n\r\nconst fold = (text: string) => stripDiacritics(text).toLowerCase();\r\n\r\n/** GET /api/catalog/products?keyword= \u2014 built-in sample products */\r\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\r\n  const keyword = fold(String(req.query.keyword ?? ''));\r\n  const products: API.TCatalogProduct[] = BUILT_IN_CATALOG.map((product, index) => ({\r\n    ...product,\r\n    id: `built-in:${index}`,\r\n    source: 'built-in',\r\n  })).filter(\r\n    (product) =>\r\n      !keyword || fold(product.title).includes(keyword) || product.barcode.includes(keyword),\r\n  );\r\n  res.status(200).json(products);\r\n}\r\n" }, { "path": "bills/render", "id": "bills/render", "file": "bills/render.ts", "absPath": "/bills/render", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';\nimport { BILL_TEMPLATES } from '@/components/Bills/registry';\nimport { renderBill } from '@/utils/render-bill';\n\nconst MAX_ITEMS = 200;\n\nconst decodePayload = (payload: string) =>\n  JSON.parse(\n    Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'),\n  );\n\nconst first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);\n\n/**\n * Query-string shortcuts on top of the full JSON bill:\n *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, qr, barcode,\n *   scale, format,\n *   items (JSON array)\n */\nconst fromQuery = (\n  query: UmiApiRequest['query'],\n): TDeepPartialBill & { scale?: string; format?: string } => {\n  const payload = first(query.payload);\n  const base: TDeepPartialBill = payload ? decodePayload(payload) : {};\n  const items = first(query.items);\n  return {\n    ...base,\n    templateId: first(query.template) ?? base.templateId,\n    store: {\n      ...base.store,\n      ...(first(query.name) ? { name: first(query.name) } : {}),\n      ...(first(query.logo) ? { logoUrl: first(query.logo) } : {}),\n    },\n    transaction: {\n      ...base.transaction,\n      ...(first(query.cashier) ? { cashier: first(query.cashier) } : {}),\n      ...(first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}),\n      ...(first(query.billId) ? { billId: first(query.billId) } : {}),\n    },\n    tax: { ...base.tax, ...(first(query.vat) ? { vatRate: Number(first(query.vat)) } : {}) },\n    display: {\n      ...base.display,\n      ...(first(query.seed) ? { seed: first(query.seed) } : {}),\n      ...(first(query.qr) ? { qrText: first(query.qr) } : {}),\n      ...(first(query.barcode) ? { barcodeText: first(query.barcode) } : {}),\n      ...(first(query.language) === 'en' || first(query.language) === 'vi'\n        ? { language: first(query.language) as 'vi' | 'en' }\n        : {}),\n    },\n    items: items ? JSON.parse(items) : base.items,\n    scale: first(query.scale),\n    format: first(query.format),\n  };\n};\n\n/**\n * GET|POST /api/bills/render \u2192 image/png (or image/svg+xml with format=svg)\n * GET /api/bills/render?list=templates \u2192 available template ids\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  try {\n    if (first(req.query.list) === 'templates') {\n      res.status(200).json(\n        BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({\n          id,\n          name,\n          description,\n          printerStyle,\n          fields,\n        })),\n      );\n      return;\n    }\n\n    let input: TDeepPartialBill & { scale?: string | number; format?: string };\n    if (req.method === 'POST') {\n      // umi has already read the body before calling the handler\n      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body ?? {};\n    } else {\n      input = fromQuery(req.query);\n    }\n\n    if ((input.items?.length ?? 0) > MAX_ITEMS) {\n      res.status(400).json({ message: `At most ${MAX_ITEMS} items per bill.` });\n      return;\n    }\n\n    const { scale, format, ...bill } = input;\n    const result = await renderBill(bill, {\n      scale: Number(scale) || undefined,\n      format: format === 'svg' ? 'svg' : 'png',\n    });\n\n    res\n      .status(200)\n      .header('Content-Type', result.contentType)\n      .header('Cache-Control', 'no-store')\n      .header('X-Bill-Template', result.data.templateId)\n      .header('X-Bill-Seed', String(result.data.display.seed))\n      .end(result.body);\n  } catch (error: any) {\n    res.status(400).json({ message: error?.message ?? 'Render failed' });\n  }\n}\n" }, { "path": "image-proxy", "id": "image-proxy", "file": "image-proxy.ts", "absPath": "/image-proxy", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nconst MAX_BYTES = 2 * 1024 * 1024;\nconst PRIVATE_HOST =\n  /^(localhost|0\\.0\\.0\\.0|127\\.|10\\.|192\\.168\\.|169\\.254\\.|172\\.(1[6-9]|2\\d|3[01])\\.|\\[?::1\\]?$|\\[?f[cd])/i;\n\n/**\n * GET /api/image-proxy?url= \u2014 re-serves a remote image from our own origin.\n * html-to-image (projector texture, PNG export) has to read the logo's pixels,\n * which the browser blocks for hosts that don't send Access-Control-Allow-Origin.\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  let target: URL;\n  try {\n    target = new URL(String(req.query.url ?? ''));\n  } catch {\n    res.status(400).json({ message: 'Invalid url' });\n    return;\n  }\n  if (!/^https?:$/.test(target.protocol) || PRIVATE_HOST.test(target.hostname)) {\n    res.status(400).json({ message: 'Only public http(s) URLs are allowed' });\n    return;\n  }\n\n  try {\n    const upstream = await fetch(target, { redirect: 'follow' });\n    const contentType = upstream.headers.get('content-type') ?? '';\n    if (!upstream.ok || !contentType.startsWith('image/')) {\n      res.status(502).json({ message: `Upstream returned ${upstream.status} ${contentType}` });\n      return;\n    }\n    const body = Buffer.from(await upstream.arrayBuffer());\n    if (body.length > MAX_BYTES) {\n      res.status(413).json({ message: 'Image is larger than 2 MB' });\n      return;\n    }\n    res\n      .status(200)\n      .header('Content-Type', contentType)\n      .header('Cache-Control', 'public, max-age=86400')\n      .header('Access-Control-Allow-Origin', '*')\n      .end(body);\n  } catch (error: any) {\n    res.status(502).json({ message: error?.message ?? 'Fetch failed' });\n  }\n}\n" }];
-var products_default2 = async (req, res) => {
+var image_proxy_default2 = async (req, res) => {
   const umiReq = new import_apiRoute.UmiApiRequest(req, apiRoutes);
   await umiReq.readBody();
   const umiRes = new import_apiRoute.UmiApiResponse(res);
   await new Promise((resolve) => middlewares_default(umiReq, umiRes, resolve));
-  await products_default(umiReq, umiRes);
+  await image_proxy_default(umiReq, umiRes);
 };

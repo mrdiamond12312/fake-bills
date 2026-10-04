@@ -205,6 +205,21 @@ export const PrintImage: React.FC<{
 );
 
 /**
+ * Remote logos go through our own /api/image-proxy in the browser so html-to-image
+ * (projector, PNG export) can read them without the host's CORS headers.
+ * Data URLs, same-origin paths and the server renderer keep the src as-is.
+ */
+const browserSafeSrc = (src: string) => {
+  if (typeof window === 'undefined' || !/^https?:\/\//i.test(src)) return src;
+  try {
+    if (new URL(src).origin === window.location.origin) return src;
+  } catch {
+    return src;
+  }
+  return `/api/image-proxy?url=${encodeURIComponent(src)}`;
+};
+
+/**
  * Store logo: the image from the form (upload or URL) when provided,
  * otherwise the template's own text wordmark.
  */
@@ -225,7 +240,7 @@ export const Logo: React.FC<{
     >
       {store.logoUrl ? (
         <Image
-          src={store.logoUrl}
+          src={browserSafeSrc(store.logoUrl)}
           width={width}
           preview={false}
           style={{ objectFit: 'contain', maxHeight: width }}
