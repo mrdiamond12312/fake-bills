@@ -128,4 +128,9 @@ export const receiptLocale = {
   'receipt.descriptionBilingual': 'Description',
   'receipt.totalVnd': 'Total VND',
   'receipt.vatRateOf': '{rate} % of {base}',
+  'receipt.goods': 'Item',
+  'receipt.totalGoods': 'Goods total',
+  'receipt.amountToPay': 'Amount to pay',
+  'receipt.invoiceAuthCode': 'Invoice auth code',
+  'receipt.wrongInfoDisclaimer': 'We are not responsible for incorrect information.',
 };

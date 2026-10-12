@@ -43,5 +43,6 @@ export const Coopmart: TStory = { args: { templateId: 'coopmart' } };
 export const Emart: TStory = { args: { templateId: 'emart' } };
 export const LotteMart: TStory = { args: { templateId: 'lotte-mart' } };
 export const WinMart: TStory = { args: { templateId: 'winmart' } };
+export const WinMart2026: TStory = { args: { templateId: 'winmart-2026' } };
 export const FamilyMart: TStory = { args: { templateId: 'familymart' } };
 export const FarmersMarket: TStory = { args: { templateId: 'farmers-market' } };

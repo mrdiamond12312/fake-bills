@@ -14,6 +14,7 @@ import { farmersMarketTemplate } from '@/components/Bills/templates/FarmersMarke
 import { goTopsTemplate } from '@/components/Bills/templates/GoTops';
 import { lotteMartTemplate } from '@/components/Bills/templates/LotteMart';
 import { winMartTemplate } from '@/components/Bills/templates/WinMart';
+import { winMart2026Template } from '@/components/Bills/templates/WinMart2026';
 import type { TBillTemplate } from '@/components/Bills/types';
 
 export const BILL_TEMPLATES: TBillTemplate[] = [
@@ -25,6 +26,7 @@ export const BILL_TEMPLATES: TBillTemplate[] = [
   emartTemplate,
   lotteMartTemplate,
   winMartTemplate,
+  winMart2026Template,
   familyMartTemplate,
   farmersMarketTemplate,
 ];

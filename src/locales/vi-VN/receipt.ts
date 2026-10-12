@@ -129,4 +129,9 @@ export const receiptLocale = {
   'receipt.descriptionBilingual': 'Description',
   'receipt.totalVnd': 'Tổng cộng VND',
   'receipt.vatRateOf': '{rate} % của {base}',
+  'receipt.goods': 'Mặt hàng',
+  'receipt.totalGoods': 'Tổng tiền hàng',
+  'receipt.amountToPay': 'Tiền cần thanh toán',
+  'receipt.invoiceAuthCode': 'Mã xác thực HĐ',
+  'receipt.wrongInfoDisclaimer': 'Thông tin sai, xin miễn chịu trách nhiệm.',
 };

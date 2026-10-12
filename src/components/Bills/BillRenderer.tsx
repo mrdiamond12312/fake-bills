@@ -5,7 +5,7 @@
 import React from 'react';
 
 import { getFontPreset } from '@/components/Bills/fonts';
-import { calculateTotals } from '@/components/Bills/helpers/calc';
+import { calculateTotals, clampItemTitles } from '@/components/Bills/helpers/calc';
 import { generateBillCodes } from '@/components/Bills/helpers/codes';
 import { createReceiptT } from '@/components/Bills/helpers/receipt-text';
 import { getBillTemplate } from '@/components/Bills/registry';
@@ -49,7 +49,11 @@ const BillRenderer: React.FC<TBillRendererProps> = ({
     >
       <Template
         data={data}
-        totals={totals ?? calculateTotals(data)}
+        totals={clampItemTitles(totals ?? calculateTotals(data), {
+          lines: data.display?.itemNameLines,
+          paperWidth,
+          fontSize,
+        })}
         codes={codes ?? generateBillCodes(data)}
         font={{ family: font.family, size: fontSize }}
         t={createReceiptT(data.display?.language)}

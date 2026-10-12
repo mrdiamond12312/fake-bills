@@ -1,6 +1,6 @@
 import { DeleteOutlined, NumberOutlined, PlusOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
-import { Button, Col, Empty, Flex, Row, Tooltip, Typography, theme } from 'antd';
+import { Button, Col, Empty, Flex, Form, Row, Tooltip, Typography, theme } from 'antd';
 import React, { useState } from 'react';
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 
@@ -10,6 +10,7 @@ import type { TBillTemplate } from '@/components/Bills/types';
 import InputText from '@/components/Input';
 import AutoComplete from '@/components/Input/AutoComplete';
 import InputNumber from '@/components/Input/InputNumber';
+import Slider from '@/components/Input/Slider';
 import ValidateError from '@/components/Input/ValidateError';
 import {
   BILL_FORM_KEY,
@@ -170,6 +171,21 @@ export const ProductList: React.FC<{ control: any; template: TBillTemplate }> = 
 
   return (
     <Flex vertical gap={8}>
+      <Form layout="vertical" component={false}>
+        <Form.Item
+          className="!mb-0"
+          label={formatMessage({
+            id: 'bills.form.display.itemNameLines',
+            defaultMessage: 'Item name lines',
+          })}
+          extra={formatMessage({
+            id: 'bills.form.display.itemNameLines.hint',
+            defaultMessage: '0 → full name; 1 → cut to one line with "..."',
+          })}
+        >
+          <Slider control={control} name="display.itemNameLines" min={0} max={3} step={0.1} />
+        </Form.Item>
+      </Form>
       {fields.length ? (
         fields.map((field, index) => (
           <ProductRow

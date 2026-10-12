@@ -30,6 +30,9 @@ export const templatesLocale = {
   'bills.template.winmart.name': 'WinMart / Bách Hóa Xanh layout',
   'bills.template.winmart.description':
     'Compact minimart slip, discount column, QR + e-invoice note side by side',
+  'bills.template.winmart-2026.name': 'WinMart 2026 layout',
+  'bills.template.winmart-2026.description':
+    'Minimart slip, QR beside the title, KM / T.Tiền columns, auth code in the note',
   'bills.font.archivo-narrow': 'Arial Narrow',
   'bills.font.arimo': 'Arial / Helvetica',
   'bills.font.ibm-plex-mono': 'Courier-style slab mono',

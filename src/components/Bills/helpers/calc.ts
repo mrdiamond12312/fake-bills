@@ -89,3 +89,32 @@ export const stripDiacritics = (text = '') =>
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'D');
+
+/** Paper's horizontal padding (px-[18px] on both sides) */
+const PAPER_PADDING_X = 36;
+/** Average glyph width / font size for receipt fonts; satori can't measure text in a pure template */
+const AVG_CHAR_WIDTH = 0.52;
+const ELLIPSIS = '...';
+
+/** Cuts item names to roughly `lines` printed lines (decimals allowed), like POS printers do. */
+export const clampItemTitles = (
+  totals: TBillTotals,
+  { lines, paperWidth, fontSize }: { lines?: number; paperWidth: number; fontSize: number },
+): TBillTotals => {
+  const maxLines = toNumber(lines);
+  if (maxLines <= 0) return totals;
+
+  const charsPerLine = (paperWidth - PAPER_PADDING_X) / (fontSize * AVG_CHAR_WIDTH);
+  const maxChars = Math.max(ELLIPSIS.length + 1, Math.floor(maxLines * charsPerLine));
+  return {
+    ...totals,
+    lines: totals.lines.map((line) =>
+      line.title.length > maxChars
+        ? {
+            ...line,
+            title: `${line.title.slice(0, maxChars - ELLIPSIS.length).trimEnd()}${ELLIPSIS}`,
+          }
+        : line,
+    ),
+  };
+};

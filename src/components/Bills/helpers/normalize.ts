@@ -71,6 +71,7 @@ export const normalizeBillData = (input: TDeepPartialBill = {}): TBillData => {
       showQr: true,
       showBarcode: true,
       inkDensity: 1,
+      itemNameLines: 0,
       ...input.display,
       watermark: {
         text: WATERMARK_LIMITS.defaultText,
@@ -103,6 +104,7 @@ export const switchBillTemplate = (current: TBillData, templateId: string): TBil
       showQr: current.display.showQr,
       showBarcode: current.display.showBarcode,
       inkDensity: current.display.inkDensity,
+      itemNameLines: current.display.itemNameLines,
       watermark: current.display.watermark,
     },
   };

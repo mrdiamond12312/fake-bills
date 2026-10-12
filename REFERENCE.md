@@ -77,6 +77,7 @@ Stack: UmiJS Max 4, React 18, Ant Design 5, Tailwind 3, react-hook-form + yup, r
     seed?;                          // QR/barcode/lookup randomness
     qrText?; barcodeText?;          // custom code content (barcode: Code 128, ASCII ≤ 80)
     showQr?; showBarcode?; inkDensity? /* 0.45–1 */;
+    itemNameLines?;                 // cut item names to ~N printed lines + "..." (decimals ok, 0 = full)
     watermark?: { text?; opacity?; size?; angle?; spacing?; color? };
   };
   footerNote?: string;

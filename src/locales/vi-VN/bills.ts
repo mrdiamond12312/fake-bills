@@ -55,6 +55,8 @@ export const billsLocale = {
   'bills.form.display.font': 'Font (ghi đè)',
   'bills.form.display.fontSize': 'Cỡ chữ',
   'bills.form.display.inkDensity': 'Độ đậm mực',
+  'bills.form.display.itemNameLines': 'Số dòng tên sản phẩm',
+  'bills.form.display.itemNameLines.hint': '0 → in đủ tên; 1 → cắt còn một dòng kèm "..."',
   'bills.form.display.language': 'Ngôn ngữ hóa đơn',
   'bills.form.display.language.hint':
     'Đổi ngôn ngữ các nhãn in trên hóa đơn. Thông tin cửa hàng, tên sản phẩm và ghi chú cuối in đúng như bạn nhập.',

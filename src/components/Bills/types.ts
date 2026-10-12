@@ -92,6 +92,11 @@ export type TDisplayOptions = {
   showBarcode?: boolean;
   /** Ink darkness 0.5 → faded print, 1 → crisp */
   inkDensity?: number;
+  /**
+   * Cut item names to about this many printed lines, ending in "...". Decimals allowed
+   * (0.5 → half a line). 0/empty → print in full.
+   */
+  itemNameLines?: number;
   watermark?: TWatermarkOptions;
 };
 

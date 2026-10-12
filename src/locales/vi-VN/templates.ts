@@ -30,6 +30,9 @@ export const templatesLocale = {
   'bills.template.winmart.name': 'Mẫu WinMart / Bách Hóa Xanh',
   'bills.template.winmart.description':
     'Phiếu nhỏ gọn cho cửa hàng mini, cột khuyến mãi, QR và ghi chú hóa đơn điện tử cạnh nhau',
+  'bills.template.winmart-2026.name': 'Mẫu WinMart 2026',
+  'bills.template.winmart-2026.description':
+    'Phiếu siêu thị mini, QR cạnh tiêu đề, cột KM / T.Tiền, mã xác thực trong ghi chú',
   'bills.font.archivo-narrow': 'Arial Narrow',
   'bills.font.arimo': 'Arial / Helvetica',
   'bills.font.ibm-plex-mono': 'Mono chân vuông kiểu Courier',

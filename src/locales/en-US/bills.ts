@@ -55,6 +55,8 @@ export const billsLocale = {
   'bills.form.display.font': 'Font (override)',
   'bills.form.display.fontSize': 'Font size',
   'bills.form.display.inkDensity': 'Ink density',
+  'bills.form.display.itemNameLines': 'Item name lines',
+  'bills.form.display.itemNameLines.hint': '0 → full name; 1 → cut to one line with "..."',
   'bills.form.display.language': 'Receipt language',
   'bills.form.display.language.hint':
     'Switches the printed labels. Store info, product names and the footer note print as you typed them.',
