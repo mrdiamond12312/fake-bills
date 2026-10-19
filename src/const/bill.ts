@@ -26,3 +26,6 @@ export const BILL_RENDER_API = '/api/bills/render';
 export const INVOICE_MASK_STORAGE_KEY = 'receipt-lab.invoice-masks';
 
 export const BILL_DRAFT_STORAGE_KEY = 'receipt-lab.bill-draft';
+
+/** The API page's request-body editor */
+export const API_BODY_STORAGE_KEY = 'receipt-lab.api-body';

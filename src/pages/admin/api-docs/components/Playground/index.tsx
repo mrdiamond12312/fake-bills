@@ -1,4 +1,4 @@
-import { SendOutlined, SyncOutlined } from '@ant-design/icons';
+import { CodeOutlined, ImportOutlined, SendOutlined, SyncOutlined } from '@ant-design/icons';
 import { useIntl } from '@umijs/max';
 import {
   Alert,
@@ -11,33 +11,60 @@ import {
   Image,
   Row,
   Segmented,
+  Select,
+  Tooltip,
+  Typography,
   theme,
 } from 'antd';
 import React from 'react';
 import { Controller } from 'react-hook-form';
 
 import { BILL_TEMPLATES } from '@/components/Bills/registry';
-import InputText from '@/components/Input';
-import InputNumber from '@/components/Input/InputNumber';
-import Select from '@/components/Input/Select';
-import { API_FORM_KEY } from '@/pages/admin/api-docs/helpers/apiFormKeys';
-import type { TApiTryResult } from '@/pages/admin/api-docs/hooks/useApiDocsForm';
+import TextArea from '@/components/Input/TextArea';
+import { BILL_RENDER_API } from '@/const/bill';
+import { API_FORM_KEY, TApiMethod } from '@/pages/admin/api-docs/helpers/apiFormKeys';
+import { LONG_URL, type TApiTryResult } from '@/pages/admin/api-docs/hooks/useApiDocsForm';
 
 const { Item } = Form;
 
 type TPlayground = {
   control: any;
+  method: TApiMethod;
+  getUrlLength: number;
   result?: TApiTryResult;
   isSending: boolean;
   onSend: () => void;
+  onStartFrom: (templateId: string) => void;
+  onLoadFromComposer: () => void;
+  onFormatBody: () => void;
   onShuffleSeed: () => void;
 };
 
+/** Segmented bound to a form field */
+const SegmentedField: React.FC<{ control: any; name: string; options: any[] }> = ({
+  control,
+  name,
+  options,
+}) => (
+  <Controller
+    control={control}
+    name={name}
+    render={({ field }) => (
+      <Segmented value={field.value} onChange={field.onChange} options={options} />
+    )}
+  />
+);
+
 export const Playground: React.FC<TPlayground> = ({
   control,
+  method,
+  getUrlLength,
   result,
   isSending,
   onSend,
+  onStartFrom,
+  onLoadFromComposer,
+  onFormatBody,
   onShuffleSeed,
 }) => {
   const { formatMessage } = useIntl();
@@ -48,102 +75,104 @@ export const Playground: React.FC<TPlayground> = ({
     <Row gutter={[24, 16]}>
       <Col span={24} lg={12}>
         <Form layout="vertical" component={false}>
-          <Row gutter={16}>
-            <Col span={24}>
-              <Item label="template">
-                <Select
-                  control={control}
-                  name={API_FORM_KEY.template}
-                  className="w-full"
-                  options={BILL_TEMPLATES.map((template) => ({
-                    value: template.id,
-                    label: `${template.id} — ${t(
-                      `bills.template.${template.id}.name`,
-                      template.name,
-                    )}`,
-                  }))}
-                />
-              </Item>
-            </Col>
-            <Col span={12}>
-              <Item label="language">
-                <Controller
-                  control={control}
-                  name={API_FORM_KEY.language}
-                  render={({ field }) => (
-                    <Segmented
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={['vi', 'en']}
-                    />
-                  )}
-                />
-              </Item>
-            </Col>
-            <Col span={12}>
-              <Item label="vat (%)">
-                <InputNumber
-                  control={control}
-                  name={API_FORM_KEY.vat}
-                  min={0}
-                  max={100}
-                  className="w-full"
-                />
-              </Item>
-            </Col>
-            <Col span={24}>
-              <Item label="seed" extra={t('apiDocs.seed.hint', 'Same seed → same codes')}>
-                <Flex gap={8}>
-                  <InputText control={control} name={API_FORM_KEY.seed} allowClear />
-                  <Button icon={<SyncOutlined />} onClick={onShuffleSeed} />
-                </Flex>
-              </Item>
-            </Col>
-            <Col span={24}>
-              <Item label="name">
-                <InputText
-                  control={control}
-                  name={API_FORM_KEY.name}
-                  allowClear
-                  placeholder={t('apiDocs.name.placeholder', 'Template default when empty')}
-                />
-              </Item>
-            </Col>
-            <Col span={12}>
-              <Item label="format">
-                <Controller
-                  control={control}
-                  name={API_FORM_KEY.format}
-                  render={({ field }) => (
-                    <Segmented
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={['png', 'svg']}
-                    />
-                  )}
-                />
-              </Item>
-            </Col>
-            <Col span={12}>
-              <Item label="scale">
-                <Controller
-                  control={control}
-                  name={API_FORM_KEY.scale}
-                  render={({ field }) => (
-                    <Segmented
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={[1, 2, 3, 4]}
-                    />
-                  )}
-                />
-              </Item>
-            </Col>
-          </Row>
+          <Flex gap={16} wrap>
+            <Item label="method">
+              <SegmentedField
+                control={control}
+                name={API_FORM_KEY.method}
+                options={['GET', 'POST']}
+              />
+            </Item>
+            <Item label="format">
+              <SegmentedField
+                control={control}
+                name={API_FORM_KEY.format}
+                options={['png', 'svg']}
+              />
+            </Item>
+            <Item label="scale">
+              <SegmentedField control={control} name={API_FORM_KEY.scale} options={[1, 2, 3, 4]} />
+            </Item>
+          </Flex>
+          <Item
+            label={t('apiDocs.body.label', 'Bill (JSON)')}
+            extra={
+              method === 'GET'
+                ? formatMessage(
+                    {
+                      id: 'apiDocs.body.hint.get',
+                      defaultMessage:
+                        'GET sends this as dotted params (store.name=…&items.0.title=…). URL: {length} chars',
+                    },
+                    { length: getUrlLength },
+                  )
+                : t(
+                    'apiDocs.body.hint.post',
+                    'POST sends this as the JSON body. Leave out anything you want from the template defaults.',
+                  )
+            }
+          >
+            <Flex gap={8} wrap className="mb-2">
+              <Select
+                size="small"
+                className="min-w-[200px]"
+                placeholder={t('apiDocs.body.startFrom', 'Start from template…')}
+                value={null}
+                onChange={onStartFrom}
+                popupMatchSelectWidth={false}
+                options={BILL_TEMPLATES.map((template) => ({
+                  value: template.id,
+                  label: `${template.id} — ${t(
+                    `bills.template.${template.id}.name`,
+                    template.name,
+                  )}`,
+                }))}
+              />
+              <Tooltip
+                title={t(
+                  'apiDocs.body.fromComposer.hint',
+                  'Copies the current Bill composer draft into the editor',
+                )}
+              >
+                <Button size="small" icon={<ImportOutlined />} onClick={onLoadFromComposer}>
+                  {t('apiDocs.body.fromComposer', 'From composer')}
+                </Button>
+              </Tooltip>
+              <Button size="small" icon={<CodeOutlined />} onClick={onFormatBody}>
+                {t('apiDocs.body.format', 'Format')}
+              </Button>
+              <Button size="small" icon={<SyncOutlined />} onClick={onShuffleSeed}>
+                {t('apiDocs.body.shuffleSeed', 'New seed')}
+              </Button>
+            </Flex>
+            <TextArea
+              control={control}
+              name={API_FORM_KEY.body}
+              spellCheck={false}
+              autoSize={{ minRows: 14, maxRows: 32 }}
+              className="font-mono text-body-3-regular"
+            />
+          </Item>
+          {method === 'GET' && getUrlLength > LONG_URL ? (
+            <Alert
+              type="warning"
+              showIcon
+              className="mb-4"
+              message={t(
+                'apiDocs.body.longUrl',
+                'This URL is very long; servers may refuse it. Switch to POST for big bills.',
+              )}
+            />
+          ) : null}
         </Form>
-        <Button type="primary" icon={<SendOutlined />} loading={isSending} onClick={onSend}>
-          {t('apiDocs.try.send', 'Send request')}
-        </Button>
+        <Flex align="center" gap={12}>
+          <Button type="primary" icon={<SendOutlined />} loading={isSending} onClick={onSend}>
+            {t('apiDocs.try.send', 'Send request')}
+          </Button>
+          <Typography.Text type="secondary" className="text-body-3-regular">
+            {`${method} ${BILL_RENDER_API}`}
+          </Typography.Text>
+        </Flex>
       </Col>
 
       <Col span={24} lg={12}>

@@ -3,6 +3,7 @@ import {
   CloudDownloadOutlined,
   CloudUploadOutlined,
   DownloadOutlined,
+  ExportOutlined,
   LinkOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
@@ -31,6 +32,7 @@ import { FormProvider } from 'react-hook-form';
 
 import BillFontFaces from '@/components/Bills/BillFontFaces';
 import Projector from '@/components/Projector';
+import { ApiPreview } from '@/pages/admin/bills/create/components/ApiPreview';
 import { BillPreview } from '@/pages/admin/bills/create/components/BillPreview';
 import { CatalogImport } from '@/pages/admin/bills/create/components/CatalogImport';
 import { DisplayOptions } from '@/pages/admin/bills/create/components/DisplayOptions';
@@ -68,6 +70,11 @@ const AdminBillCreate: React.FC = () => {
     handleShuffleCodes,
     handleExportPng,
     handleRenderViaApi,
+    apiImage,
+    isApiPreviewOpen,
+    setIsApiPreviewOpen,
+    handleDownloadApiImage,
+    handleOpenApiInTab,
     handleCopyApiUrl,
     handleCopyPageLink,
   } = useBillForm();
@@ -207,9 +214,17 @@ const AdminBillCreate: React.FC = () => {
                     >
                       {t('bills.actions.renderApi', 'Via API')}
                     </Button>
-                    <Tooltip title={t('bills.actions.copyApiUrl', 'Copy API URL')}>
-                      <Button icon={<LinkOutlined />} onClick={handleCopyApiUrl} />
+                    <Tooltip
+                      title={t(
+                        'bills.actions.renderApi.newTab',
+                        'Open the API render in a new tab',
+                      )}
+                    >
+                      <Button icon={<ExportOutlined />} onClick={handleOpenApiInTab} />
                     </Tooltip>
+                    <Button icon={<LinkOutlined />} onClick={handleCopyApiUrl}>
+                      {t('bills.actions.copyApiUrl', 'Copy API link')}
+                    </Button>
                   </Space>
                 }
               >
@@ -268,6 +283,13 @@ const AdminBillCreate: React.FC = () => {
             </Col>
           </Row>
         </div>
+
+        <ApiPreview
+          src={apiImage?.url}
+          open={isApiPreviewOpen}
+          onOpenChange={setIsApiPreviewOpen}
+          onDownload={handleDownloadApiImage}
+        />
 
         <Modal
           open={catalogOpen}

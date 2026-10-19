@@ -150,28 +150,39 @@ curl -o bill.png -X POST -H 'Content-Type: application/json' http://localhost:80
 }'
 ```
 
-### GET (query shortcuts)
+### GET (same power as POST)
 
-| Param             | Sets                                                      |
-| ----------------- | --------------------------------------------------------- |
-| `template`        | `templateId`                                              |
-| `vat`             | `tax.vatRate`                                             |
-| `seed`            | `display.seed`                                            |
-| `language`        | `display.language` (`vi` \| `en`)                         |
-| `name`            | `store.name`                                              |
-| `logo`            | `store.logoUrl`                                           |
-| `cashier`         | `transaction.cashier`                                     |
-| `invoice`         | `transaction.invoiceNo`                                   |
-| `billId`          | `transaction.billId`                                      |
-| `qr`              | `display.qrText`                                          |
-| `barcode`         | `display.barcodeText`                                     |
-| `items`           | `items` (JSON array)                                      |
-| `payload`         | full bill as base64url JSON (shortcuts above override it) |
-| `scale`, `format` | output options                                            |
+Every `TBillData` field works as a dotted param, in the same format as the composer's page link. **Copy API link** in the composer copies the current bill this way, uploaded logos included:
 
 ```bash
-curl -o bill.png "http://localhost:8000/api/bills/render?template=winmart&vat=8&seed=run42&language=en"
+curl -o bill.png "http://localhost:8000/api/bills/render?templateId=winmart-2026\
+&store.name=My%20Test%20Mart&transaction.cashier=0001&tax.vatRate=8\
+&items.0.title=B%C3%A1nh%20m%C3%AC&items.0.unitPrice=15000&items.0.quantity=2&items.0.discount=2000\
+&display.seed=run42&display.itemNameLines=1&display.watermark.opacity=0.2&scale=2"
 ```
+
+- Roots: `templateId`, `store.*`, `transaction.*`, `items.N.*`, `tax.*`, `display.*` (including `display.watermark.*`), `footerNote`.
+- Values are typed from a normalized bill of the template, so numbers and `true`/`false` come back as numbers and booleans. Any `items.N.*` param replaces the whole item list.
+- `scale` (1–4, default 2) and `format` (`png` | `svg`) are output options.
+- Very long bills (many items, uploaded logos) can exceed URL limits of about 8–16 KB. Use POST for those.
+
+Older links still work. Layers apply in order, and later ones win: `payload` → shortcuts → dotted params.
+
+| Param      | Sets                              |
+| ---------- | --------------------------------- |
+| `payload`  | full bill as base64url JSON       |
+| `template` | `templateId`                      |
+| `vat`      | `tax.vatRate`                     |
+| `seed`     | `display.seed`                    |
+| `language` | `display.language` (`vi` \| `en`) |
+| `name`     | `store.name`                      |
+| `logo`     | `store.logoUrl`                   |
+| `cashier`  | `transaction.cashier`             |
+| `invoice`  | `transaction.invoiceNo`           |
+| `billId`   | `transaction.billId`              |
+| `qr`       | `display.qrText`                  |
+| `barcode`  | `display.barcodeText`             |
+| `items`    | `items` (JSON array)              |
 
 Response headers `X-Bill-Template` and `X-Bill-Seed` identify the render. Errors return `400 { message }`. A bill can have at most 200 items.
 

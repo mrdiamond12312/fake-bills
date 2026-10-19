@@ -2,56 +2,70 @@ import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';
 
 import type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';
 import { BILL_TEMPLATES } from '@/components/Bills/registry';
+import { billFromQuery, mergeBill } from '@/utils/bill-query';
 import { renderBill } from '@/utils/render-bill';
 
 const MAX_ITEMS = 200;
+
+type TRenderInput = TDeepPartialBill & { scale?: string | number; format?: string };
 
 const decodePayload = (payload: string) =>
   JSON.parse(
     Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'),
   );
 
-const first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
+// umi's `req.query` splits the raw URL without decoding it (accents, spaces, JSON break)
+const searchParamsOf = (req: UmiApiRequest) =>
+  new URL(req.url ?? '', 'http://localhost').searchParams;
 
 /**
- * Query-string shortcuts on top of the full JSON bill:
- *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, qr, barcode,
- *   scale, format,
- *   items (JSON array)
+ * Legacy shortcuts, kept so old links still work:
+ *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, billId,
+ *   qr, barcode, items (JSON array)
  */
-const fromQuery = (
-  query: UmiApiRequest['query'],
-): TDeepPartialBill & { scale?: string; format?: string } => {
-  const payload = first(query.payload);
-  const base: TDeepPartialBill = payload ? decodePayload(payload) : {};
-  const items = first(query.items);
+const fromShortcuts = (params: URLSearchParams): TDeepPartialBill => {
+  const get = (key: string) => params.get(key) || undefined;
+  const items = get('items');
+  const language = get('language');
   return {
-    ...base,
-    templateId: first(query.template) ?? base.templateId,
+    ...(get('template') ? { templateId: get('template') } : {}),
     store: {
-      ...base.store,
-      ...(first(query.name) ? { name: first(query.name) } : {}),
-      ...(first(query.logo) ? { logoUrl: first(query.logo) } : {}),
+      ...(get('name') ? { name: get('name') } : {}),
+      ...(get('logo') ? { logoUrl: get('logo') } : {}),
     },
     transaction: {
-      ...base.transaction,
-      ...(first(query.cashier) ? { cashier: first(query.cashier) } : {}),
-      ...(first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}),
-      ...(first(query.billId) ? { billId: first(query.billId) } : {}),
+      ...(get('cashier') ? { cashier: get('cashier') } : {}),
+      ...(get('invoice') ? { invoiceNo: get('invoice') } : {}),
+      ...(get('billId') ? { billId: get('billId') } : {}),
     },
-    tax: { ...base.tax, ...(first(query.vat) ? { vatRate: Number(first(query.vat)) } : {}) },
+    tax: get('vat') ? { vatRate: Number(get('vat')) } : {},
     display: {
-      ...base.display,
-      ...(first(query.seed) ? { seed: first(query.seed) } : {}),
-      ...(first(query.qr) ? { qrText: first(query.qr) } : {}),
-      ...(first(query.barcode) ? { barcodeText: first(query.barcode) } : {}),
-      ...(first(query.language) === 'en' || first(query.language) === 'vi'
-        ? { language: first(query.language) as 'vi' | 'en' }
-        : {}),
+      ...(get('seed') ? { seed: get('seed') } : {}),
+      ...(get('qr') ? { qrText: get('qr') } : {}),
+      ...(get('barcode') ? { barcodeText: get('barcode') } : {}),
+      ...(language === 'en' || language === 'vi' ? { language } : {}),
     },
-    items: items ? JSON.parse(items) : base.items,
-    scale: first(query.scale),
-    format: first(query.format),
+    ...(items ? { items: JSON.parse(items) } : {}),
+  };
+};
+
+/**
+ * GET takes everything POST does: the same bill as dotted params (`templateId=…&store.name=…&
+ * items.0.title=…`, what the composer's "Copy API link" builds). Later layers win:
+ * `payload` (base64url JSON) → legacy shortcuts → dotted params.
+ */
+const fromQuery = (params: URLSearchParams): TRenderInput => {
+  const get = (key: string) => params.get(key) || undefined;
+  const payload = get('payload');
+  const layers = [
+    payload ? decodePayload(payload) : {},
+    fromShortcuts(params),
+    billFromQuery(params) ?? {},
+  ];
+  return {
+    ...layers.reduce<TDeepPartialBill>((acc, layer) => mergeBill(acc, layer), {}),
+    scale: get('scale'),
+    format: get('format'),
   };
 };
 
@@ -61,7 +75,8 @@ const fromQuery = (
  */
 export default async function (req: UmiApiRequest, res: UmiApiResponse) {
   try {
-    if (first(req.query.list) === 'templates') {
+    const params = searchParamsOf(req);
+    if (params.get('list') === 'templates') {
       res.status(200).json(
         BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({
           id,
@@ -74,12 +89,12 @@ export default async function (req: UmiApiRequest, res: UmiApiResponse) {
       return;
     }
 
-    let input: TDeepPartialBill & { scale?: string | number; format?: string };
+    let input: TRenderInput;
     if (req.method === 'POST') {
       // umi has already read the body before calling the handler
       input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body ?? {};
     } else {
-      input = fromQuery(req.query);
+      input = fromQuery(params);
     }
 
     if ((input.items?.length ?? 0) > MAX_ITEMS) {

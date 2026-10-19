@@ -19,10 +19,14 @@ const AdminApiDocs: React.FC = () => {
   const {
     methods,
     control,
+    values,
     examples,
     result,
     isSending,
     handleSend,
+    handleStartFrom,
+    handleLoadFromComposer,
+    handleFormatBody,
     handleShuffleSeed,
     handleCopy,
   } = useApiDocsForm();
@@ -117,23 +121,41 @@ const AdminApiDocs: React.FC = () => {
           <FormProvider {...methods}>
             <Playground
               control={control}
+              method={values.method}
+              getUrlLength={examples.getUrl.length}
               result={result}
               isSending={isSending}
               onSend={handleSend}
+              onStartFrom={handleStartFrom}
+              onLoadFromComposer={handleLoadFromComposer}
+              onFormatBody={handleFormatBody}
               onShuffleSeed={handleShuffleSeed}
             />
           </FormProvider>
           <Flex vertical gap={12} className="mt-6">
-            <CodeBlock label="GET URL" code={examples.getUrl} onCopy={handleCopy} />
-            <CodeBlock label="curl" code={examples.getCurl} onCopy={handleCopy} />
+            {values.method === 'GET' ? (
+              <>
+                <CodeBlock label="GET URL" code={examples.getUrl} onCopy={handleCopy} />
+                <CodeBlock label="curl" code={examples.getCurl} onCopy={handleCopy} />
+              </>
+            ) : (
+              <CodeBlock label="curl" code={examples.postCurl} onCopy={handleCopy} />
+            )}
           </Flex>
         </Card>
 
-        <Card title={t('apiDocs.section.get', 'GET: query shortcuts')}>
+        <Card title={t('apiDocs.section.get', 'GET: same power as POST')}>
           <Typography.Paragraph type="secondary">
             {t(
               'apiDocs.get.intro',
-              'Handy for quick renders and links. The shortcuts override anything inside payload.',
+              'Every bill field works as a dotted param, the same format as the composer page link: templateId=…&store.name=…&items.0.title=…&display.watermark.opacity=…, plus scale and format. Numbers and true/false come back typed. "Copy API link" in the composer builds one for the current bill.',
+            )}
+          </Typography.Paragraph>
+          <CodeBlock label="GET" code={examples.getUrl} onCopy={handleCopy} />
+          <Typography.Paragraph type="secondary" className="!mt-4">
+            {t(
+              'apiDocs.get.legacy',
+              'Older shortcuts still work. Layers apply in order, later ones win: payload → shortcuts → dotted params.',
             )}
           </Typography.Paragraph>
           <Table
@@ -157,7 +179,7 @@ const AdminApiDocs: React.FC = () => {
           <Typography.Paragraph type="secondary">
             {t(
               'apiDocs.post.intro',
-              'Send any subset of the bill as the JSON body (templateId, store, transaction, items, tax, display, footerNote), plus scale and format. This example follows the playground values above.',
+              'Send any subset of the bill as the JSON body (templateId, store, transaction, items, tax, display, footerNote), plus scale and format. This example follows the playground body above.',
             )}
           </Typography.Paragraph>
           <CodeBlock label="curl" code={examples.postCurl} onCopy={handleCopy} />
@@ -185,7 +207,7 @@ const AdminApiDocs: React.FC = () => {
             <li>
               {t(
                 'apiDocs.responses.logo',
-                'Logos: pass an image URL in store.logoUrl (or logo=). Use POST for data URLs; they are too long for a query string.',
+                'Logos: pass an image URL in store.logoUrl (or logo=). Data URLs work in GET too but make very long links; prefer POST for those.',
               )}
             </li>
           </ul>

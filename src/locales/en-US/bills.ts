@@ -1,4 +1,18 @@
 export const billsLocale = {
+  'apiDocs.body.format': 'Format',
+  'apiDocs.body.fromComposer': 'From composer',
+  'apiDocs.body.fromComposer.hint': 'Copies the current Bill composer draft into the editor',
+  'apiDocs.body.hint.get':
+    'GET sends this as dotted params (store.name=…&items.0.title=…). URL: {length} chars',
+  'apiDocs.body.hint.post':
+    'POST sends this as the JSON body. Leave out anything you want from the template defaults.',
+  'apiDocs.body.invalid': 'Fix the JSON first',
+  'apiDocs.body.label': 'Bill (JSON)',
+  'apiDocs.body.longUrl':
+    'This URL is very long; servers may refuse it. Switch to POST for big bills.',
+  'apiDocs.body.noDraft': 'No composer draft yet. Open the Bill composer first.',
+  'apiDocs.body.shuffleSeed': 'New seed',
+  'apiDocs.body.startFrom': 'Start from template…',
   'apiDocs.col.method': 'Method',
   'apiDocs.col.param': 'Param',
   'apiDocs.col.path': 'Path',
@@ -10,38 +24,44 @@ export const billsLocale = {
   'apiDocs.endpoints.render': 'Renders a receipt → image/png (or image/svg+xml with format=svg)',
   'apiDocs.endpoints.templates': 'Lists template ids, names and the fields each prints (JSON)',
   'apiDocs.get.intro':
-    'Handy for quick renders and links. The shortcuts override anything inside payload.',
-  'apiDocs.name.placeholder': 'Template default when empty',
+    'Every bill field works as a dotted param, the same format as the composer page link: templateId=…&store.name=…&items.0.title=…&display.watermark.opacity=…, plus scale and format. Numbers and true/false come back typed. "Copy API link" in the composer builds one for the current bill.',
+  'apiDocs.get.legacy':
+    'Older shortcuts still work. Layers apply in order, later ones win: payload → shortcuts → dotted params.',
   'apiDocs.overview.intro':
     'The API draws a receipt with the same templates, fonts and codes as the composer, server-side (satori → resvg). Send only the fields you want to change; everything else comes from the template defaults. The same seed always gives the same QR, barcode and lookup codes.',
   'apiDocs.overview.watermark':
     'Every response carries the tiled SAMPLE watermark. display.watermark can tune it (opacity ≥ 0.08) but not remove it.',
   'apiDocs.post.intro':
-    'Send any subset of the bill as the JSON body (templateId, store, transaction, items, tax, display, footerNote), plus scale and format. This example follows the playground values above.',
+    'Send any subset of the bill as the JSON body (templateId, store, transaction, items, tax, display, footerNote), plus scale and format. This example follows the playground body above.',
   'apiDocs.responses.error': 'JSON with a message field describing what went wrong.',
   'apiDocs.responses.items': 'At most 200 items per bill. scale is clamped to 1–4.',
   'apiDocs.responses.logo':
-    'Logos: pass an image URL in store.logoUrl (or logo=). Use POST for data URLs; they are too long for a query string.',
+    'Logos: pass an image URL in store.logoUrl (or logo=). Data URLs work in GET too but make very long links; prefer POST for those.',
   'apiDocs.responses.ok':
     'The image. Headers X-Bill-Template and X-Bill-Seed identify the render; reuse the seed to reproduce it.',
-  'apiDocs.section.get': 'GET: query shortcuts',
+  'apiDocs.section.get': 'GET: same power as POST',
   'apiDocs.section.overview': 'Overview',
   'apiDocs.section.post': 'POST: full control',
   'apiDocs.section.responses': 'Responses & limits',
   'apiDocs.section.try': 'Try it',
-  'apiDocs.seed.hint': 'Same seed → same codes',
   'apiDocs.subtitle': 'Render the same sample receipts over HTTP',
   'apiDocs.title': 'Render API',
   'apiDocs.try.empty': 'Send a request to see the rendered receipt here',
   'apiDocs.try.send': 'Send request',
   'apiDocs.try.size': 'Size',
   'apiDocs.try.time': 'Time',
-  'apiDocs.validation.vat': 'VAT must be 0–100',
-  'bills.actions.copyApiUrl': 'Copy API URL',
-  'bills.actions.copyApiUrl.done': 'API URL copied ({length} chars)',
+  'apiDocs.validation.items': 'At most {max} items per bill',
+  'apiDocs.validation.json': 'The body must be a JSON object, e.g. { "templateId": "winmart" }',
+  'bills.actions.copyApiUrl': 'Copy API link',
+  'bills.actions.copyApiUrl.done': 'API link copied ({length} chars)',
+  'bills.actions.copyApiUrl.long':
+    'API link copied ({length} chars). That is long; use POST if it gets cut.',
   'bills.actions.renderApi': 'Via API',
+  'bills.actions.renderApi.newTab': 'Open the API render in a new tab',
   'bills.actions.resetAll': 'Start over',
   'bills.actions.resetAll.confirm': 'Discard the draft and start over?',
+  'bills.apiPreview.download': 'Download',
+  'bills.apiPreview.newTab': 'Open in new tab',
   'bills.catalog.clear': 'Clear all',
   'bills.catalog.clear.confirm': 'Remove all imported products?',
   'bills.catalog.import.done': 'Imported {count} products from {name}{skipped}',

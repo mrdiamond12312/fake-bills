@@ -1,4 +1,18 @@
 export const billsLocale = {
+  'apiDocs.body.format': 'Định dạng',
+  'apiDocs.body.fromComposer': 'Lấy từ trang soạn',
+  'apiDocs.body.fromComposer.hint': 'Chép bản nháp hiện tại của trang soạn hóa đơn vào trình soạn',
+  'apiDocs.body.hint.get':
+    'GET gửi nội dung này dưới dạng tham số có dấu chấm (store.name=…&items.0.title=…). URL: {length} ký tự',
+  'apiDocs.body.hint.post':
+    'POST gửi nội dung này làm JSON body. Bỏ trống trường nào thì dùng mặc định của mẫu.',
+  'apiDocs.body.invalid': 'Hãy sửa JSON trước',
+  'apiDocs.body.label': 'Hóa đơn (JSON)',
+  'apiDocs.body.longUrl':
+    'URL này rất dài, máy chủ có thể từ chối. Hãy chuyển sang POST cho hóa đơn lớn.',
+  'apiDocs.body.noDraft': 'Chưa có bản nháp. Hãy mở trang soạn hóa đơn trước.',
+  'apiDocs.body.shuffleSeed': 'Seed mới',
+  'apiDocs.body.startFrom': 'Bắt đầu từ mẫu…',
   'apiDocs.col.method': 'Phương thức',
   'apiDocs.col.param': 'Tham số',
   'apiDocs.col.path': 'Đường dẫn',
@@ -10,38 +24,44 @@ export const billsLocale = {
   'apiDocs.endpoints.render': 'Vẽ hóa đơn → image/png (hoặc image/svg+xml khi format=svg)',
   'apiDocs.endpoints.templates': 'Danh sách id mẫu, tên và các trường mỗi mẫu in ra (JSON)',
   'apiDocs.get.intro':
-    'Tiện để vẽ nhanh và chia sẻ link. Các tham số rút gọn ghi đè giá trị trong payload.',
-  'apiDocs.name.placeholder': 'Để trống → dùng tên mặc định của mẫu',
+    'Mọi trường của hóa đơn đều dùng được làm tham số có dấu chấm, cùng định dạng với link trang soạn: templateId=…&store.name=…&items.0.title=…&display.watermark.opacity=…, kèm scale và format. Số và true/false được trả về đúng kiểu. Nút "Sao chép link API" ở trang soạn tạo sẵn link cho hóa đơn hiện tại.',
+  'apiDocs.get.legacy':
+    'Các tham số rút gọn cũ vẫn dùng được. Thứ tự áp dụng, cái sau ghi đè cái trước: payload → rút gọn → tham số có dấu chấm.',
   'apiDocs.overview.intro':
     'API vẽ hóa đơn phía máy chủ (satori → resvg) với cùng mẫu, font và mã như trang soạn hóa đơn. Chỉ cần gửi các trường muốn thay đổi; phần còn lại lấy từ mặc định của mẫu. Cùng seed luôn cho ra cùng mã QR, mã vạch và mã tra cứu.',
   'apiDocs.overview.watermark':
     'Mọi phản hồi đều có hình mờ SAMPLE lặp lại. display.watermark chỉ chỉnh được (độ mờ ≥ 0.08), không tắt được.',
   'apiDocs.post.intro':
-    'Gửi bất kỳ phần nào của hóa đơn dưới dạng JSON (templateId, store, transaction, items, tax, display, footerNote), kèm scale và format. Ví dụ này lấy theo giá trị ở phần thử nghiệm phía trên.',
+    'Gửi bất kỳ phần nào của hóa đơn dưới dạng JSON (templateId, store, transaction, items, tax, display, footerNote), kèm scale và format. Ví dụ này lấy theo nội dung ở phần thử nghiệm phía trên.',
   'apiDocs.responses.error': 'JSON có trường message mô tả lỗi.',
   'apiDocs.responses.items': 'Tối đa 200 sản phẩm mỗi hóa đơn. scale được giới hạn trong 1–4.',
   'apiDocs.responses.logo':
-    'Logo: truyền URL ảnh vào store.logoUrl (hoặc logo=). Dùng POST cho data URL vì quá dài để đặt trong query.',
+    'Logo: truyền URL ảnh vào store.logoUrl (hoặc logo=). Data URL vẫn dùng được với GET nhưng link sẽ rất dài; nên dùng POST.',
   'apiDocs.responses.ok':
     'Ảnh hóa đơn. Header X-Bill-Template và X-Bill-Seed cho biết lần vẽ; dùng lại seed để tạo lại đúng hóa đơn đó.',
-  'apiDocs.section.get': 'GET: tham số rút gọn',
+  'apiDocs.section.get': 'GET: làm được mọi thứ như POST',
   'apiDocs.section.overview': 'Tổng quan',
   'apiDocs.section.post': 'POST: toàn quyền',
   'apiDocs.section.responses': 'Phản hồi & giới hạn',
   'apiDocs.section.try': 'Thử ngay',
-  'apiDocs.seed.hint': 'Cùng seed → cùng mã',
   'apiDocs.subtitle': 'Vẽ hóa đơn mẫu qua HTTP',
   'apiDocs.title': 'API vẽ hóa đơn',
   'apiDocs.try.empty': 'Gửi yêu cầu để xem hóa đơn được vẽ tại đây',
   'apiDocs.try.send': 'Gửi yêu cầu',
   'apiDocs.try.size': 'Dung lượng',
   'apiDocs.try.time': 'Thời gian',
-  'apiDocs.validation.vat': 'VAT phải từ 0–100',
-  'bills.actions.copyApiUrl': 'Sao chép URL API',
-  'bills.actions.copyApiUrl.done': 'Đã sao chép URL API ({length} ký tự)',
+  'apiDocs.validation.items': 'Tối đa {max} sản phẩm mỗi hóa đơn',
+  'apiDocs.validation.json': 'Body phải là một đối tượng JSON, ví dụ { "templateId": "winmart" }',
+  'bills.actions.copyApiUrl': 'Sao chép link API',
+  'bills.actions.copyApiUrl.done': 'Đã sao chép link API ({length} ký tự)',
+  'bills.actions.copyApiUrl.long':
+    'Đã sao chép link API ({length} ký tự). Link khá dài, dùng POST nếu bị cắt.',
   'bills.actions.renderApi': 'Qua API',
+  'bills.actions.renderApi.newTab': 'Mở ảnh vẽ qua API trong tab mới',
   'bills.actions.resetAll': 'Làm lại từ đầu',
   'bills.actions.resetAll.confirm': 'Bỏ bản nháp và làm lại từ đầu?',
+  'bills.apiPreview.download': 'Tải xuống',
+  'bills.apiPreview.newTab': 'Mở trong tab mới',
   'bills.catalog.clear': 'Xóa tất cả',
   'bills.catalog.clear.confirm': 'Xóa toàn bộ sản phẩm đã nhập?',
   'bills.catalog.import.done': 'Đã nhập {count} sản phẩm từ {name}{skipped}',

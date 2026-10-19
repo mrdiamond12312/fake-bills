@@ -1,38 +1,66 @@
+import type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';
 import { DEFAULT_TEMPLATE_ID } from '@/components/Bills/registry';
-import { BILL_RENDER_API, DEFAULT_VAT_RATE } from '@/const/bill';
+import { BILL_RENDER_API } from '@/const/bill';
+import { billToQuery } from '@/utils/bill-query';
 
 export enum API_FORM_KEY {
-  template = 'template',
-  language = 'language',
-  seed = 'seed',
-  vat = 'vat',
-  name = 'name',
+  method = 'method',
   format = 'format',
   scale = 'scale',
+  body = 'body',
 }
 
+export type TApiMethod = 'GET' | 'POST';
+
 export type TApiFormFields = {
-  [API_FORM_KEY.template]: string;
-  [API_FORM_KEY.language]: 'vi' | 'en';
-  [API_FORM_KEY.seed]: string;
-  [API_FORM_KEY.vat]: number;
-  [API_FORM_KEY.name]: string;
+  [API_FORM_KEY.method]: TApiMethod;
   [API_FORM_KEY.format]: 'png' | 'svg';
   [API_FORM_KEY.scale]: number;
+  /** The bill as JSON text; GET sends it as dotted params, POST as the body */
+  [API_FORM_KEY.body]: string;
 };
+
+export const API_MAX_ITEMS = 200;
+
+type TOutputOptions = Pick<TApiFormFields, API_FORM_KEY.format | API_FORM_KEY.scale>;
+
+/** A short bill that shows the main sections; everything left out comes from the template. */
+export const starterBody = (templateId = DEFAULT_TEMPLATE_ID, seed = 'run-42') =>
+  JSON.stringify(
+    {
+      templateId,
+      transaction: { cashier: '0001' },
+      items: [
+        { title: 'Bánh mì', barcode: '8930000000017', unitPrice: 15000, quantity: 2 },
+        { title: 'Sữa tươi 180ml', unitPrice: 8000, quantity: 3, discount: 2000 },
+      ],
+      tax: { vatRate: 8 },
+      display: { seed, language: 'vi', itemNameLines: 0 },
+    },
+    null,
+    2,
+  );
 
 export const API_FORM_DEFAULTS: TApiFormFields = {
-  [API_FORM_KEY.template]: DEFAULT_TEMPLATE_ID,
-  [API_FORM_KEY.language]: 'vi',
-  [API_FORM_KEY.seed]: 'run-42',
-  [API_FORM_KEY.vat]: DEFAULT_VAT_RATE,
-  [API_FORM_KEY.name]: '',
+  [API_FORM_KEY.method]: 'GET',
   [API_FORM_KEY.format]: 'png',
   [API_FORM_KEY.scale]: 2,
+  [API_FORM_KEY.body]: starterBody(),
 };
 
-/** GET query shortcuts accepted by /api/bills/render, and the bill field each one sets. */
+/** The body as a bill, or `undefined` when it isn't a JSON object. */
+export const parseBody = (text?: string): TDeepPartialBill | undefined => {
+  try {
+    const value = JSON.parse(text ?? '');
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+/** Legacy GET shortcuts, still accepted next to the dotted params. */
 export const RENDER_QUERY_PARAMS = [
+  { param: 'payload', sets: 'whole bill as base64url JSON' },
   { param: 'template', sets: 'templateId' },
   { param: 'vat', sets: 'tax.vatRate' },
   { param: 'seed', sets: 'display.seed' },
@@ -45,41 +73,35 @@ export const RENDER_QUERY_PARAMS = [
   { param: 'qr', sets: 'display.qrText' },
   { param: 'barcode', sets: 'display.barcodeText' },
   { param: 'items', sets: 'items (JSON array)' },
-  { param: 'payload', sets: 'whole bill as base64url JSON' },
-  { param: 'scale', sets: '1–4, default 2' },
-  { param: 'format', sets: 'png | svg' },
 ] as const;
 
-/** Only non-default values go in the URL, so the example stays short. */
-export const buildRenderUrl = (origin: string, values: TApiFormFields) => {
-  const params = new URLSearchParams();
-  params.set('template', values.template);
-  if (values.language !== API_FORM_DEFAULTS.language) params.set('language', values.language);
-  if (values.seed) params.set('seed', values.seed);
-  if (values.vat !== DEFAULT_VAT_RATE) params.set('vat', String(values.vat));
-  if (values.name?.trim()) params.set('name', values.name.trim());
-  if (values.format !== 'png') params.set('format', values.format);
-  if (values.scale !== 2) params.set('scale', String(values.scale));
+/** Output options go in only when they differ from the defaults, so links stay short. */
+const outputOptions = ({ format, scale }: TOutputOptions) => ({
+  ...(format !== 'png' ? { format } : {}),
+  ...(scale !== 2 ? { scale } : {}),
+});
+
+export const buildRenderUrl = (origin: string, bill: TDeepPartialBill, values: TOutputOptions) => {
+  const params = billToQuery(bill, { keepDataUrls: true });
+  Object.entries(outputOptions(values)).forEach(([key, value]) => params.set(key, String(value)));
   return `${origin}${BILL_RENDER_API}?${params.toString()}`;
 };
+
+export const buildPostBody = (bill: TDeepPartialBill, values: TOutputOptions) => ({
+  ...bill,
+  ...outputOptions(values),
+});
 
 export const buildGetCurl = (url: string, format: TApiFormFields['format']) =>
   `curl -o bill.${format} "${url}"`;
 
-export const buildPostCurl = (origin: string, values: TApiFormFields) => {
-  const body = {
-    templateId: values.template,
-    store: { name: values.name?.trim() || 'My Test Mart' },
-    items: [{ title: 'Bánh mì', barcode: '8930000000017', unitPrice: 15000, quantity: 2 }],
-    tax: { vatRate: values.vat },
-    display: { seed: values.seed, language: values.language },
-    scale: values.scale,
-    format: values.format,
-  };
-  return [
+export const buildPostCurl = (origin: string, bill: TDeepPartialBill, values: TOutputOptions) =>
+  [
     `curl -o bill.${values.format} -X POST \\`,
     `  -H 'Content-Type: application/json' \\`,
     `  ${origin}${BILL_RENDER_API} \\`,
-    `  -d '${JSON.stringify(body, null, 2).replace(/\n/g, '\n  ')}'`,
+    // single quotes inside the JSON would end the shell string
+    `  -d '${JSON.stringify(buildPostBody(bill, values), null, 2)
+      .replace(/'/g, "'\\''")
+      .replace(/\n/g, '\n  ')}'`,
   ].join('\n');
-};

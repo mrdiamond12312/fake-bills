@@ -12,8 +12,8 @@ import { randomSeed } from '@/components/Bills/helpers/random';
 import { BILL_DRAFT_STORAGE_KEY, BILL_RENDER_API } from '@/const/bill';
 import { TBillFormFields } from '@/pages/admin/bills/create/helpers/billFormKeys';
 import { useBillResolver } from '@/pages/admin/bills/create/hooks/useBillResolver';
+import { billFromQuery, billToQuery } from '@/utils/bill-query';
 import { readLocalStorage, removeLocalStorage, writeLocalStorage } from '@/utils/local-storage';
-import { flattenToQuery, unflattenQuery } from '@/utils/query-params';
 
 const downloadBlob = (blob: Blob, fileName: string) => {
   const url = URL.createObjectURL(blob);
@@ -24,28 +24,21 @@ const downloadBlob = (blob: Blob, fileName: string) => {
   URL.revokeObjectURL(url);
 };
 
-/** Uploaded (data-URL) logos are far too long for a link; they stay in the local draft only. */
-const skipInLink = (path: string, value: unknown) =>
-  path === 'store.logoUrl' && String(value).startsWith('data:');
-
-export const billToQuery = (bill: TBillFormFields) => flattenToQuery(bill, { skip: skipInLink });
-
 /** Form state from the page link, if it carries one (`?templateId=…&store.name=…`). */
 const billFromLocation = () => {
   const params = new URLSearchParams(window.location.search);
   if (!params.has('templateId')) return undefined;
-  // a fully-populated bill of the same template tells unflatten which values are numbers/booleans
-  const reference = normalizeBillData({ templateId: params.get('templateId') ?? undefined });
-  reference.transaction.amountPaid ??= 0;
-  reference.store.logoWidth ??= 0;
-  return unflattenQuery(params, reference) as TBillFormFields;
+  return billFromQuery(params) as TBillFormFields;
 };
 
-const toBase64Url = (text: string) =>
-  btoa(unescape(encodeURIComponent(text)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+/** Past this, some proxies/servers start cutting the URL (Node's default header limit is 16 KB). */
+const LONG_URL = 8000;
+
+/** The GET render link for the current bill: the page link's params on the API path. */
+const apiUrlFor = (bill: TBillFormFields) =>
+  `${window.location.origin}${BILL_RENDER_API}?${billToQuery(bill, {
+    keepDataUrls: true,
+  }).toString()}`;
 
 export const useBillForm = () => {
   const { formatMessage } = useIntl();
@@ -152,25 +145,72 @@ export const useBillForm = () => {
   }, [fileBaseName]);
 
   const [isRendering, setIsRendering] = useState(false);
+  /** The last API render, shown fullscreen; `url` is a blob URL */
+  const [apiImage, setApiImage] = useState<{ url: string; blob: Blob; fileName: string }>();
+  const [isApiPreviewOpen, setIsApiPreviewOpen] = useState(false);
+
+  // release the previous render's blob URL when replaced or on leaving the page
+  useEffect(
+    () => () => {
+      if (apiImage) URL.revokeObjectURL(apiImage.url);
+    },
+    [apiImage],
+  );
+
+  /** GET the exact link "Copy API link" gives; POST only when it's too long to send. */
+  const fetchApiRender = useCallback(async () => {
+    const url = apiUrlFor(methods.getValues());
+    const response =
+      url.length <= LONG_URL
+        ? await fetch(url)
+        : await fetch(BILL_RENDER_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(methods.getValues()),
+          });
+    if (!response.ok) throw new Error((await response.json()).message);
+    return response.blob();
+  }, [methods]);
 
   const handleRenderViaApi = useCallback(async () => {
     const valid = await methods.trigger();
     if (!valid) return;
     setIsRendering(true);
     try {
-      const response = await fetch(BILL_RENDER_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...methods.getValues(), scale: 2 }),
-      });
-      if (!response.ok) throw new Error((await response.json()).message);
-      downloadBlob(await response.blob(), `${fileBaseName}.api.png`);
+      const blob = await fetchApiRender();
+      setApiImage({ url: URL.createObjectURL(blob), blob, fileName: `${fileBaseName}.api.png` });
+      setIsApiPreviewOpen(true);
     } catch (error: any) {
       message.error(error?.message ?? 'Render failed');
     } finally {
       setIsRendering(false);
     }
-  }, [methods, fileBaseName]);
+  }, [methods, fetchApiRender, fileBaseName]);
+
+  const handleDownloadApiImage = useCallback(() => {
+    if (apiImage) downloadBlob(apiImage.blob, apiImage.fileName);
+  }, [apiImage]);
+
+  /** The browser shows the PNG itself: the GET link directly, or the POST result as a blob. */
+  const handleOpenApiInTab = useCallback(async () => {
+    const url = apiUrlFor(methods.getValues());
+    if (url.length <= LONG_URL) {
+      window.open(url, '_blank', 'noopener');
+      return;
+    }
+    // open the tab inside the click so it isn't blocked as a popup, fill it once POST returns
+    const tab = window.open('', '_blank');
+    setIsRendering(true);
+    try {
+      const blob = await fetchApiRender();
+      if (tab) tab.location.href = URL.createObjectURL(blob);
+    } catch (error: any) {
+      tab?.close();
+      message.error(error?.message ?? 'Render failed');
+    } finally {
+      setIsRendering(false);
+    }
+  }, [methods, fetchApiRender]);
 
   const handleCopyPageLink = useCallback(async () => {
     const url = `${window.location.origin}${window.location.pathname}?${billToQuery(
@@ -186,19 +226,21 @@ export const useBillForm = () => {
   }, [methods, formatMessage]);
 
   const handleCopyApiUrl = useCallback(async () => {
-    const { store, ...rest } = methods.getValues();
-    // data-URL logos make the URL huge; POST the JSON body for those
-    const payload = {
-      ...rest,
-      store: { ...store, logoUrl: store.logoUrl?.startsWith('data:') ? '' : store.logoUrl },
-    };
-    const url = `${window.location.origin}${BILL_RENDER_API}?payload=${toBase64Url(
-      JSON.stringify(payload),
-    )}`;
+    const url = apiUrlFor(methods.getValues());
     await navigator.clipboard.writeText(url);
-    message.success(
+    const notify = url.length > LONG_URL ? message.warning : message.success;
+    notify(
       formatMessage(
-        { id: 'bills.actions.copyApiUrl.done', defaultMessage: 'API URL copied ({length} chars)' },
+        {
+          id:
+            url.length > LONG_URL
+              ? 'bills.actions.copyApiUrl.long'
+              : 'bills.actions.copyApiUrl.done',
+          defaultMessage:
+            url.length > LONG_URL
+              ? 'API link copied ({length} chars). That is long; use POST if it gets cut.'
+              : 'API link copied ({length} chars)',
+        },
         { length: url.length },
       ),
     );
@@ -220,6 +262,11 @@ export const useBillForm = () => {
     handleShuffleCodes,
     handleExportPng,
     handleRenderViaApi,
+    apiImage,
+    isApiPreviewOpen,
+    setIsApiPreviewOpen,
+    handleDownloadApiImage,
+    handleOpenApiInTab,
     handleCopyApiUrl,
     handleCopyPageLink,
   } as const;

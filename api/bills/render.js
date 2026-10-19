@@ -2792,13 +2792,13 @@ var require_scheduler_development = __commonJS({
           if (heap.length === 0) {
             return null;
           }
-          var first2 = heap[0];
+          var first = heap[0];
           var last = heap.pop();
-          if (last !== first2) {
+          if (last !== first) {
             heap[0] = last;
             siftDown(heap, last, 0);
           }
-          return first2;
+          return first;
         }
         function siftUp(heap, node, i) {
           var index = i;
@@ -21164,12 +21164,12 @@ var require_react_dom_development = __commonJS({
             queue.pending = null;
           }
           if (baseQueue !== null) {
-            var first2 = baseQueue.next;
+            var first = baseQueue.next;
             var newState = current2.baseState;
             var newBaseState = null;
             var newBaseQueueFirst = null;
             var newBaseQueueLast = null;
-            var update = first2;
+            var update = first;
             do {
               var updateLane = update.lane;
               if (!isSubsetOfLanes(renderLanes, updateLane)) {
@@ -21210,7 +21210,7 @@ var require_react_dom_development = __commonJS({
                 }
               }
               update = update.next;
-            } while (update !== null && update !== first2);
+            } while (update !== null && update !== first);
             if (newBaseQueueLast === null) {
               newBaseState = newState;
             } else {
@@ -156299,7 +156299,7 @@ var require_lodash = __commonJS({
               } else {
                 newValue = [];
               }
-            } else if (isPlainObject(srcValue) || isArguments(srcValue)) {
+            } else if (isPlainObject3(srcValue) || isArguments(srcValue)) {
               newValue = objValue;
               if (isArguments(objValue)) {
                 newValue = toPlainObject(objValue);
@@ -157263,7 +157263,7 @@ var require_lodash = __commonJS({
           return objValue;
         }
         function customOmitClone(value) {
-          return isPlainObject(value) ? undefined2 : value;
+          return isPlainObject3(value) ? undefined2 : value;
         }
         function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
           var isPartial = bitmask & COMPARE_PARTIAL_FLAG, arrLength = array.length, othLength = other.length;
@@ -158764,7 +158764,7 @@ var require_lodash = __commonJS({
         var isBuffer = nativeIsBuffer || stubFalse;
         var isDate = nodeIsDate ? baseUnary(nodeIsDate) : baseIsDate;
         function isElement(value) {
-          return isObjectLike(value) && value.nodeType === 1 && !isPlainObject(value);
+          return isObjectLike(value) && value.nodeType === 1 && !isPlainObject3(value);
         }
         function isEmpty(value) {
           if (value == null) {
@@ -158800,7 +158800,7 @@ var require_lodash = __commonJS({
             return false;
           }
           var tag = baseGetTag(value);
-          return tag == errorTag || tag == domExcTag || typeof value.message == "string" && typeof value.name == "string" && !isPlainObject(value);
+          return tag == errorTag || tag == domExcTag || typeof value.message == "string" && typeof value.name == "string" && !isPlainObject3(value);
         }
         function isFinite2(value) {
           return typeof value == "number" && nativeIsFinite(value);
@@ -158851,7 +158851,7 @@ var require_lodash = __commonJS({
         function isNumber(value) {
           return typeof value == "number" || isObjectLike(value) && baseGetTag(value) == numberTag;
         }
-        function isPlainObject(value) {
+        function isPlainObject3(value) {
           if (!isObjectLike(value) || baseGetTag(value) != objectTag) {
             return false;
           }
@@ -159922,7 +159922,7 @@ var require_lodash = __commonJS({
         lodash.isNumber = isNumber;
         lodash.isObject = isObject;
         lodash.isObjectLike = isObjectLike;
-        lodash.isPlainObject = isPlainObject;
+        lodash.isPlainObject = isPlainObject3;
         lodash.isRegExp = isRegExp;
         lodash.isSafeInteger = isSafeInteger;
         lodash.isSet = isSet;
@@ -162652,6 +162652,150 @@ var BILL_TEMPLATE_MAP = Object.fromEntries(
 );
 var DEFAULT_TEMPLATE_ID = BILL_TEMPLATES[0].id;
 var getBillTemplate = (templateId) => BILL_TEMPLATE_MAP[templateId ?? ""] ?? BILL_TEMPLATE_MAP[DEFAULT_TEMPLATE_ID];
+
+// src/components/Bills/helpers/normalize.ts
+var SAMPLE_ITEMS = [
+  {
+    title: "N\u01B0\u1EDBc su\u1ED1i tinh khi\u1EBFt 500ml",
+    barcode: "8930000000017",
+    unit: "Chai",
+    unitPrice: 7e3,
+    quantity: 3
+  },
+  {
+    title: "M\xEC \u0103n li\u1EC1n v\u1ECB t\xF4m chua cay 75g",
+    barcode: "8930000000024",
+    unit: "G\xF3i",
+    unitPrice: 4500,
+    quantity: 5
+  }
+];
+var normalizeBillData = (input = {}) => {
+  const template = getBillTemplate(input.templateId);
+  const { defaults } = template;
+  const items = (input.items?.length ? input.items : SAMPLE_ITEMS).map((item) => ({
+    title: item.title ?? "",
+    barcode: item.barcode ?? "",
+    unit: item.unit ?? "",
+    unitPrice: Number(item.unitPrice) || 0,
+    quantity: Number(item.quantity) || 0,
+    discount: Number(item.discount) || 0
+  }));
+  return {
+    templateId: template.id,
+    store: { ...defaults.store, ...input.store, name: input.store?.name || defaults.store.name },
+    transaction: {
+      ...defaults.transaction,
+      dateTime: (/* @__PURE__ */ new Date()).toISOString(),
+      ...input.transaction
+    },
+    items,
+    tax: {
+      vatRate: DEFAULT_VAT_RATE,
+      priceIncludesVat: true,
+      ...defaults.tax,
+      ...input.tax
+    },
+    display: {
+      fontId: template.fontId,
+      fontSize: template.fontSize,
+      paperWidth: template.paperWidth,
+      seed: randomSeed(),
+      language: "vi",
+      showQr: true,
+      showBarcode: true,
+      inkDensity: 1,
+      itemNameLines: 0,
+      ...input.display,
+      watermark: {
+        text: WATERMARK_LIMITS.defaultText,
+        opacity: WATERMARK_LIMITS.opacity.default,
+        size: WATERMARK_LIMITS.size.default,
+        angle: WATERMARK_LIMITS.angle.default,
+        spacing: WATERMARK_LIMITS.spacing.default,
+        ...input.display?.watermark
+      }
+    },
+    footerNote: input.footerNote ?? defaults.footerNote
+  };
+};
+
+// src/utils/query-params.ts
+var isPlainObject = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
+var unflattenQuery = (params, reference = {}) => {
+  const result = {};
+  const referenceAt = (segments) => segments.reduce((node, segment) => {
+    if (Array.isArray(node)) return node[Number(segment)] ?? node[0];
+    return isPlainObject(node) ? node[segment] : void 0;
+  }, reference);
+  const coerce = (raw, sample) => {
+    if (typeof sample === "number") {
+      const parsed = Number(raw);
+      return Number.isFinite(parsed) ? parsed : sample;
+    }
+    if (typeof sample === "boolean") return raw === "true";
+    return raw;
+  };
+  params.forEach((raw, path2) => {
+    const segments = path2.split(".");
+    let node = result;
+    segments.forEach((segment, index) => {
+      const last = index === segments.length - 1;
+      const nextIsIndex = /^\d+$/.test(segments[index + 1] ?? "");
+      const key = Array.isArray(node) ? Number(segment) : segment;
+      if (last) {
+        node[key] = coerce(raw, referenceAt(segments));
+      } else {
+        node[key] ??= nextIsIndex ? [] : {};
+        node = node[key];
+      }
+    });
+  });
+  const compact = (node) => {
+    if (Array.isArray(node)) return node.filter((item) => item !== void 0).map(compact);
+    if (isPlainObject(node)) {
+      return Object.fromEntries(Object.entries(node).map(([key, child]) => [key, compact(child)]));
+    }
+    return node;
+  };
+  return compact(result);
+};
+
+// src/utils/bill-query.ts
+var BILL_ROOT_KEYS = [
+  "templateId",
+  "store",
+  "transaction",
+  "items",
+  "tax",
+  "display",
+  "footerNote"
+];
+var billFromQuery = (params) => {
+  const billParams = new URLSearchParams();
+  params.forEach((value, key) => {
+    if (key !== "items" && BILL_ROOT_KEYS.includes(key.split(".")[0])) {
+      billParams.append(key, value);
+    }
+  });
+  if (![...billParams.keys()].length) return void 0;
+  const reference = normalizeBillData({ templateId: billParams.get("templateId") ?? void 0 });
+  reference.transaction.amountPaid ??= 0;
+  reference.store.logoWidth ??= 0;
+  reference.items = [{ ...reference.items[0], discount: 0 }];
+  return unflattenQuery(billParams, reference);
+};
+var isPlainObject2 = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
+var mergeBill = (base, override) => {
+  if (!isPlainObject2(base) || !isPlainObject2(override)) {
+    return override === void 0 ? base : override;
+  }
+  const result = { ...base };
+  Object.entries(override).forEach(([key, value]) => {
+    result[key] = mergeBill(result[key], value);
+  });
+  return result;
+};
 
 // src/utils/render-bill/index.ts
 var import_fs = __toESM(require("fs"));
@@ -210385,9 +210529,9 @@ var STBTT = /* @__PURE__ */ (function() {
       }
       return 0;
     } else if (format == 6) {
-      var first2 = ttUSHORT(data, index_map + 6), count = ttUSHORT(data, index_map + 8);
-      if (unicode_codepoint >= first2 && unicode_codepoint < first2 + count) {
-        return ttUSHORT(data, index_map + 10 + (unicode_codepoint - first2) * 2);
+      var first = ttUSHORT(data, index_map + 6), count = ttUSHORT(data, index_map + 8);
+      if (unicode_codepoint >= first && unicode_codepoint < first + count) {
+        return ttUSHORT(data, index_map + 10 + (unicode_codepoint - first) * 2);
       }
       return 0;
     } else if (format == 2) {
@@ -212269,73 +212413,6 @@ var BillRenderer = ({
 };
 var BillRenderer_default = BillRenderer;
 
-// src/components/Bills/helpers/normalize.ts
-var SAMPLE_ITEMS = [
-  {
-    title: "N\u01B0\u1EDBc su\u1ED1i tinh khi\u1EBFt 500ml",
-    barcode: "8930000000017",
-    unit: "Chai",
-    unitPrice: 7e3,
-    quantity: 3
-  },
-  {
-    title: "M\xEC \u0103n li\u1EC1n v\u1ECB t\xF4m chua cay 75g",
-    barcode: "8930000000024",
-    unit: "G\xF3i",
-    unitPrice: 4500,
-    quantity: 5
-  }
-];
-var normalizeBillData = (input = {}) => {
-  const template = getBillTemplate(input.templateId);
-  const { defaults } = template;
-  const items = (input.items?.length ? input.items : SAMPLE_ITEMS).map((item) => ({
-    title: item.title ?? "",
-    barcode: item.barcode ?? "",
-    unit: item.unit ?? "",
-    unitPrice: Number(item.unitPrice) || 0,
-    quantity: Number(item.quantity) || 0,
-    discount: Number(item.discount) || 0
-  }));
-  return {
-    templateId: template.id,
-    store: { ...defaults.store, ...input.store, name: input.store?.name || defaults.store.name },
-    transaction: {
-      ...defaults.transaction,
-      dateTime: (/* @__PURE__ */ new Date()).toISOString(),
-      ...input.transaction
-    },
-    items,
-    tax: {
-      vatRate: DEFAULT_VAT_RATE,
-      priceIncludesVat: true,
-      ...defaults.tax,
-      ...input.tax
-    },
-    display: {
-      fontId: template.fontId,
-      fontSize: template.fontSize,
-      paperWidth: template.paperWidth,
-      seed: randomSeed(),
-      language: "vi",
-      showQr: true,
-      showBarcode: true,
-      inkDensity: 1,
-      itemNameLines: 0,
-      ...input.display,
-      watermark: {
-        text: WATERMARK_LIMITS.defaultText,
-        opacity: WATERMARK_LIMITS.opacity.default,
-        size: WATERMARK_LIMITS.size.default,
-        angle: WATERMARK_LIMITS.angle.default,
-        spacing: WATERMARK_LIMITS.spacing.default,
-        ...input.display?.watermark
-      }
-    },
-    footerNote: input.footerNote ?? defaults.footerNote
-  };
-};
-
 // src/utils/render-bill/to-satori.ts
 var import_antd14 = __toESM(require_lib49());
 var import_lodash = __toESM(require_lodash());
@@ -212453,41 +212530,50 @@ var MAX_ITEMS = 200;
 var decodePayload = (payload) => JSON.parse(
   Buffer.from(payload.replace(/-/g, "+").replace(/_/g, "/"), "base64").toString("utf-8")
 );
-var first = (value) => Array.isArray(value) ? value[0] : value;
-var fromQuery = (query) => {
-  const payload = first(query.payload);
-  const base = payload ? decodePayload(payload) : {};
-  const items = first(query.items);
+var searchParamsOf = (req) => new URL(req.url ?? "", "http://localhost").searchParams;
+var fromShortcuts = (params) => {
+  const get = (key) => params.get(key) || void 0;
+  const items = get("items");
+  const language = get("language");
   return {
-    ...base,
-    templateId: first(query.template) ?? base.templateId,
+    ...get("template") ? { templateId: get("template") } : {},
     store: {
-      ...base.store,
-      ...first(query.name) ? { name: first(query.name) } : {},
-      ...first(query.logo) ? { logoUrl: first(query.logo) } : {}
+      ...get("name") ? { name: get("name") } : {},
+      ...get("logo") ? { logoUrl: get("logo") } : {}
     },
     transaction: {
-      ...base.transaction,
-      ...first(query.cashier) ? { cashier: first(query.cashier) } : {},
-      ...first(query.invoice) ? { invoiceNo: first(query.invoice) } : {},
-      ...first(query.billId) ? { billId: first(query.billId) } : {}
+      ...get("cashier") ? { cashier: get("cashier") } : {},
+      ...get("invoice") ? { invoiceNo: get("invoice") } : {},
+      ...get("billId") ? { billId: get("billId") } : {}
     },
-    tax: { ...base.tax, ...first(query.vat) ? { vatRate: Number(first(query.vat)) } : {} },
+    tax: get("vat") ? { vatRate: Number(get("vat")) } : {},
     display: {
-      ...base.display,
-      ...first(query.seed) ? { seed: first(query.seed) } : {},
-      ...first(query.qr) ? { qrText: first(query.qr) } : {},
-      ...first(query.barcode) ? { barcodeText: first(query.barcode) } : {},
-      ...first(query.language) === "en" || first(query.language) === "vi" ? { language: first(query.language) } : {}
+      ...get("seed") ? { seed: get("seed") } : {},
+      ...get("qr") ? { qrText: get("qr") } : {},
+      ...get("barcode") ? { barcodeText: get("barcode") } : {},
+      ...language === "en" || language === "vi" ? { language } : {}
     },
-    items: items ? JSON.parse(items) : base.items,
-    scale: first(query.scale),
-    format: first(query.format)
+    ...items ? { items: JSON.parse(items) } : {}
+  };
+};
+var fromQuery = (params) => {
+  const get = (key) => params.get(key) || void 0;
+  const payload = get("payload");
+  const layers = [
+    payload ? decodePayload(payload) : {},
+    fromShortcuts(params),
+    billFromQuery(params) ?? {}
+  ];
+  return {
+    ...layers.reduce((acc, layer) => mergeBill(acc, layer), {}),
+    scale: get("scale"),
+    format: get("format")
   };
 };
 async function render_default(req, res) {
   try {
-    if (first(req.query.list) === "templates") {
+    const params = searchParamsOf(req);
+    if (params.get("list") === "templates") {
       res.status(200).json(
         BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({
           id,
@@ -212503,7 +212589,7 @@ async function render_default(req, res) {
     if (req.method === "POST") {
       input = typeof req.body === "string" ? JSON.parse(req.body) : req.body ?? {};
     } else {
-      input = fromQuery(req.query);
+      input = fromQuery(params);
     }
     if ((input.items?.length ?? 0) > MAX_ITEMS) {
       res.status(400).json({ message: `At most ${MAX_ITEMS} items per bill.` });
@@ -212522,7 +212608,7 @@ async function render_default(req, res) {
 
 // src/.umi/api/bills/render.ts
 var import_apiRoute = __toESM(require_apiRoute());
-var apiRoutes = [{ "path": "catalog/products", "id": "catalog/products", "file": "catalog/products.ts", "absPath": "/catalog/products", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport { stripDiacritics } from '@/components/Bills/helpers/calc';\nimport { BUILT_IN_CATALOG } from '@/const/catalog';\n\nconst fold = (text: string) => stripDiacritics(text).toLowerCase();\n\n/** GET /api/catalog/products?keyword= \u2014 built-in sample products */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  const keyword = fold(String(req.query.keyword ?? ''));\n  const products: API.TCatalogProduct[] = BUILT_IN_CATALOG.map((product, index) => ({\n    ...product,\n    id: `built-in:${index}`,\n    source: 'built-in',\n  })).filter(\n    (product) =>\n      !keyword || fold(product.title).includes(keyword) || product.barcode.includes(keyword),\n  );\n  res.status(200).json(products);\n}\n" }, { "path": "bills/render", "id": "bills/render", "file": "bills/render.ts", "absPath": "/bills/render", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';\nimport { BILL_TEMPLATES } from '@/components/Bills/registry';\nimport { renderBill } from '@/utils/render-bill';\n\nconst MAX_ITEMS = 200;\n\nconst decodePayload = (payload: string) =>\n  JSON.parse(\n    Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'),\n  );\n\nconst first = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);\n\n/**\n * Query-string shortcuts on top of the full JSON bill:\n *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, qr, barcode,\n *   scale, format,\n *   items (JSON array)\n */\nconst fromQuery = (\n  query: UmiApiRequest['query'],\n): TDeepPartialBill & { scale?: string; format?: string } => {\n  const payload = first(query.payload);\n  const base: TDeepPartialBill = payload ? decodePayload(payload) : {};\n  const items = first(query.items);\n  return {\n    ...base,\n    templateId: first(query.template) ?? base.templateId,\n    store: {\n      ...base.store,\n      ...(first(query.name) ? { name: first(query.name) } : {}),\n      ...(first(query.logo) ? { logoUrl: first(query.logo) } : {}),\n    },\n    transaction: {\n      ...base.transaction,\n      ...(first(query.cashier) ? { cashier: first(query.cashier) } : {}),\n      ...(first(query.invoice) ? { invoiceNo: first(query.invoice) } : {}),\n      ...(first(query.billId) ? { billId: first(query.billId) } : {}),\n    },\n    tax: { ...base.tax, ...(first(query.vat) ? { vatRate: Number(first(query.vat)) } : {}) },\n    display: {\n      ...base.display,\n      ...(first(query.seed) ? { seed: first(query.seed) } : {}),\n      ...(first(query.qr) ? { qrText: first(query.qr) } : {}),\n      ...(first(query.barcode) ? { barcodeText: first(query.barcode) } : {}),\n      ...(first(query.language) === 'en' || first(query.language) === 'vi'\n        ? { language: first(query.language) as 'vi' | 'en' }\n        : {}),\n    },\n    items: items ? JSON.parse(items) : base.items,\n    scale: first(query.scale),\n    format: first(query.format),\n  };\n};\n\n/**\n * GET|POST /api/bills/render \u2192 image/png (or image/svg+xml with format=svg)\n * GET /api/bills/render?list=templates \u2192 available template ids\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  try {\n    if (first(req.query.list) === 'templates') {\n      res.status(200).json(\n        BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({\n          id,\n          name,\n          description,\n          printerStyle,\n          fields,\n        })),\n      );\n      return;\n    }\n\n    let input: TDeepPartialBill & { scale?: string | number; format?: string };\n    if (req.method === 'POST') {\n      // umi has already read the body before calling the handler\n      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body ?? {};\n    } else {\n      input = fromQuery(req.query);\n    }\n\n    if ((input.items?.length ?? 0) > MAX_ITEMS) {\n      res.status(400).json({ message: `At most ${MAX_ITEMS} items per bill.` });\n      return;\n    }\n\n    const { scale, format, ...bill } = input;\n    const result = await renderBill(bill, {\n      scale: Number(scale) || undefined,\n      format: format === 'svg' ? 'svg' : 'png',\n    });\n\n    res\n      .status(200)\n      .header('Content-Type', result.contentType)\n      .header('Cache-Control', 'no-store')\n      .header('X-Bill-Template', result.data.templateId)\n      .header('X-Bill-Seed', String(result.data.display.seed))\n      .end(result.body);\n  } catch (error: any) {\n    res.status(400).json({ message: error?.message ?? 'Render failed' });\n  }\n}\n" }, { "path": "image-proxy", "id": "image-proxy", "file": "image-proxy.ts", "absPath": "/image-proxy", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nconst MAX_BYTES = 10 * 1024 * 1024;\nconst PRIVATE_HOST =\n  /^(localhost|0\\.0\\.0\\.0|127\\.|10\\.|192\\.168\\.|169\\.254\\.|172\\.(1[6-9]|2\\d|3[01])\\.|\\[?::1\\]?$|\\[?f[cd])/i;\n\n/**\n * GET /api/image-proxy?url= \u2014 re-serves a remote image from our own origin.\n * html-to-image (projector texture, PNG export) has to read the logo's pixels,\n * which the browser blocks for hosts that don't send Access-Control-Allow-Origin.\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  let target: URL;\n  try {\n    // req.query leaves values percent-encoded, so read the decoded param from the raw URL\n    const search = String(req.url ?? '').split('?')[1] ?? '';\n    target = new URL(new URLSearchParams(search).get('url') ?? '');\n  } catch {\n    res.status(400).json({ message: 'Invalid url' });\n    return;\n  }\n  if (!/^https?:$/.test(target.protocol) || PRIVATE_HOST.test(target.hostname)) {\n    res.status(400).json({ message: 'Only public http(s) URLs are allowed' });\n    return;\n  }\n\n  try {\n    const upstream = await fetch(target, { redirect: 'follow' });\n    const contentType = upstream.headers.get('content-type') ?? '';\n    if (!upstream.ok || !contentType.startsWith('image/')) {\n      res.status(502).json({ message: `Upstream returned ${upstream.status} ${contentType}` });\n      return;\n    }\n    const body = Buffer.from(await upstream.arrayBuffer());\n    if (body.length > MAX_BYTES) {\n      res.status(413).json({ message: `Image is larger than ${MAX_BYTES / 1024 / 1024} MB` });\n      return;\n    }\n    res\n      .status(200)\n      .header('Content-Type', contentType)\n      .header('Cache-Control', 'public, max-age=86400')\n      .header('Access-Control-Allow-Origin', '*')\n      .end(body);\n  } catch (error: any) {\n    res.status(502).json({ message: error?.message ?? 'Fetch failed' });\n  }\n}\n" }];
+var apiRoutes = [{ "path": "catalog/products", "id": "catalog/products", "file": "catalog/products.ts", "absPath": "/catalog/products", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport { stripDiacritics } from '@/components/Bills/helpers/calc';\nimport { BUILT_IN_CATALOG } from '@/const/catalog';\n\nconst fold = (text: string) => stripDiacritics(text).toLowerCase();\n\n/** GET /api/catalog/products?keyword= \u2014 built-in sample products */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  const keyword = fold(String(req.query.keyword ?? ''));\n  const products: API.TCatalogProduct[] = BUILT_IN_CATALOG.map((product, index) => ({\n    ...product,\n    id: `built-in:${index}`,\n    source: 'built-in',\n  })).filter(\n    (product) =>\n      !keyword || fold(product.title).includes(keyword) || product.barcode.includes(keyword),\n  );\n  res.status(200).json(products);\n}\n" }, { "path": "bills/render", "id": "bills/render", "file": "bills/render.ts", "absPath": "/bills/render", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nimport type { TDeepPartialBill } from '@/components/Bills/helpers/normalize';\nimport { BILL_TEMPLATES } from '@/components/Bills/registry';\nimport { billFromQuery, mergeBill } from '@/utils/bill-query';\nimport { renderBill } from '@/utils/render-bill';\n\nconst MAX_ITEMS = 200;\n\ntype TRenderInput = TDeepPartialBill & { scale?: string | number; format?: string };\n\nconst decodePayload = (payload: string) =>\n  JSON.parse(\n    Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf-8'),\n  );\n\n// umi's `req.query` splits the raw URL without decoding it (accents, spaces, JSON break)\nconst searchParamsOf = (req: UmiApiRequest) =>\n  new URL(req.url ?? '', 'http://localhost').searchParams;\n\n/**\n * Legacy shortcuts, kept so old links still work:\n *   template, vat, seed, language (vi|en), name, logo (image URL), cashier, invoice, billId,\n *   qr, barcode, items (JSON array)\n */\nconst fromShortcuts = (params: URLSearchParams): TDeepPartialBill => {\n  const get = (key: string) => params.get(key) || undefined;\n  const items = get('items');\n  const language = get('language');\n  return {\n    ...(get('template') ? { templateId: get('template') } : {}),\n    store: {\n      ...(get('name') ? { name: get('name') } : {}),\n      ...(get('logo') ? { logoUrl: get('logo') } : {}),\n    },\n    transaction: {\n      ...(get('cashier') ? { cashier: get('cashier') } : {}),\n      ...(get('invoice') ? { invoiceNo: get('invoice') } : {}),\n      ...(get('billId') ? { billId: get('billId') } : {}),\n    },\n    tax: get('vat') ? { vatRate: Number(get('vat')) } : {},\n    display: {\n      ...(get('seed') ? { seed: get('seed') } : {}),\n      ...(get('qr') ? { qrText: get('qr') } : {}),\n      ...(get('barcode') ? { barcodeText: get('barcode') } : {}),\n      ...(language === 'en' || language === 'vi' ? { language } : {}),\n    },\n    ...(items ? { items: JSON.parse(items) } : {}),\n  };\n};\n\n/**\n * GET takes everything POST does: the same bill as dotted params (`templateId=\u2026&store.name=\u2026&\n * items.0.title=\u2026`, what the composer's \"Copy API link\" builds). Later layers win:\n * `payload` (base64url JSON) \u2192 legacy shortcuts \u2192 dotted params.\n */\nconst fromQuery = (params: URLSearchParams): TRenderInput => {\n  const get = (key: string) => params.get(key) || undefined;\n  const payload = get('payload');\n  const layers = [\n    payload ? decodePayload(payload) : {},\n    fromShortcuts(params),\n    billFromQuery(params) ?? {},\n  ];\n  return {\n    ...layers.reduce<TDeepPartialBill>((acc, layer) => mergeBill(acc, layer), {}),\n    scale: get('scale'),\n    format: get('format'),\n  };\n};\n\n/**\n * GET|POST /api/bills/render \u2192 image/png (or image/svg+xml with format=svg)\n * GET /api/bills/render?list=templates \u2192 available template ids\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  try {\n    const params = searchParamsOf(req);\n    if (params.get('list') === 'templates') {\n      res.status(200).json(\n        BILL_TEMPLATES.map(({ id, name, description, printerStyle, fields }) => ({\n          id,\n          name,\n          description,\n          printerStyle,\n          fields,\n        })),\n      );\n      return;\n    }\n\n    let input: TRenderInput;\n    if (req.method === 'POST') {\n      // umi has already read the body before calling the handler\n      input = typeof req.body === 'string' ? JSON.parse(req.body) : req.body ?? {};\n    } else {\n      input = fromQuery(params);\n    }\n\n    if ((input.items?.length ?? 0) > MAX_ITEMS) {\n      res.status(400).json({ message: `At most ${MAX_ITEMS} items per bill.` });\n      return;\n    }\n\n    const { scale, format, ...bill } = input;\n    const result = await renderBill(bill, {\n      scale: Number(scale) || undefined,\n      format: format === 'svg' ? 'svg' : 'png',\n    });\n\n    res\n      .status(200)\n      .header('Content-Type', result.contentType)\n      .header('Cache-Control', 'no-store')\n      .header('X-Bill-Template', result.data.templateId)\n      .header('X-Bill-Seed', String(result.data.display.seed))\n      .end(result.body);\n  } catch (error: any) {\n    res.status(400).json({ message: error?.message ?? 'Render failed' });\n  }\n}\n" }, { "path": "image-proxy", "id": "image-proxy", "file": "image-proxy.ts", "absPath": "/image-proxy", "__content": "import type { UmiApiRequest, UmiApiResponse } from '@umijs/max';\n\nconst MAX_BYTES = 10 * 1024 * 1024;\nconst PRIVATE_HOST =\n  /^(localhost|0\\.0\\.0\\.0|127\\.|10\\.|192\\.168\\.|169\\.254\\.|172\\.(1[6-9]|2\\d|3[01])\\.|\\[?::1\\]?$|\\[?f[cd])/i;\n\n/**\n * GET /api/image-proxy?url= \u2014 re-serves a remote image from our own origin.\n * html-to-image (projector texture, PNG export) has to read the logo's pixels,\n * which the browser blocks for hosts that don't send Access-Control-Allow-Origin.\n */\nexport default async function (req: UmiApiRequest, res: UmiApiResponse) {\n  let target: URL;\n  try {\n    // req.query leaves values percent-encoded, so read the decoded param from the raw URL\n    const search = String(req.url ?? '').split('?')[1] ?? '';\n    target = new URL(new URLSearchParams(search).get('url') ?? '');\n  } catch {\n    res.status(400).json({ message: 'Invalid url' });\n    return;\n  }\n  if (!/^https?:$/.test(target.protocol) || PRIVATE_HOST.test(target.hostname)) {\n    res.status(400).json({ message: 'Only public http(s) URLs are allowed' });\n    return;\n  }\n\n  try {\n    const upstream = await fetch(target, { redirect: 'follow' });\n    const contentType = upstream.headers.get('content-type') ?? '';\n    if (!upstream.ok || !contentType.startsWith('image/')) {\n      res.status(502).json({ message: `Upstream returned ${upstream.status} ${contentType}` });\n      return;\n    }\n    const body = Buffer.from(await upstream.arrayBuffer());\n    if (body.length > MAX_BYTES) {\n      res.status(413).json({ message: `Image is larger than ${MAX_BYTES / 1024 / 1024} MB` });\n      return;\n    }\n    res\n      .status(200)\n      .header('Content-Type', contentType)\n      .header('Cache-Control', 'public, max-age=86400')\n      .header('Access-Control-Allow-Origin', '*')\n      .end(body);\n  } catch (error: any) {\n    res.status(502).json({ message: error?.message ?? 'Fetch failed' });\n  }\n}\n" }];
 var render_default2 = async (req, res) => {
   const umiReq = new import_apiRoute.UmiApiRequest(req, apiRoutes);
   await umiReq.readBody();
