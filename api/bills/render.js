@@ -162534,12 +162534,12 @@ var WinMart2026 = ({ data, totals, codes, font, t }) => {
     ] }),
     /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { className: "mt-1", children: `${formatDateTime(transaction.dateTime, "DD/MM/YYYY HH:mm")}|MSCH:${store.branch ?? ""}|PTT:${transaction.invoiceNo ?? ""}` }),
     /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { children: `NV:${transaction.cashier ?? ""}|${t("receipt.taxAuthorityCode")}: ${codes.taxAuthorityCode}` }),
-    /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(Text, { className: "mt-1", children: t("receipt.goods") }),
     /* @__PURE__ */ (0, import_jsx_runtime12.jsx)(
       Cells,
       {
+        className: "mt-1",
         cells: [
-          { text: "", flex: 3 },
+          { text: t("receipt.goods"), flex: 3 },
           { text: t("receipt.promo"), ...money3 },
           { text: t("receipt.amountShort"), ...money3 }
         ]
@@ -162551,9 +162551,8 @@ var WinMart2026 = ({ data, totals, codes, font, t }) => {
         Cells,
         {
           cells: [
-            { text: line.quantity, width: s * 1.6 },
-            { text: "x", width: s * 1.2 },
-            { text: formatMoney(line.unitPrice), flex: 2 },
+            // same flex split as the header so KM / T.Tiền line up
+            { text: `${line.quantity} x ${formatMoney(line.unitPrice)}`, flex: 3 },
             { text: line.discount ? `-${formatMoney(line.discount)}` : "", ...money3 },
             { text: formatMoney(line.lineTotal), ...money3 }
           ]

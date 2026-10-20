@@ -194,12 +194,7 @@ export const TransactionInfo: React.FC<{
         </Item>
       </Col>
       {TEXT_FIELDS.filter(({ field }) => isFieldVisible(fields, field)).map((item) => (
-        <Col
-          key={item.field}
-          span={24}
-          // the invoice row carries two buttons, so it gets the full width
-          md={item.field === 'transaction.invoiceNo' ? 24 : 12}
-        >
+        <Col key={item.field} span={24}>
           <Item label={formatMessage({ id: item.id, defaultMessage: item.label })}>
             {item.field === 'transaction.invoiceNo' ? (
               invoiceInput

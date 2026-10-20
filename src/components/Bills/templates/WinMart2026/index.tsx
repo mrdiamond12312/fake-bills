@@ -57,10 +57,10 @@ const WinMart2026: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, 
         codes.taxAuthorityCode
       }`}</Text>
 
-      <Text className="mt-1">{t('receipt.goods')}</Text>
       <Cells
+        className="mt-1"
         cells={[
-          { text: '', flex: 3 },
+          { text: t('receipt.goods'), flex: 3 },
           { text: t('receipt.promo'), ...money },
           { text: t('receipt.amountShort'), ...money },
         ]}
@@ -70,9 +70,8 @@ const WinMart2026: React.FC<TBillTemplateProps> = ({ data, totals, codes, font, 
           <Text>{line.title}</Text>
           <Cells
             cells={[
-              { text: line.quantity, width: s * 1.6 },
-              { text: 'x', width: s * 1.2 },
-              { text: formatMoney(line.unitPrice), flex: 2 },
+              // same flex split as the header so KM / T.Tiền line up
+              { text: `${line.quantity} x ${formatMoney(line.unitPrice)}`, flex: 3 },
               { text: line.discount ? `-${formatMoney(line.discount)}` : '', ...money },
               { text: formatMoney(line.lineTotal), ...money },
             ]}
