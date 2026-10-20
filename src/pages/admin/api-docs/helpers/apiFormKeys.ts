@@ -60,7 +60,7 @@ export const parseBody = (text?: string): TDeepPartialBill | undefined => {
 
 /** Legacy GET shortcuts, still accepted next to the dotted params. */
 export const RENDER_QUERY_PARAMS = [
-  { param: 'payload', sets: 'whole bill as base64url JSON' },
+  { param: 'payload', sets: 'same as data, but base64url-encoded JSON' },
   { param: 'template', sets: 'templateId' },
   { param: 'vat', sets: 'tax.vatRate' },
   { param: 'seed', sets: 'display.seed' },
@@ -92,16 +92,52 @@ export const buildPostBody = (bill: TDeepPartialBill, values: TOutputOptions) =>
   ...outputOptions(values),
 });
 
-export const buildGetCurl = (url: string, format: TApiFormFields['format']) =>
-  `curl -o bill.${format} "${url}"`;
+/** GET with the whole body as one URL-encoded JSON param */
+export const buildDataUrl = (origin: string, bill: TDeepPartialBill, values: TOutputOptions) =>
+  `${origin}${BILL_RENDER_API}?data=${encodeURIComponent(
+    JSON.stringify(buildPostBody(bill, values)),
+  )}`;
+
+// single quotes inside a value would end the shell string
+const shellQuote = (text: string) => `'${text.replace(/'/g, "'\\''")}'`;
+
+/** The query params a GET URL carries, in order */
+const queryOf = (url: string) => [...new URL(url).searchParams.entries()];
+
+/**
+ * `curl -G` with one `--data-urlencode` per param: curl does the encoding, so the command stays
+ * readable (accents as typed, the data JSON pretty-printed).
+ */
+export const buildGetCurl = (url: string, format: TApiFormFields['format']) => {
+  const base = url.split('?')[0];
+  const params = queryOf(url).map(([key, value]) => {
+    const json = key === 'data' ? parseBody(value) : undefined;
+    const text = json ? JSON.stringify(json, null, 2).replace(/\n/g, '\n  ') : value;
+    return `  --data-urlencode ${shellQuote(`${key}=${text}`)}`;
+  });
+  return [`curl -G -o bill.${format} ${base}`, ...params].join(' \\\n');
+};
+
+/**
+ * A GET URL for reading: one param per line, decoded, the data JSON pretty-printed.
+ * Display only; copy the real URL.
+ */
+export const readableUrl = (url: string) => {
+  const params = queryOf(url).map(([key, value], index) => {
+    const json = key === 'data' ? parseBody(value) : undefined;
+    const text = json ? JSON.stringify(json, null, 2).replace(/\n/g, '\n  ') : value;
+    return `  ${index ? '&' : '?'}${key}=${text}`;
+  });
+  return [`GET ${url.split('?')[0]}`, ...params].join('\n');
+};
 
 export const buildPostCurl = (origin: string, bill: TDeepPartialBill, values: TOutputOptions) =>
   [
     `curl -o bill.${values.format} -X POST \\`,
     `  -H 'Content-Type: application/json' \\`,
     `  ${origin}${BILL_RENDER_API} \\`,
-    // single quotes inside the JSON would end the shell string
-    `  -d '${JSON.stringify(buildPostBody(bill, values), null, 2)
-      .replace(/'/g, "'\\''")
-      .replace(/\n/g, '\n  ')}'`,
+    `  -d ${shellQuote(JSON.stringify(buildPostBody(bill, values), null, 2)).replace(
+      /\n/g,
+      '\n  ',
+    )}`,
   ].join('\n');

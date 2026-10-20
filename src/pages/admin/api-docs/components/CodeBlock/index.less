@@ -1,0 +1,117 @@
+// VS Code "Dark+" colours for highlight.js tokens, scoped to the docs code blocks
+.code-editor {
+  --editor-bg: #1e1e1e;
+  --editor-header: #252526;
+  --editor-border: #333333;
+
+  background: var(--editor-bg);
+  color: #d4d4d4;
+
+  .code-editor__header {
+    border-bottom: 1px solid var(--editor-border);
+  }
+
+  .code-editor__tab {
+    background: transparent;
+    border-top: 2px solid transparent;
+    color: #8b8b8b;
+    font-family: inherit;
+
+    &:not(:disabled):hover {
+      color: #d4d4d4;
+    }
+  }
+
+  .code-editor__tab--active {
+    background: var(--editor-bg);
+    border-top-color: #0078d4;
+    color: #ffffff;
+  }
+
+  .code-editor__gutter {
+    // stays put while long lines scroll sideways, like an editor
+    position: sticky;
+    left: 0;
+    background: var(--editor-bg);
+    color: #6e7681;
+    border-right: 1px solid var(--editor-border);
+  }
+
+  .hljs-keyword,
+  .hljs-literal,
+  .hljs-doctag {
+    color: #569cd6;
+  }
+  .hljs-meta,
+  .hljs-meta .hljs-keyword {
+    color: #c586c0;
+  }
+  .hljs-built_in,
+  .hljs-type,
+  .hljs-title.class_,
+  .hljs-title.class_.inherited__ {
+    color: #4ec9b0;
+  }
+  .hljs-title,
+  .hljs-title.function_ {
+    color: #dcdcaa;
+  }
+  .hljs-attr,
+  .hljs-property,
+  .hljs-variable,
+  .hljs-params,
+  .hljs-template-variable {
+    color: #9cdcfe;
+  }
+  .hljs-string,
+  .hljs-meta .hljs-string {
+    color: #ce9178;
+  }
+  .hljs-subst {
+    color: #d4d4d4;
+  }
+  .hljs-number {
+    color: #b5cea8;
+  }
+  .hljs-regexp {
+    color: #d16969;
+  }
+  .hljs-comment,
+  .hljs-quote {
+    color: #6a9955;
+    font-style: italic;
+  }
+  .hljs-punctuation,
+  .hljs-operator {
+    color: #808080;
+  }
+  .hljs-url {
+    color: #4fc1ff;
+  }
+
+  // the playground's JSON input: same editor colours on a plain textarea
+  &.code-editor--input {
+    textarea.ant-input {
+      padding: 12px;
+      color: #d4d4d4;
+      background: var(--editor-bg);
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      caret-color: #aeafad;
+
+      &::placeholder {
+        color: #6e7681;
+      }
+
+      &::selection {
+        background: #264f78;
+      }
+    }
+
+    // keep the invalid-JSON state visible on the dark background
+    textarea.ant-input-status-error {
+      box-shadow: inset 0 0 0 1px #f14c4c;
+    }
+  }
+}

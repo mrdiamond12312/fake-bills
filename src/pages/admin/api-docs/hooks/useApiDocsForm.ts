@@ -4,18 +4,31 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { randomSeed } from '@/components/Bills/helpers/random';
-import { API_BODY_STORAGE_KEY, BILL_DRAFT_STORAGE_KEY, BILL_RENDER_API } from '@/const/bill';
+import {
+  API_BODY_STORAGE_KEY,
+  API_CLIENT_LANGUAGE_STORAGE_KEY,
+  BILL_DRAFT_STORAGE_KEY,
+  BILL_RENDER_API,
+} from '@/const/bill';
+import type { TCodeFile } from '@/pages/admin/api-docs/components/CodeBlock';
 import {
   API_FORM_DEFAULTS,
   API_FORM_KEY,
   TApiFormFields,
+  buildDataUrl,
   buildGetCurl,
   buildPostBody,
   buildPostCurl,
   buildRenderUrl,
   parseBody,
+  readableUrl,
   starterBody,
 } from '@/pages/admin/api-docs/helpers/apiFormKeys';
+import {
+  DOTTED_SNIPPETS,
+  buildClientSnippets,
+} from '@/pages/admin/api-docs/helpers/clientSnippets';
+import { buildRequestType } from '@/pages/admin/api-docs/helpers/requestType';
 import { useApiDocsResolver } from '@/pages/admin/api-docs/hooks/useApiDocsResolver';
 import { readLocalStorage, writeLocalStorage } from '@/utils/local-storage';
 
@@ -66,14 +79,61 @@ export const useApiDocsForm = () => {
   const bill = useMemo(() => parseBody(values.body) ?? {}, [values.body]);
   const examples = useMemo(() => {
     const getUrl = buildRenderUrl(origin, bill, values);
+    const dataUrl = buildDataUrl(origin, bill, values);
+    // runnable curl first, then the URL laid out for reading (copy gives the real one)
+    const getFiles = (url: string): TCodeFile[] => [
+      { key: 'curl', label: 'curl', language: 'bash', code: buildGetCurl(url, values.format) },
+      { key: 'url', label: 'URL', language: 'url', code: readableUrl(url), copyText: url },
+    ];
+    const urlFile = (url: string): TCodeFile[] => [
+      { key: 'url', label: 'URL', language: 'url', code: readableUrl(url), copyText: url },
+    ];
     return {
       getUrl,
-      getCurl: buildGetCurl(getUrl, values.format),
-      postCurl: buildPostCurl(origin, bill, values),
-      listUrl: `${origin}${BILL_RENDER_API}?list=templates`,
-      catalogUrl: `${origin}/api/catalog/products?keyword=banh`,
+      dottedFiles: getFiles(getUrl),
+      dataFiles: getFiles(dataUrl),
+      postFiles: [
+        {
+          key: 'curl',
+          label: 'curl',
+          language: 'bash',
+          code: buildPostCurl(origin, bill, values),
+        },
+      ] as TCodeFile[],
+      clientFiles: buildClientSnippets({
+        api: `${origin}${BILL_RENDER_API}`,
+        body: buildPostBody(bill, values),
+        format: values.format,
+      }).map((snippet): TCodeFile => ({ ...snippet, language: snippet.key })),
+      listFiles: urlFile(`${origin}${BILL_RENDER_API}?list=templates`),
+      catalogFiles: urlFile(`${origin}/api/catalog/products?keyword=banh`),
     };
   }, [origin, bill, values]);
+
+  // only depends on the registry and constants
+  const typeFiles = useMemo(
+    (): TCodeFile[] => [
+      { key: 'type', label: 'TypeScript', language: 'typescript', code: buildRequestType() },
+    ],
+    [],
+  );
+  const dottedHelperFiles = useMemo(
+    () => DOTTED_SNIPPETS.map((snippet): TCodeFile => ({ ...snippet, language: snippet.key })),
+    [],
+  );
+
+  // the client examples and the dotted-params helper share one language tab
+  const [clientLanguage, setClientLanguage] = useState(
+    () => readLocalStorage<string>(API_CLIENT_LANGUAGE_STORAGE_KEY) ?? examples.clientFiles[0].key,
+  );
+  const handleClientLanguageChange = useCallback((key: string) => {
+    setClientLanguage(key);
+    try {
+      writeLocalStorage(API_CLIENT_LANGUAGE_STORAGE_KEY, key);
+    } catch {
+      // only a convenience; the tab still switches
+    }
+  }, []);
 
   const [result, setResult] = useState<TApiTryResult>();
   const [isSending, setIsSending] = useState(false);
@@ -193,6 +253,10 @@ export const useApiDocsForm = () => {
     control: methods.control,
     values,
     examples,
+    typeFiles,
+    dottedHelperFiles,
+    clientLanguage,
+    handleClientLanguageChange,
     result,
     isSending,
     handleSend,

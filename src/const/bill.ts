@@ -29,3 +29,6 @@ export const BILL_DRAFT_STORAGE_KEY = 'receipt-lab.bill-draft';
 
 /** The API page's request-body editor */
 export const API_BODY_STORAGE_KEY = 'receipt-lab.api-body';
+
+/** Last language picked in the API docs client examples */
+export const API_CLIENT_LANGUAGE_STORAGE_KEY = 'receipt-lab.api-client-language';

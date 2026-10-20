@@ -50,22 +50,26 @@ const fromShortcuts = (params: URLSearchParams): TDeepPartialBill => {
 };
 
 /**
- * GET takes everything POST does: the same bill as dotted params (`templateId=…&store.name=…&
- * items.0.title=…`, what the composer's "Copy API link" builds). Later layers win:
- * `payload` (base64url JSON) → legacy shortcuts → dotted params.
+ * GET takes everything POST does, in two ways: `data` (the POST body as URL-encoded JSON) or
+ * dotted params (`templateId=…&store.name=…&items.0.title=…`, what "Copy API link" builds).
+ * Later layers win: `payload` (legacy base64url JSON) → `data` → legacy shortcuts → dotted params.
  */
 const fromQuery = (params: URLSearchParams): TRenderInput => {
   const get = (key: string) => params.get(key) || undefined;
   const payload = get('payload');
-  const layers = [
+  const data = get('data');
+  const layers: TRenderInput[] = [
     payload ? decodePayload(payload) : {},
+    // URLSearchParams has already percent-decoded it
+    data ? JSON.parse(data) : {},
     fromShortcuts(params),
     billFromQuery(params) ?? {},
   ];
+  const merged = layers.reduce<TRenderInput>((acc, layer) => mergeBill(acc, layer), {});
   return {
-    ...layers.reduce<TDeepPartialBill>((acc, layer) => mergeBill(acc, layer), {}),
-    scale: get('scale'),
-    format: get('format'),
+    ...merged,
+    scale: get('scale') ?? merged.scale,
+    format: get('format') ?? merged.format,
   };
 };
 

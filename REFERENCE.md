@@ -133,14 +133,165 @@ Each template definition (`TBillTemplate`) declares:
 
 ## Render API
 
-`GET | POST /api/bills/render` returns `image/png`, or `image/svg+xml` with `format=svg`.
+### Overview
 
-### POST (full control)
+| Endpoint | Returns |
+| --- | --- |
+| `POST /api/bills/render` | The bill image, from a JSON body |
+| `GET /api/bills/render?…` | The bill image, from the query string |
+| `GET /api/bills/render?list=templates` | JSON list of templates: `id`, `name`, `description`, `printerStyle`, `fields` |
+| `GET /api/catalog/products?keyword=` | The built-in demo catalog. Search ignores accents. |
 
-Send any subset of `TBillData` as the JSON body, plus `scale` (1–4, default 2) and `format`:
+**The input is always the same object:** any subset of `TBillData` plus two output options. The full TypeScript type is in [Request body type](#request-body-type). Anything left out falls back to the template's defaults.
+
+| Option | Values | Default |
+| --- | --- | --- |
+| `scale` | `1`–`4` | `2` |
+| `format` | `png` \| `svg` | `png` |
+
+**Response**
+
+- `200` with `image/png` or `image/svg+xml`.
+- Headers `X-Bill-Template` and `X-Bill-Seed` identify the render. Re-sending the same seed gives the same codes.
+- `400 { message }` on bad input. A bill can have at most 200 items.
+- The watermark is always applied. See [Watermark](#watermark).
+
+### Request body type
+
+Copy this into your client to get autocomplete and type checks. Every field is optional. Missing fields come from the template's defaults, and a bill with no `items` prints two sample items.
+
+```ts
+/** Body of POST /api/bills/render, and the JSON in GET `?data=` */
+type BillRenderRequest = {
+  /** Unknown ids fall back to the default template. Live list: GET /api/bills/render?list=templates */
+  templateId?:
+    | 'winmart' | 'winmart-2026' | 'coopmart' | 'circle-k' | 'familymart' | 'aeon'
+    | 'aeon-citimart' | 'lotte-mart' | 'emart' | 'go-tops' | 'farmers-market';
+  store?: {
+    /** Printed exactly as given. Empty → the template's fictional default */
+    name?: string;
+    legalName?: string;
+    branch?: string;
+    address?: string;
+    phone?: string;
+    hotline?: string;
+    taxCode?: string;
+    website?: string;
+    slogan?: string;
+    /** http(s) image URL or data URL. Empty → text wordmark */
+    logoUrl?: string;
+    /** px */
+    logoWidth?: number;
+    logoAlign?: 'left' | 'center' | 'right';
+    showLogo?: boolean;
+  };
+  transaction?: {
+    invoiceNo?: string;
+    posNo?: string;
+    cashier?: string;
+    /** ISO 8601, e.g. '2026-10-20T10:03:00+07:00'. Default: now */
+    dateTime?: string;
+    paymentMethod?: string;
+    /** VND handed over. Empty → exactly the total */
+    amountPaid?: number;
+    customerName?: string;
+    memberCode?: string;
+    /** E-invoice lookup code put in the random QR link (Circle K also prints it) */
+    lookupCode?: string;
+    /** Overrides the value OCR reads as bill_id (Mã CQT or barcode). Empty → generated */
+    billId?: string;
+  };
+  /** Replaces the whole list; there is no per-item merge */
+  items?: {
+    title: string;
+    barcode?: string;
+    unit?: string;
+    /** VND */
+    unitPrice: number;
+    quantity: number;
+    /** Absolute VND off the line */
+    discount?: number;
+  }[];
+  tax?: {
+    /** Percent. Default 10 */
+    vatRate?: number;
+    /** true (default) → prices already include VAT; false → VAT added on top */
+    priceIncludesVat?: boolean;
+  };
+  display?: {
+    /** Language of the printed labels. Default 'vi' */
+    language?: 'vi' | 'en';
+    /** Overrides the template's font */
+    fontId?:
+      | 'inconsolata-condensed' | 'vt323' | 'ibm-plex-mono' | 'roboto-condensed'
+      | 'arimo' | 'archivo-narrow' | 'tinos' | 'open-sans';
+    /** Base font size, px */
+    fontSize?: number;
+    /** Paper width, px (58 mm ≈ 384, 80 mm ≈ 576) */
+    paperWidth?: number;
+    /** Same seed → same QR, barcode and generated codes. Default: random */
+    seed?: string;
+    /** QR content. Empty → random from the seed */
+    qrText?: string;
+    /** Code 128 content, printable ASCII ≤ 80. Empty → from the seed */
+    barcodeText?: string;
+    showQr?: boolean;
+    showBarcode?: boolean;
+    /** 0.45 (faded) – 1 (crisp). Default 1 */
+    inkDensity?: number;
+    /** Cut item names to about N printed lines + "...". Decimals ok; 0 = full. Default 0 */
+    itemNameLines?: number;
+    /** Always rendered. Values are clamped and the SAMPLE mark is always kept */
+    watermark?: {
+      text?: string;
+      /** 0.08 – 0.6, default 0.14 */
+      opacity?: number;
+      /** px, 12 – 64, default 22 */
+      size?: number;
+      /** degrees, -90 – 90, default -30 */
+      angle?: number;
+      /** 0.6 – 2, default 1 */
+      spacing?: number;
+      /** CSS colour, default '#b3261e' */
+      color?: string;
+    };
+  };
+  footerNote?: string;
+
+  /** Output zoom, 1 – 4. Default 2 */
+  scale?: number;
+  /** Default 'png' */
+  format?: 'png' | 'svg';
+};
+
+/** GET /api/bills/render?list=templates */
+type BillTemplateInfo = {
+  id: string;
+  name: string;
+  description: string;
+  printerStyle: string;
+  /** Optional form fields this template prints, e.g. 'store.address', 'item.discount' */
+  fields: string[];
+};
+```
+
+The source types are `TBillData` in `src/components/Bills/types.ts` and `TDeepPartialBill` in `src/components/Bills/helpers/normalize.ts`. Update the block above when they change.
+
+### Ways to send the bill
+
+| Way | Use it when | Example |
+| --- | --- | --- |
+| 1. **POST** JSON body | Calling from code. No size limit. | `-d '{"templateId":"winmart-2026",…}'` |
+| 2. **GET `data`** | You need a URL and have an object in code | `?data=%7B%22templateId%22…` |
+| 3. **GET dotted params** | Writing or editing a link by hand | `?templateId=winmart-2026&store.name=…` |
+
+All three accept the same fields. URLs over about 8–16 KB (many items, uploaded data-URL logos) get rejected by servers and proxies, so use POST for big bills.
+
+#### 1. POST
 
 ```bash
-curl -o bill.png -X POST -H 'Content-Type: application/json' http://localhost:8000/api/bills/render -d '{
+curl -o bill.png -X POST -H 'Content-Type: application/json' \
+  http://localhost:8000/api/bills/render -d '{
   "templateId": "coopmart",
   "store": { "name": "My Test Mart", "logoUrl": "https://example.com/logo.png" },
   "items": [{ "title": "Bánh mì", "barcode": "8930000000017", "unitPrice": 15000, "quantity": 2 }],
@@ -150,9 +301,31 @@ curl -o bill.png -X POST -H 'Content-Type: application/json' http://localhost:80
 }'
 ```
 
-### GET (same power as POST)
+#### 2. GET with `data`
 
-Every `TBillData` field works as a dotted param, in the same format as the composer's page link. **Copy API link** in the composer copies the current bill this way, uploaded logos included:
+`data` is the POST body as URL-encoded JSON (OpenAPI calls this a `content: application/json` parameter). `scale` and `format` can go inside it or next to it.
+
+```js
+const bill = {
+  templateId: 'winmart-2026',
+  store: { name: 'My Test Mart' },
+  items: [{ title: 'Bánh mì', unitPrice: 15000, quantity: 2 }],
+  display: { seed: 'run42' },
+  scale: 2,
+};
+const url = `http://localhost:8000/api/bills/render?data=${encodeURIComponent(JSON.stringify(bill))}`;
+```
+
+```python
+import json
+from urllib.parse import quote
+
+url = 'http://localhost:8000/api/bills/render?data=' + quote(json.dumps(bill, ensure_ascii=False))
+```
+
+#### 3. GET with dotted params
+
+Each field is one param, named by its path: nested keys joined with `.`, array items by index. This is the same format as the composer's page link, and **Copy API link** in the composer builds it from the current bill, uploaded logos included.
 
 ```bash
 curl -o bill.png "http://localhost:8000/api/bills/render?templateId=winmart-2026\
@@ -161,34 +334,283 @@ curl -o bill.png "http://localhost:8000/api/bills/render?templateId=winmart-2026
 &display.seed=run42&display.itemNameLines=1&display.watermark.opacity=0.2&scale=2"
 ```
 
-- Roots: `templateId`, `store.*`, `transaction.*`, `items.N.*`, `tax.*`, `display.*` (including `display.watermark.*`), `footerNote`.
-- Values are typed from a normalized bill of the template, so numbers and `true`/`false` come back as numbers and booleans. Any `items.N.*` param replaces the whole item list.
-- `scale` (1–4, default 2) and `format` (`png` | `svg`) are output options.
-- Very long bills (many items, uploaded logos) can exceed URL limits of about 8–16 KB. Use POST for those.
+| Rule | Example |
+| --- | --- |
+| Roots: `templateId`, `store`, `transaction`, `items`, `tax`, `display`, `footerNote` | `store.name=My%20Mart` |
+| Nested objects use `.` | `display.watermark.opacity=0.2` |
+| Array items use their index | `items.0.title=…&items.1.title=…` |
+| Numbers and `true`/`false` are typed from the template's defaults | `tax.vatRate=8`, `display.showQr=false` |
+| Any `items.N.*` param replaces the whole item list | |
+| `scale` and `format` are plain params | `scale=2&format=svg` |
 
-Older links still work. Layers apply in order, and later ones win: `payload` → shortcuts → dotted params.
+Dotted params are this API's own convention, not a standard. `qs.stringify` writes brackets (`items[0][title]`), which this API doesn't read. To generate dotted params from an object, flatten it yourself, or use way 2 instead:
 
-| Param      | Sets                              |
-| ---------- | --------------------------------- |
-| `payload`  | full bill as base64url JSON       |
-| `template` | `templateId`                      |
-| `vat`      | `tax.vatRate`                     |
-| `seed`     | `display.seed`                    |
+```js
+const toDotted = (value, prefix = '', out = new URLSearchParams()) => {
+  if (value === undefined || value === null) return out;
+  if (typeof value === 'object') {
+    Object.entries(value).forEach(([key, child]) => toDotted(child, prefix ? `${prefix}.${key}` : key, out));
+  } else {
+    out.append(prefix, String(value));
+  }
+  return out;
+};
+
+const url = `http://localhost:8000/api/bills/render?${toDotted(bill)}`;
+// …?templateId=winmart-2026&store.name=My+Test+Mart&items.0.title=B%C3%A1nh+m%C3%AC&…
+```
+
+### Client examples
+
+Each example sends the same bill. It POSTs it and saves `bill.png`, then builds the equivalent GET `data` URL. Only standard libraries are used. Replace `http://localhost:8000` with your deployment.
+
+<details>
+<summary><b>TypeScript / JavaScript</b> (Node 18+ or browser)</summary>
+
+```ts
+const API = 'http://localhost:8000/api/bills/render';
+
+const bill: BillRenderRequest = {
+  templateId: 'winmart-2026',
+  store: { name: 'My Test Mart' },
+  items: [{ title: 'Bánh mì', unitPrice: 15000, quantity: 2 }],
+  display: { seed: 'run42' },
+  scale: 2,
+};
+
+// POST
+const res = await fetch(API, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(bill),
+});
+if (!res.ok) throw new Error((await res.json()).message);
+const png = new Uint8Array(await res.arrayBuffer());
+// Node: (await import('node:fs/promises')).writeFile('bill.png', png)
+// Browser: URL.createObjectURL(new Blob([png], { type: 'image/png' }))
+
+// GET
+const url = `${API}?data=${encodeURIComponent(JSON.stringify(bill))}`;
+```
+
+</details>
+
+<details>
+<summary><b>Python</b> (3.8+)</summary>
+
+```python
+import json
+import urllib.request
+from urllib.parse import quote
+
+API = 'http://localhost:8000/api/bills/render'
+
+bill = {
+    'templateId': 'winmart-2026',
+    'store': {'name': 'My Test Mart'},
+    'items': [{'title': 'Bánh mì', 'unitPrice': 15000, 'quantity': 2}],
+    'display': {'seed': 'run42'},
+    'scale': 2,
+}
+
+# POST (raises HTTPError on 400; the body has {"message": ...})
+req = urllib.request.Request(
+    API,
+    data=json.dumps(bill).encode(),
+    headers={'Content-Type': 'application/json'},
+    method='POST',
+)
+with urllib.request.urlopen(req) as res, open('bill.png', 'wb') as f:
+    f.write(res.read())
+
+# GET
+url = f'{API}?data={quote(json.dumps(bill, ensure_ascii=False))}'
+```
+
+With `requests`: `requests.post(API, json=bill).content`, and `requests.get(API, params={'data': json.dumps(bill)})`.
+
+</details>
+
+<details>
+<summary><b>Go</b></summary>
+
+```go
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
+)
+
+const api = "http://localhost:8000/api/bills/render"
+
+func main() {
+	bill := map[string]any{
+		"templateId": "winmart-2026",
+		"store":      map[string]any{"name": "My Test Mart"},
+		"items":      []map[string]any{{"title": "Bánh mì", "unitPrice": 15000, "quantity": 2}},
+		"display":    map[string]any{"seed": "run42"},
+		"scale":      2,
+	}
+	body, _ := json.Marshal(bill)
+
+	// POST
+	res, err := http.Post(api, "application/json", bytes.NewReader(body))
+	if err != nil {
+		panic(err)
+	}
+	defer res.Body.Close()
+	png, _ := io.ReadAll(res.Body)
+	if res.StatusCode != http.StatusOK {
+		panic(string(png)) // {"message": ...}
+	}
+	os.WriteFile("bill.png", png, 0o644)
+
+	// GET
+	fmt.Println(api + "?data=" + url.QueryEscape(string(body)))
+}
+```
+
+</details>
+
+<details>
+<summary><b>Java</b> (15+)</summary>
+
+```java
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+
+public class RenderBill {
+  static final String API = "http://localhost:8000/api/bills/render";
+
+  public static void main(String[] args) throws Exception {
+    // Build this with Jackson/Gson in real code
+    String bill = """
+        {"templateId":"winmart-2026","store":{"name":"My Test Mart"},
+         "items":[{"title":"Bánh mì","unitPrice":15000,"quantity":2}],
+         "display":{"seed":"run42"},"scale":2}""";
+
+    // POST
+    HttpRequest req = HttpRequest.newBuilder(URI.create(API))
+        .header("Content-Type", "application/json")
+        .POST(HttpRequest.BodyPublishers.ofString(bill, StandardCharsets.UTF_8))
+        .build();
+    HttpResponse<Path> res = HttpClient.newHttpClient()
+        .send(req, HttpResponse.BodyHandlers.ofFile(Path.of("bill.png")));
+    if (res.statusCode() != 200) throw new RuntimeException("Render failed: " + res.statusCode());
+
+    // GET (URLEncoder writes spaces as '+', which the API also accepts)
+    String url = API + "?data=" + URLEncoder.encode(bill, StandardCharsets.UTF_8);
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>C#</b> (.NET 6+)</summary>
+
+```csharp
+using System.Net.Http.Json;
+
+const string Api = "http://localhost:8000/api/bills/render";
+
+var bill = new
+{
+    templateId = "winmart-2026",
+    store = new { name = "My Test Mart" },
+    items = new[] { new { title = "Bánh mì", unitPrice = 15000, quantity = 2 } },
+    display = new { seed = "run42" },
+    scale = 2,
+};
+
+using var http = new HttpClient();
+
+// POST
+var res = await http.PostAsJsonAsync(Api, bill);
+if (!res.IsSuccessStatusCode) throw new Exception(await res.Content.ReadAsStringAsync());
+await File.WriteAllBytesAsync("bill.png", await res.Content.ReadAsByteArrayAsync());
+
+// GET
+var url = $"{Api}?data={Uri.EscapeDataString(System.Text.Json.JsonSerializer.Serialize(bill))}";
+```
+
+</details>
+
+<details>
+<summary><b>PHP</b></summary>
+
+```php
+<?php
+$api = 'http://localhost:8000/api/bills/render';
+
+$bill = [
+    'templateId' => 'winmart-2026',
+    'store' => ['name' => 'My Test Mart'],
+    'items' => [['title' => 'Bánh mì', 'unitPrice' => 15000, 'quantity' => 2]],
+    'display' => ['seed' => 'run42'],
+    'scale' => 2,
+];
+$json = json_encode($bill, JSON_UNESCAPED_UNICODE);
+
+// POST
+$ch = curl_init($api);
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_POSTFIELDS => $json,
+    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+    CURLOPT_RETURNTRANSFER => true,
+]);
+$png = curl_exec($ch);
+if (curl_getinfo($ch, CURLINFO_HTTP_CODE) !== 200) {
+    throw new RuntimeException($png);
+}
+file_put_contents('bill.png', $png);
+
+// GET (http_build_query would write brackets, so encode the JSON yourself)
+$url = $api . '?data=' . rawurlencode($json);
+```
+
+</details>
+
+### Combining and legacy params
+
+GET params are applied in layers. When the same field is set twice, the later layer wins:
+
+1. `payload` (legacy)
+2. `data`
+3. legacy shortcuts
+4. dotted params
+
+So you can send a base bill in `data` and override single fields with dotted params: `?data=…&store.name=Other%20Mart`.
+
+Legacy params are kept so old links keep working. Don't use them for new code.
+
+| Param | Same as |
+| --- | --- |
+| `payload` | `data`, but base64url-encoded JSON |
+| `template` | `templateId` |
+| `vat` | `tax.vatRate` |
+| `seed` | `display.seed` |
 | `language` | `display.language` (`vi` \| `en`) |
-| `name`     | `store.name`                      |
-| `logo`     | `store.logoUrl`                   |
-| `cashier`  | `transaction.cashier`             |
-| `invoice`  | `transaction.invoiceNo`           |
-| `billId`   | `transaction.billId`              |
-| `qr`       | `display.qrText`                  |
-| `barcode`  | `display.barcodeText`             |
-| `items`    | `items` (JSON array)              |
-
-Response headers `X-Bill-Template` and `X-Bill-Seed` identify the render. Errors return `400 { message }`. A bill can have at most 200 items.
-
-### Other endpoints
-
-- `GET /api/catalog/products?keyword=`: the built-in demo catalog. Search ignores accents.
+| `name` | `store.name` |
+| `logo` | `store.logoUrl` |
+| `cashier` | `transaction.cashier` |
+| `invoice` | `transaction.invoiceNo` |
+| `billId` | `transaction.billId` |
+| `qr` | `display.qrText` |
+| `barcode` | `display.barcodeText` |
+| `items` | `items` (JSON array) |
 
 ---
 

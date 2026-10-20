@@ -1,4 +1,28 @@
 export const billsLocale = {
+  'apiDocs.clients.intro':
+    'The playground bill sent with POST (saved to a file), then the same bill as a GET data URL. Standard libraries only.',
+  'apiDocs.legacy.intro':
+    'These older params keep old links working. Use data or dotted params in new code.',
+  'apiDocs.legacy.layers':
+    'GET params apply in layers, later ones win: payload → data → legacy shortcuts → dotted params. So data=…&store.name=Other%20Mart sends a base bill and overrides one field.',
+  'apiDocs.section.clients': 'Client examples',
+  'apiDocs.section.legacy': 'Combining & legacy params',
+  'apiDocs.section.types': 'Request body type',
+  'apiDocs.section.ways': 'Ways to send the bill',
+  'apiDocs.types.intro':
+    'Copy this into your client for autocomplete and type checks. Every field is optional; anything left out comes from the template defaults.',
+  'apiDocs.ways.data.hint':
+    'You need a URL and already have the bill as an object: data=encodeURIComponent(JSON.stringify(bill)). scale and format can go inside it or next to it.',
+  'apiDocs.ways.data.title': '2. GET with data',
+  'apiDocs.ways.dotted.hint':
+    'Writing or editing a link by hand: templateId=…&store.name=…&items.0.title=…, plus scale and format. Numbers and true/false come back typed, and any items.N.* param replaces the whole list. "Copy API link" in the composer builds one for the current bill.',
+  'apiDocs.ways.dotted.helper':
+    "Building dotted params from an object in code: flatten it with a helper like this. Libraries such as qs or http_build_query write brackets (items[0][title]), which the API doesn't read.",
+  'apiDocs.ways.dotted.title': '3. GET with dotted params',
+  'apiDocs.ways.intro':
+    'All three take the same fields and give the same image. The examples follow the playground body above. URLs past about 8–16 KB get refused, so use POST for big bills.',
+  'apiDocs.ways.post.hint': 'Calling from code. No size limit. scale and format go in the body.',
+  'apiDocs.ways.post.title': '1. POST a JSON body',
   'apiDocs.body.format': 'Format',
   'apiDocs.body.fromComposer': 'From composer',
   'apiDocs.body.fromComposer.hint': 'Copies the current Bill composer draft into the editor',
@@ -19,29 +43,22 @@ export const billsLocale = {
   'apiDocs.col.returns': 'Returns',
   'apiDocs.col.sets': 'Sets',
   'apiDocs.copied': 'Copied',
+  'apiDocs.copy.encoded': 'Copy (URL-encoded)',
   'apiDocs.copy': 'Copy',
   'apiDocs.endpoints.catalog': 'Searches the built-in demo catalog; accents are ignored (JSON)',
   'apiDocs.endpoints.render': 'Renders a receipt → image/png (or image/svg+xml with format=svg)',
   'apiDocs.endpoints.templates': 'Lists template ids, names and the fields each prints (JSON)',
-  'apiDocs.get.intro':
-    'Every bill field works as a dotted param, the same format as the composer page link: templateId=…&store.name=…&items.0.title=…&display.watermark.opacity=…, plus scale and format. Numbers and true/false come back typed. "Copy API link" in the composer builds one for the current bill.',
-  'apiDocs.get.legacy':
-    'Older shortcuts still work. Layers apply in order, later ones win: payload → shortcuts → dotted params.',
   'apiDocs.overview.intro':
     'The API draws a receipt with the same templates, fonts and codes as the composer, server-side (satori → resvg). Send only the fields you want to change; everything else comes from the template defaults. The same seed always gives the same QR, barcode and lookup codes.',
   'apiDocs.overview.watermark':
     'Every response carries the tiled SAMPLE watermark. display.watermark can tune it (opacity ≥ 0.08) but not remove it.',
-  'apiDocs.post.intro':
-    'Send any subset of the bill as the JSON body (templateId, store, transaction, items, tax, display, footerNote), plus scale and format. This example follows the playground body above.',
   'apiDocs.responses.error': 'JSON with a message field describing what went wrong.',
   'apiDocs.responses.items': 'At most 200 items per bill. scale is clamped to 1–4.',
   'apiDocs.responses.logo':
     'Logos: pass an image URL in store.logoUrl (or logo=). Data URLs work in GET too but make very long links; prefer POST for those.',
   'apiDocs.responses.ok':
     'The image. Headers X-Bill-Template and X-Bill-Seed identify the render; reuse the seed to reproduce it.',
-  'apiDocs.section.get': 'GET: same power as POST',
   'apiDocs.section.overview': 'Overview',
-  'apiDocs.section.post': 'POST: full control',
   'apiDocs.section.responses': 'Responses & limits',
   'apiDocs.section.try': 'Try it',
   'apiDocs.subtitle': 'Render the same sample receipts over HTTP',
@@ -51,7 +68,7 @@ export const billsLocale = {
   'apiDocs.try.size': 'Size',
   'apiDocs.try.time': 'Time',
   'apiDocs.validation.items': 'At most {max} items per bill',
-  'apiDocs.validation.json': 'The body must be a JSON object, e.g. { "templateId": "winmart" }',
+  'apiDocs.validation.json': 'The body must be a JSON object, e.g. \'{ "templateId": "winmart" }\'',
   'bills.actions.copyApiUrl': 'Copy API link',
   'bills.actions.copyApiUrl.done': 'API link copied ({length} chars)',
   'bills.actions.copyApiUrl.long':

@@ -26,22 +26,25 @@ pnpm start            # http://localhost:8000/admin/bills/create
 
 ## API
 
-`GET|POST /api/bills/render` returns `image/png` (or SVG with `format=svg`).
+`GET|POST /api/bills/render` returns `image/png` (or SVG with `format=svg`). Send any part of the bill (same shape as the form); anything missing falls back to the template defaults.
 
 ```bash
-# query shortcuts
-curl -o bill.png "http://localhost:8000/api/bills/render?template=winmart&vat=8&seed=run42&name=Test%20Store&scale=2"
-
-# full bill as JSON (same shape as the form; anything missing falls back to the template defaults)
+# 1. POST a JSON body
 curl -o bill.png -X POST -H 'Content-Type: application/json' \
   -d '{"templateId":"coopmart","items":[{"title":"Bánh mì","barcode":"8930000000017","unitPrice":15000,"quantity":2}],"tax":{"vatRate":10},"display":{"seed":"run42"},"scale":2}' \
   http://localhost:8000/api/bills/render
+
+# 2. GET with the same JSON, URL-encoded: ?data=<encodeURIComponent(JSON.stringify(bill))>
+curl -o bill.png "http://localhost:8000/api/bills/render?data=%7B%22templateId%22%3A%22winmart-2026%22%2C%22display%22%3A%7B%22seed%22%3A%22run42%22%7D%7D"
+
+# 3. GET with dotted params (what the composer's "Copy API link" builds)
+curl -o bill.png "http://localhost:8000/api/bills/render?templateId=winmart-2026&store.name=Test%20Store&tax.vatRate=8&display.seed=run42&scale=2"
 
 # list templates and the fields each one prints
 curl "http://localhost:8000/api/bills/render?list=templates"
 ```
 
-`logo=<image URL>` sets the logo src; `qr=` and `barcode=` set the code contents (empty → random from the seed). GET also accepts `payload=<base64url JSON>`. The **copy link** button in the preview builds that URL from the current form. Response headers `X-Bill-Template` and `X-Bill-Seed` identify the render. The API returns the flat receipt only; projector effects are browser-only for now.
+Response headers `X-Bill-Template` and `X-Bill-Seed` identify the render. The API returns the flat receipt only; projector effects are browser-only for now. Full rules, legacy params and helpers: [REFERENCE.md → Render API](REFERENCE.md#render-api).
 
 `GET /api/catalog/products?keyword=` returns the built-in sample catalog (accent-insensitive search).
 

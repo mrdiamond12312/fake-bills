@@ -21,6 +21,10 @@ const AdminApiDocs: React.FC = () => {
     control,
     values,
     examples,
+    typeFiles,
+    dottedHelperFiles,
+    clientLanguage,
+    handleClientLanguageChange,
     result,
     isSending,
     handleSend,
@@ -132,30 +136,115 @@ const AdminApiDocs: React.FC = () => {
               onShuffleSeed={handleShuffleSeed}
             />
           </FormProvider>
-          <Flex vertical gap={12} className="mt-6">
-            {values.method === 'GET' ? (
-              <>
-                <CodeBlock label="GET URL" code={examples.getUrl} onCopy={handleCopy} />
-                <CodeBlock label="curl" code={examples.getCurl} onCopy={handleCopy} />
-              </>
-            ) : (
-              <CodeBlock label="curl" code={examples.postCurl} onCopy={handleCopy} />
-            )}
+          <Flex vertical className="mt-6">
+            <CodeBlock
+              // remount on method switch so the tab resets to curl
+              key={values.method}
+              files={values.method === 'GET' ? examples.dottedFiles : examples.postFiles}
+              onCopy={handleCopy}
+            />
           </Flex>
         </Card>
 
-        <Card title={t('apiDocs.section.get', 'GET: same power as POST')}>
+        <Card title={t('apiDocs.section.ways', 'Ways to send the bill')}>
           <Typography.Paragraph type="secondary">
             {t(
-              'apiDocs.get.intro',
-              'Every bill field works as a dotted param, the same format as the composer page link: templateId=…&store.name=…&items.0.title=…&display.watermark.opacity=…, plus scale and format. Numbers and true/false come back typed. "Copy API link" in the composer builds one for the current bill.',
+              'apiDocs.ways.intro',
+              'All three take the same fields and give the same image. The examples follow the playground body above. URLs past about 8–16 KB get refused, so use POST for big bills.',
             )}
           </Typography.Paragraph>
-          <CodeBlock label="GET" code={examples.getUrl} onCopy={handleCopy} />
-          <Typography.Paragraph type="secondary" className="!mt-4">
+          <Flex vertical gap={20}>
+            {[
+              {
+                key: 'post',
+                title: t('apiDocs.ways.post.title', '1. POST a JSON body'),
+                hint: t(
+                  'apiDocs.ways.post.hint',
+                  'Calling from code. No size limit. scale and format go in the body.',
+                ),
+                files: examples.postFiles,
+              },
+              {
+                key: 'data',
+                title: t('apiDocs.ways.data.title', '2. GET with data'),
+                hint: t(
+                  'apiDocs.ways.data.hint',
+                  'You need a URL and already have the bill as an object: data=encodeURIComponent(JSON.stringify(bill)). scale and format can go inside it or next to it.',
+                ),
+                files: examples.dataFiles,
+              },
+              {
+                key: 'dotted',
+                title: t('apiDocs.ways.dotted.title', '3. GET with dotted params'),
+                hint: t(
+                  'apiDocs.ways.dotted.hint',
+                  'Writing or editing a link by hand: templateId=…&store.name=…&items.0.title=…, plus scale and format. Numbers and true/false come back typed, and any items.N.* param replaces the whole list. "Copy API link" in the composer builds one for the current bill.',
+                ),
+                files: examples.dottedFiles,
+                extra: (
+                  <>
+                    <Typography.Text type="secondary" className="mt-2">
+                      {t(
+                        'apiDocs.ways.dotted.helper',
+                        "Building dotted params from an object in code: flatten it with a helper like this. Libraries such as qs or http_build_query write brackets (items[0][title]), which the API doesn't read.",
+                      )}
+                    </Typography.Text>
+                    <CodeBlock
+                      files={dottedHelperFiles}
+                      activeKey={clientLanguage}
+                      onActiveChange={handleClientLanguageChange}
+                      onCopy={handleCopy}
+                    />
+                  </>
+                ),
+              },
+            ].map((way) => (
+              <Flex vertical gap={8} key={way.key}>
+                <Typography.Text strong>{way.title}</Typography.Text>
+                <Typography.Text type="secondary">{way.hint}</Typography.Text>
+                <CodeBlock files={way.files} onCopy={handleCopy} />
+                {'extra' in way ? way.extra : null}
+              </Flex>
+            ))}
+          </Flex>
+        </Card>
+
+        <Card title={t('apiDocs.section.types', 'Request body type')}>
+          <Typography.Paragraph type="secondary">
             {t(
-              'apiDocs.get.legacy',
-              'Older shortcuts still work. Layers apply in order, later ones win: payload → shortcuts → dotted params.',
+              'apiDocs.types.intro',
+              'Copy this into your client for autocomplete and type checks. Every field is optional; anything left out comes from the template defaults.',
+            )}
+          </Typography.Paragraph>
+          <CodeBlock files={typeFiles} onCopy={handleCopy} />
+        </Card>
+
+        <Card title={t('apiDocs.section.clients', 'Client examples')}>
+          <Typography.Paragraph type="secondary">
+            {t(
+              'apiDocs.clients.intro',
+              'The playground bill sent with POST (saved to a file), then the same bill as a GET data URL. Standard libraries only.',
+            )}
+          </Typography.Paragraph>
+          <CodeBlock
+            files={examples.clientFiles}
+            activeKey={clientLanguage}
+            onActiveChange={handleClientLanguageChange}
+            onCopy={handleCopy}
+          />
+        </Card>
+
+        <Card title={t('apiDocs.section.legacy', 'Combining & legacy params')}>
+          <Typography.Paragraph type="secondary">
+            {t(
+              'apiDocs.legacy.layers',
+              'GET params apply in layers, later ones win: payload → data → legacy shortcuts → dotted params. So data=…&store.name=Other%20Mart sends a base bill and overrides one field.',
+            )}
+          </Typography.Paragraph>
+          <Typography.Paragraph type="secondary">
+            {t(
+              'apiDocs.legacy.intro',
+              'These older params keep old links working. Use data or dotted params in new code.',
             )}
           </Typography.Paragraph>
           <Table
@@ -173,16 +262,6 @@ const AdminApiDocs: React.FC = () => {
               { title: t('apiDocs.col.sets', 'Sets'), dataIndex: 'sets' },
             ]}
           />
-        </Card>
-
-        <Card title={t('apiDocs.section.post', 'POST: full control')}>
-          <Typography.Paragraph type="secondary">
-            {t(
-              'apiDocs.post.intro',
-              'Send any subset of the bill as the JSON body (templateId, store, transaction, items, tax, display, footerNote), plus scale and format. This example follows the playground body above.',
-            )}
-          </Typography.Paragraph>
-          <CodeBlock label="curl" code={examples.postCurl} onCopy={handleCopy} />
         </Card>
 
         <Card title={t('apiDocs.section.responses', 'Responses & limits')}>
@@ -212,8 +291,8 @@ const AdminApiDocs: React.FC = () => {
             </li>
           </ul>
           <Flex vertical gap={12} className="mt-4">
-            <CodeBlock label="GET" code={examples.listUrl} onCopy={handleCopy} />
-            <CodeBlock label="GET" code={examples.catalogUrl} onCopy={handleCopy} />
+            <CodeBlock files={examples.listFiles} onCopy={handleCopy} />
+            <CodeBlock files={examples.catalogFiles} onCopy={handleCopy} />
           </Flex>
         </Card>
       </div>

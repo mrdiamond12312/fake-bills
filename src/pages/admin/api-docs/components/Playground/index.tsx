@@ -25,6 +25,8 @@ import { BILL_RENDER_API } from '@/const/bill';
 import { API_FORM_KEY, TApiMethod } from '@/pages/admin/api-docs/helpers/apiFormKeys';
 import { LONG_URL, type TApiTryResult } from '@/pages/admin/api-docs/hooks/useApiDocsForm';
 
+import '@/pages/admin/api-docs/components/CodeBlock/index.less';
+
 const { Item } = Form;
 
 type TPlayground = {
@@ -145,13 +147,20 @@ export const Playground: React.FC<TPlayground> = ({
                 {t('apiDocs.body.shuffleSeed', 'New seed')}
               </Button>
             </Flex>
-            <TextArea
-              control={control}
-              name={API_FORM_KEY.body}
-              spellCheck={false}
-              autoSize={{ minRows: 14, maxRows: 32 }}
-              className="font-mono text-body-3-regular"
-            />
+            <Flex vertical className="code-editor code-editor--input overflow-hidden rounded-lg">
+              <Flex className="code-editor__header pt-1">
+                <span className="code-editor__tab code-editor__tab--active rounded-t px-3 py-1 font-mono text-body-3-regular">
+                  bill.json
+                </span>
+              </Flex>
+              <TextArea
+                control={control}
+                name={API_FORM_KEY.body}
+                spellCheck={false}
+                autoSize={{ minRows: 14, maxRows: 32 }}
+                className="font-mono text-body-3-regular"
+              />
+            </Flex>
           </Item>
           {method === 'GET' && getUrlLength > LONG_URL ? (
             <Alert

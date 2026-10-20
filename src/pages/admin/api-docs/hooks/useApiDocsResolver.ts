@@ -22,7 +22,7 @@ export const useApiDocsResolver = () => {
         'json',
         formatMessage({
           id: 'apiDocs.validation.json',
-          defaultMessage: 'The body must be a JSON object, e.g. { "templateId": "winmart" }',
+          defaultMessage: 'The body must be a JSON object, e.g. \'{ "templateId": "winmart" }\'',
         }),
         (value) => parseBody(value) !== undefined,
       )
